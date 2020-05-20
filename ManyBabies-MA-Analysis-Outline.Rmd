@@ -1,0 +1,153 @@
+---
+title: "Analysis outline"
+author: "Christina Bergmann"
+date: "2020-5-19"
+output: html_document
+---
+
+```{r, setup}
+library(tidyverse)
+library(metafor)
+
+#Helper function from MB1 code
+
+d_var_calc <- function(n, d) {
+  return((2/n) + (d ^ 2 / (4 * n)))
+}
+
+```
+
+
+## Goals / Hypotheses
+
+(MB = ManyBabies data, MA = Meta-Analysis)
+
+1. Quantify (descriptively) the relation between replications and meta-analyses:
+
+-- MA: Inform design choices for replications  
+-- MA: Help interpret replication results  
+-- Replications: Test predictions of MA in a controlled way (think MB1 age effect)  
+-- Replications: Broaden sample   
+
+2. Reassess with a new dataset whether:
+
+-- There is indeed a systematic difference between MA and RRR (i.e. introduce "Replication" as moderator in a joint analysis)
+-> Open question: Is MB1 *one* very precise datapoint or does each lab sample count? The latter is more in line with the MB analysis.  
+-- Matching datasets removes any RRR effect
+-> Open question: How to define matching? I.e. either introducing all relevant moderatoes or subsetting? 
+-- We can actually predict the result of MB1 / of MB1 moderator analyses (i.e. towards the Bayesian analyses already done)
+
+
+## Read in and clean data 
+```{r}
+#This is the updated spreadsheet from Google drive 
+
+MAdataset_url = "https://docs.google.com/spreadsheets/d/1E2eGPYfTPlpbJZveSrJe6H3uf4KV1TbCClzAacMs_uo/export?id=1E2eGPYfTPlpbJZveSrJe6H3uf4KV1TbCClzAacMs_uo&format=csv"
+MA = MAdataset_url %>%
+    httr::GET() %>%
+    httr::content(col_names = TRUE, col_types = NULL, encoding = "UTF-8")
+
+names(MA)
+
+# The final ManyBabies1 dataset from the public github repository, plus the processing pipeline from the paper
+MB1 = read.csv(file = "https://raw.githubusercontent.com/manybabies/mb1-analysis-public/master/processed_data/03_data_diff_main.csv") %>%
+  mutate(method = as.character(method)) %>% # Needed to add this line to the MB1 code
+  mutate(method = case_when(
+    method == "singlescreen" ~ "Central fixation",
+    method == "eyetracking" ~ "Eye tracking",
+    method == "hpp" ~ "HPP",
+    TRUE ~ method)) 
+ordered_ages <- c("3-6 mo", "6-9 mo", "9-12 mo", "12-15 mo")
+MB1$age_group <- fct_relevel(MB1$age_group, ordered_ages)
+
+ages <- MB1 %>%
+  group_by(lab, age_group, method, nae, subid) %>%
+  summarise(age_mo = mean(age_mo)) %>%
+  summarise(age_mo = mean(age_mo))
+
+```
+
+Compute effect sizes: ManyBabies1 data
+
+```{r}
+ds_zt <- MB1 %>%
+  group_by(lab, age_group, method, nae, subid) %>%
+  summarise(d = mean(diff, na.rm = TRUE)) %>%
+  group_by(lab, age_group, method, nae) %>%
+  summarise(d_z = mean(d, na.rm = TRUE) / sd(d, na.rm = TRUE), 
+            n = length(unique(subid)), 
+            d_z_var = d_var_calc(n, d_z)) %>%
+  filter(n >= 10) %>%
+  left_join(ages) %>%
+  filter(!is.na(d_z)) 
+
+names(ds_zt)
+
+```
+
+
+Compute effect sizes: Meta-analysis
+
+```{r}
+#TODO
+```
+
+
+TODO:
+
+1. Wrange both datasets in shape: Add constant info to MB1 dataset (speech_type = "Naturalistic" etc), align names
+2. Read in hand-coded vs automatically coded for Central fixation in MB1 dataset (if possible)? Open question: merge eyetracking and Central fixation to align with meta-analysis?
+3. Add native_lang info to MB1 data
+4. Align lab (any lab that contributed both to MB1 and the MA should have the same code)
+
+--> Any other variables we think matter? 
+
+
+```{r}
+#Data wrangling
+```
+ 
+ 
+## Results
+
+### Descriptives 
+
+Outline: Age, method, stimulus type distribution (basically all factors we think might matter)
+
+```{r}
+#Descriptives
+```
+
+
+```{r}
+#Figures
+```
+
+### Do the MB1 data stand out in a meta-regression? 
+
+```{r}
+# Analysis 1: MA with / without MB1 data
+```
+
+```{r}
+#Analysis 2
+```
+
+### Can we "match" datasets and predict MB1 results?
+
+```{r}
+
+```
+
+
+
+
+
+
+## Session info
+
+For replicability, add info on how this doc was generated
+```{r}
+sessionInfo()
+```
+
