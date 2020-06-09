@@ -1,0 +1,65 @@
+---
+title: IDS ManyBabies and MA merged dataset
+author: Molly Lewis 
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    number_sections: false
+    theme: cerulean
+    toc_float: false
+    code_folding: hide
+---
+  
+  
+```{r setup, include = F}
+# load packages
+library(tidyverse) 
+library(knitr)
+library(here)
+
+opts_chunk$set(echo = T, message = F, warning = F, 
+               error = F, tidy = F,  cache = F, fig.height = 4)
+theme_set(theme_classic())
+
+``` 
+
+```{r}
+COMBINED_DATASET <- here("data/mb_ma_combined.csv")
+
+full_dataset <- read_csv(COMBINED_DATASET)
+```
+
+Here's what the merged dataset looks like: 
+```{r}
+DT::datatable(full_dataset)
+```
+
+
+There are 76 MA effect sizes and 150 MB effect sizes. 
+
+I left several of the methodological variables blank for the MB data right now, with the hope that someone with more experience (Jessica?) with the MB dataset could help fill them in. Those variables are:
+
+  * num_trials
+  * participant_design
+  * presentation
+  * response_mode 
+  * setting 
+  * speaker 
+  * speaker_experience 
+  * speaker_fam 
+  * speaker_female 
+  * speech_type 
+  * test_lang
+  
+Explanations for these variables should be [here](https://github.com/langcog/metalab2/blob/master/metadata/spec.yaml).
+  
+  
+There were also a couple variables from the MB data that I thought we could code in the MA data if we were so inclined:
+
+  * parent_education
+  * prop_caregiver_seat
+  
+  
+  
+ 
