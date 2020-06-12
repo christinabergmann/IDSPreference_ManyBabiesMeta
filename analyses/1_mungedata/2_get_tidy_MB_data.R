@@ -91,6 +91,10 @@ study_moderators <-  mb_data_tidy_fct %>%
 
 mb_data <- full_join(es_by_study, study_moderators)
 
+#add methodological variables
+methodological_vars <- read_csv(here("data/mb_methodological_variables.csv"))
+
+mb_data <- full_join(mb_data, methodological_vars)
 
 write_csv(mb_data, MB_OUT_PATH)
 

@@ -53,7 +53,10 @@ I left several of the methodological variables blank for the MB data right now, 
   * test_lang
   
 Explanations for these variables should be [here](https://github.com/langcog/metalab2/blob/master/metadata/spec.yaml).
-  
+
+Jessica filled in these variables (all except test_lang because I want to check with the group.)
+
+Above link did not work, but I used the MB Meta-Analysis codebook to code the variables, available [here](https://docs.google.com/spreadsheets/d/1E2eGPYfTPlpbJZveSrJe6H3uf4KV1TbCClzAacMs_uo/edit#gid=1387133600)
   
 There were also a couple variables from the MB data that I thought we could code in the MA data if we were so inclined:
 

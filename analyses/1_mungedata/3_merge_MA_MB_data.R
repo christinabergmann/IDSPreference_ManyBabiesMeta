@@ -18,16 +18,8 @@ mb_data_tidy <- mb_data_raw %>%
          native_lang = modal_lang1) %>%
   mutate(study_type = "MB",
          main_question_ids_preference = "yes",
-         num_trials = NA,
-         participant_design = NA,
-         presentation = NA,
-         response_mode = NA,
-         setting = NA,
-         speaker = NA,
-         speaker_experience = NA,
-         speaker_fam = NA,
-         speaker_female = NA,
-         speech_type = NA,
+         dependent_measure = "looking_time",
+         exposure_phase = "test_only",
          test_lang = NA,
          infant_type = case_when(prop_preterm > .25 | prop_curr_earinfection > .25 |
                                    prop_hearing_vision > .25 | prop_cognitive_developmental > .25 |
