@@ -28,7 +28,7 @@ ma_data_tidy_with_es <-  ma_data_tidy %>%
   nest() %>%
   mutate(es_data = map(data, compute_es)) %>%
   unnest() %>%
-  select(id, d_calc, d_var_calc) %>%
+  select(id, d_calc, d_var_calc, es_method) %>%
   ungroup()
 
 # get study characteristics
