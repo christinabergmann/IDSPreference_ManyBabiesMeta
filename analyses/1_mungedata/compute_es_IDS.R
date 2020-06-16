@@ -1,6 +1,3 @@
-#This script calculates effect sizes for entries in metalab
-#metalab.stanford.edu
-#for questions please contact team members on metalab website
 
 library(dplyr)
 library(purrr)
@@ -17,19 +14,13 @@ compute_es <- function(ma_df) {
   participant_design <- ma_df$participant_design
   x_1 <- ma_df$x_1
   x_2 <- ma_df$x_2
-  x_dif <- ma_df$x_dif
   SD_1 = ma_df$sd_1
   SD_2 = ma_df$sd_2
-  SD_dif = ma_df$SD_dif
   n_1 =ma_df$n_1
   n_2 = ma_df$n_2
-  t = ma_df$t
-  f = ma_df$f
   d = ma_df$d
   d_var = ma_df$d_var
-  corr = ma_df$corr
-  r = ma_df$xr2
-  r_var = ma_df$r_var
+
 
 
     assert_that(participant_design %in% c("between", "within_two"))
