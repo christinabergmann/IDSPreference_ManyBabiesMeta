@@ -13,12 +13,12 @@ compute_es <- function(ma_df) {
   participant_design <- ma_df$participant_design
   x_1 <- ma_df$x_1
   x_2 <- ma_df$x_2
-  SD_1 = ma_df$sd_1
-  SD_2 = ma_df$sd_2
-  n_1 =ma_df$n_1
-  n_2 = ma_df$n_2
-  d = ma_df$d
-  d_var = ma_df$d_var
+  SD_1 <- ma_df$sd_1
+  SD_2 <- ma_df$sd_2
+  n_1 <- ma_df$n_1
+  n_2 <- ma_df$n_2
+  d <- ma_df$d
+  d_var <- ma_df$d_var
 
   assert_that(participant_design %in% c("between", "within_two"))
 
