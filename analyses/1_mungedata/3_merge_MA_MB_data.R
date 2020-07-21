@@ -17,17 +17,18 @@ mb_data_tidy <- mb_data_raw %>%
          d_var_calc = d_z_var,
          native_lang = modal_lang1) %>%
   mutate(study_type = "MB",
+         short_cite = "ManyBabies Consortium (2020)", 
          main_question_ids_preference = "yes",
          dependent_measure = "looking_time",
          exposure_phase = "test_only",
-         test_lang = NA,
+         test_lang = ifelse(prop_nae>.9, "native", "nonnative"),
          infant_type = case_when(prop_preterm > .25 | prop_curr_earinfection > .25 |
                                    prop_hearing_vision > .25 | prop_cognitive_developmental > .25 |
                                    prop_monolingual < .75 | mean_lang1_exposure < .75 ~ "non-typical",
                                  TRUE ~ "typical")) %>% # define typicality based on demographic variables
   select(-prop_preterm, -prop_curr_earinfection,
          -prop_hearing_vision, -prop_cognitive_developmental,
-         -prop_monolingual, -mean_lang1_exposure, -prop_beard) %>%
+         -prop_monolingual, -mean_lang1_exposure) %>%
   group_by(study_id) %>%
   mutate(same_infant = 1:n())
 

@@ -1,147 +1,220 @@
 ---
-title: "Analysis outline"
-author: "Christina Bergmann"
-date: "2020-5-19"
+title: "Preregistration outline"
+author: "Christina Bergmann, Molly Lewis, Jessica Kosie "
+date: "2020-7-17"
 output: html_document
 ---
 
 ```{r, setup}
 library(tidyverse)
 library(metafor)
+library(here)
+library(knitr)
+library(janitor)
 
-#Helper function from MB1 code
-
-d_var_calc <- function(n, d) {
-  return((2/n) + (d ^ 2 / (4 * n)))
-}
+opts_chunk$set(echo = T, message = F, warning = F, 
+               error = F, tidy = F,  cache = F, fig.height = 4)
+theme_set(theme_classic())
 
 ```
+
+# Introduction
 
 
 ## Goals / Hypotheses
 
 (MB = ManyBabies data, MA = Meta-Analysis)
 
-1. Quantify (descriptively) the relation between replications and meta-analyses:
-
--- MA: Inform design choices for replications  
--- MA: Help interpret replication results  
--- Replications: Test predictions of MA in a controlled way (think MB1 age effect)  
--- Replications: Broaden sample   
-
-2. Reassess with a new dataset whether:
-
--- There is indeed a systematic difference between MA and RRR (i.e. introduce "Replication" as moderator in a joint analysis)
--> Open question: Is MB1 *one* very precise datapoint or does each lab sample count? The latter is more in line with the MB analysis.  
--- Matching datasets removes any RRR effect
--> Open question: How to define matching? I.e. either introducing all relevant moderatoes or subsetting? 
--- We can actually predict the result of MB1 / of MB1 moderator analyses (i.e. towards the Bayesian analyses already done)
 
 
-## Read in and clean data 
+# Methods
+
+## Replication: ManyBabies1-IDS preference
+
+The first empirical ManyBabies project (The ManyBabies Consortium, 2020) tested infants' preference for speech directed to infants over adult-directed speech (IDS and ADS respectively). 
+
+
+### Sampling
+
+In 14 months, labs were asked to test infants in up to 4 age groups (3-6, 6-9, 9-12, 12-15 months of age) and invite at least 16 participants to the laboratory. Note that this includes infants who refuse to participate or drop out with too few usable trials. To be included, infants had to contribute at least one trial per condition. 
+
+Participants grew up with one language. As consequence, native language and test language (native vs non-native) vary. (Note thus that we are not including the data from the bilingual sample sister project in the main analyses). 
+
+Exclusion criteria included:
+
+- out of age range
+- known developmental delay
+- premature birth (before 37 weeks)
+
+
+### Method
+
+#### Stimuli
+
+Naturalistic speech of North-American English speaking mothers to their child or an adult was recorded.
+
+### Analysis
+
+In the analysis, the data were either subjected to linear mixed models or group-level effect sizes were analyzed with meta-analytic regressions. Here, we will focus on the latter. 
+
+Participants who contributed at least one matched trial pair were included, and effect sizes were computed for labs with at least 10 participants with data per age bracket. (#TODO: Add exclusion criterion)
+
+The overall meta-analytic effect of IDS was reported as d = 0.35 (CI = [0.29-0.41]) based on 108 samples.
+
+### Moderators
+
+The following moderators were tested:
+- `mean_age_1` age (reported as d = 0.05)
+- method (singlescreen vs eyetracking vs HPP)
+- native versus non-native stimuli
+
+Interactions of these moderators were examined in a mixed effects framework. 
+
+## Meta-analysis
+
+### Search strategy
+
+From original paper: "Studies were located using motherese or parentese or
+fatherese or infant directed speech or infant-directed speech or
+infant directed talk or child directed speech or child-directed
+speech or child directed talk or child-directed talk or baby
+talk AND infant* or neonate* or toddler* as search terms.
+Both controlled-vocabulary and natural-language searches
+were conducted (Lucas & Cutspec, 2007). Psychological
+Abstracts (PsychInfo), Educational Resource Information
+Center (ERIC), MEDLINE, Academic Search Premier, CINAHL, Education Resource Complete, and Dissertation
+Abstracts International were searched. These were supplemented by Google Scholar, Scirus, and Ingenta searches as
+well as a search of an extensive EndNote Library maintained
+by our Institute. Hand searches of the reference sections of
+all retrieved journal articles, book chapters, books, dissertations, and unpublished papers were also examined to locate
+additional studies. Studies were included if the effects of infant-directed speech on child behavior were compared to the
+effects of adult-directed speech on child behavior. Studies
+that intentionally manipulated word boundaries (e.g., Hirsh-
+Pasek et al., 1987; Nelson, Hirsh-Pasek, Jusczyk, & Cassidy,
+1989) or used nonsense words or phrases (e.g., Mattys, Jusc-
+zyk, Luce, & Morgan, 1999; Thiessen, Hill, & Saffran, 2005)
+were excluded."
+
+### Original meta-analysis and its moderators
+
+The overall finding is reported as follows (p. 3): "The average weighted effect size for infant-directed vs. adult-directed speech for all studies combined was 0.67 (95% CI = 0.57 to 0.76), Z = 3.75, p = .0002."
+
+The authors investigated the impact of the following variables in subset analyses (see particularly figures 1-4 and tables 1-2):
+
+
+- `speech_type` (naturalistic, filtered, synthesized) 
+- stimulus characteristics: frequency difference between both types of speech (IDS - ADS) and length of IDS recording [not reported for replication]
+- participant age `mean_age_1` 
+- `speaker` (the infant's own mother or an unfamiliar female speaker)
+- `presentation` (audio only or audio and video)
+- `dependent_measure` type of dependent variable: preference or affect
+- publication year, design (between versus within participants) `participant_design`, journal publication vs other `peer_reviewed`
+- `setting` test location: child's home or laboratory 
+
+Note that none of these have been directly tested through moderator analyses. 
+Note also that the authors do not specify any exclusion criteria e.g. because infants have been born preterm or because effect sizes are 3 SD away from the mean. A replication would thus include all studies reported. 
+
+
+
+### Adding moderators
+
+To add moderators for comparison with the replication dataset MB1, a subset of the authors (MZ, JK, AST, NK) extracted additional information from the source papers of the meta-analysis. 
+
+- `stimulus_set`was a particular stimulus set re-used 
+- `main_question` was a preference for IDS over ADS the main research question
+- `trial_control` were trials of a fixed length or could infants control the duration by looking away from a central display or lamp 
+- `human_coded` were the data coded automatically by an eye-tracker or hand-coded by a human observer
+- `native_lang` what was the native language of the child
+- `test_lang` were the stimuli presented in the child's native language or dialect 
+- `num_minimum_trials` if reported, what were the inclusion criteria in terms of number of trials completed
+
+
+### Further variables of note
+
+In the meta-analysis, some infant groups contribute to multiple effect sizes, this is noted within experiments in the column `same_infant`, which joint with `studyID` yields a unique identifier of participant group. 
+
+
+### Recomputing Effect sizes to resolve discrepancies
+
+In the final dataset, `d` contains the reported effect size for all studies, and `d_calc` a recomputed effect sizes from t-values or means and SD (extracted from figures when noted in )
+
+While coding moderators, a number of effect sizes stood out as the reported statistics in the original papers did not match. 
+
+(Copied from this spreadsheet: https://docs.google.com/spreadsheets/d/1feOk-tQ5MrOBvIwmgg3Xoqq4xIHVebQGoJV0Spo-3qY/edit#gid=0)
+
+
+#### Effect sizes discrepancies
+
+Fernald1987	2	Martin Zettersten	unclear on how effect size was computed in Dunst et al.; unclear how effect size could be 0 if the average looking to IDS side reported in the paper is above chance (8.15 vs. chance = 7.5) - perhaps binomial effect size? But that doesn't explain effect size reported in Experiment 3
+
+
+Fernald1987	1	Martin Zettersten	unclear on how effect size was computed in Dunst et al.; seems way too big and does not match up with e.g. t-value reported in paper
+
+
+Fernald1987	3	Martin Zettersten	unclear on how effect size was computed in Dunst et al.; d= 0.8 (reported in Dunst) is completely implausible given the reported mean (M = 7.8; chance = 7.5) and Fig 3 (just above 50% of infants prefer IDS side)
+
+Fernald1985	1	Martin Zettersten	effect size appears to be incorrectly coded in Dunst et al.; Fig 3 in manuscript allows the entire data to be recreated - the effect calculated based on Fig 3 is t(47) = 2.24, p = .03, d = 0.32
+
+
+Cooper1994		Martin Zettersten	Checking for trouble: Based on the d reported in Dunst (1.24) and the means/ sds reported in the paper, the correlation r would need to be unusually large (~.71). More worryingly, the value 1.24 is what you get if you compute the effect size as a between-subjects measure. In  fact, Dunst et al. had this incorrectly (I think) coded as a between-subjects condition. Is it  possible there is an error here? 
+
+
+Newman2006		Martin Zettersten	checking for trouble  - effect sizes don't line up with the means/ sds noted in the sheet. Possible SE/ SD issue? (values appear to be SEs)
+
+
+Werker1994		Martin Zettersten	checking for trouble  - effect sizes don't line up with the means/ sds noted in the sheet. Possible SE/ SD issue? After re-extracting data from plot, SDs do appear to be off by an order of magnitude (maybe accidentally divided through sqrt(N)?)
+
+odd/ impossible effect  sizes given means/ sds	Singh2002		Martin Zettersten	checking for trouble  - effect sizes don't line up with the means/ sds noted in the sheet. Possible SE/ SD issue?
+
+odd/ impossible effect  sizes given means/ sds	Pegg1992		Martin Zettersten	checking for trouble in second row  - effect sizes don't line up with the means/ sds noted in the sheet. Possible SE/ SD issue?
+
+odd/ impossible effect  sizes given means/ sds	Pegg1989		Martin Zettersten	checking for trouble in second row - effect sizes don't line up with the means/ sds noted in the sheet. Possible SE/ SD issue?
+
+
+#### Coding errors potentially affecting effect size
+
+incorrect coding	Cooper1994	3	Martin Zettersten	since experiment is not between-subjects, group_name_1 and group_name_2 was re-coded as NA (formerly IDS and ADS) (first row)
+
+incorrect coding	Cooper1994	3	Martin Zettersten	since experiment is not between-subjects, group_name_1 and group_name_2 was re-coded as NA (formerly IDS and ADS) (first row)
+
+incorrect coding	Cooper1994	3	Martin Zettersten	participant_design incorrectly coded as "between" (second row) - likely a confusion related to the fact that this experiment was broken into two rows to report the effect for two orders separately; however, the key comparison is still within-participants (ADS vs. IDS)
+
+n_1	Pegg1989	1	Jessica Kosie	Originally n_1 was listed as 48. This is the total number of infants, but there were actually 24 in each group. I changed each value to 24. 
+
+
+#### Excluded studies
+
+Pegg1992	-	Jessica Kosie	Only experiment 2 was included in Dunst et al., but not experiment 1. I can't determine why experiment 1 was not included (it's also testing for IDS vs. ADS preference), and we might want to include it in the more comprehensive meta-analysis.
+
+Glenn1983	1	Martin Zettersten	only experiment 1 is reported in Dunst et al, but there IDS vs. ADS was also measured in experiment 2. Why is this experiment omitted?
+
+# Analyses
+
+## Read in and preprocess data
+
+DISCLAIMER: This is not the final dataset, some MA checks are still in progress and we should be able to recover trial_control for the MB data.
 ```{r}
-#This is the updated spreadsheet from Google drive 
+COMBINED_DATASET <- here("data/mb_ma_combined.csv")
 
-MAdataset_url = "https://docs.google.com/spreadsheets/d/1E2eGPYfTPlpbJZveSrJe6H3uf4KV1TbCClzAacMs_uo/export?id=1E2eGPYfTPlpbJZveSrJe6H3uf4KV1TbCClzAacMs_uo&format=csv"
-MA = MAdataset_url %>%
-    httr::GET() %>%
-    httr::content(col_names = TRUE, col_types = NULL, encoding = "UTF-8")
+full_dataset <- read_csv(COMBINED_DATASET)
+```
 
-names(MA)
 
-# The final ManyBabies1 dataset from the public github repository, plus the processing pipeline from the paper
-MB1 = read.csv(file = "https://raw.githubusercontent.com/manybabies/mb1-analysis-public/master/processed_data/03_data_diff_main.csv") %>%
-  mutate(method = as.character(method)) %>% # Needed to add this line to the MB1 code
-  mutate(method = case_when(
-    method == "singlescreen" ~ "Central fixation",
-    method == "eyetracking" ~ "Eye tracking",
-    method == "hpp" ~ "HPP",
-    TRUE ~ method)) 
-ordered_ages <- c("3-6 mo", "6-9 mo", "9-12 mo", "12-15 mo")
-MB1$age_group <- fct_relevel(MB1$age_group, ordered_ages)
+## Scramble data for preregistration
 
-ages <- MB1 %>%
-  group_by(lab, age_group, method, nae, subid) %>%
-  summarise(age_mo = mean(age_mo)) %>%
-  summarise(age_mo = mean(age_mo))
+```{r}
+set.seed(1819)
+full_datasset_shuffled <- full_dataset %>%
+  mutate(d_calc = sample(d_calc, replace = F), 
+         d_var_calc = sample(d_var_calc, replace = F))
+  
 
 ```
 
-Compute effect sizes: ManyBabies1 data
-
+Here's what the merged dataset looks like: 
 ```{r}
-ds_zt <- MB1 %>%
-  group_by(lab, age_group, method, nae, subid) %>%
-  summarise(d = mean(diff, na.rm = TRUE)) %>%
-  group_by(lab, age_group, method, nae) %>%
-  summarise(d_z = mean(d, na.rm = TRUE) / sd(d, na.rm = TRUE), 
-            n = length(unique(subid)), 
-            d_z_var = d_var_calc(n, d_z)) %>%
-  filter(n >= 10) %>%
-  left_join(ages) %>%
-  filter(!is.na(d_z)) 
-
-names(ds_zt)
-
+DT::datatable(full_dataset_shuffled)
 ```
-
-
-Compute effect sizes: Meta-analysis
-
-```{r}
-#TODO
-```
-
-
-TODO:
-
-1. Wrange both datasets in shape: Add constant info to MB1 dataset (speech_type = "Naturalistic" etc), align names
-2. Read in hand-coded vs automatically coded for Central fixation in MB1 dataset (if possible)? Open question: merge eyetracking and Central fixation to align with meta-analysis?
-3. Add native_lang info to MB1 data
-4. Align lab (any lab that contributed both to MB1 and the MA should have the same code)
-
---> Any other variables we think matter? 
-
-
-```{r}
-#Data wrangling
-```
- 
- 
-## Results
-
-### Descriptives 
-
-Outline: Age, method, stimulus type distribution (basically all factors we think might matter)
-
-```{r}
-#Descriptives
-```
-
-
-```{r}
-#Figures
-```
-
-### Do the MB1 data stand out in a meta-regression? 
-
-```{r}
-# Analysis 1: MA with / without MB1 data
-```
-
-```{r}
-#Analysis 2
-```
-
-### Can we "match" datasets and predict MB1 results?
-
-```{r}
-
-```
-
-
-
-
 
 
 ## Session info
