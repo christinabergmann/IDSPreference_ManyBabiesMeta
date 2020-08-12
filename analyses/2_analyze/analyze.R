@@ -17,6 +17,7 @@ library(weightr)
 library(PublicationBias)
 library(xtable)
 library(boot)
+library(testthat)
 
 data.dir = here("data")
 # where to save results
@@ -25,27 +26,31 @@ results.dir = here("results_from_R")
 overleaf.dir = "~/Dropbox/Apps/Overleaf/MB-Meta/R_objects"
 
 # should we remove existing results file instead of overwriting individual entries? 
-start.res.from.scratch = TRUE
+start.res.from.scratch = FALSE
 # should we use the grateful package to scan and cite packages?
 cite.packages.anew = FALSE
+# should we bootstrap from scratch or read in old resamples?
+boot.from.scratch = FALSE
 
 digits = 2
 pval.cutoff = 10^-4  # threshold for using "<"
-
+boot.reps = 2000 # for cross-model comparisons 
 
 if ( start.res.from.scratch == TRUE ) wr()
 
 # helper code
 source( here("analyses/2_analyze/analyze_helper.R") )
-# source internal fns from boot package
-# it's a long story
-# see my_boot() in helper fns if you like long stories
-source( here("analyses/2_analyze/bootfuns.R") )
+# # source internal fns from boot package
+# # it's a long story
+# # see my_boot() in helper fns if you like long stories
+# source( here("analyses/2_analyze/bootfuns.R") )
 
 # read in dataset
 setwd(data.dir)
 d = read_csv("mb_ma_combined_scrambled_prepped.csv")
 
+# dataset with just the meta-analysis
+dma = d %>% filter(isMeta == TRUE)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 #                       0. CHARACTERISTICS OF INCLUDED STUDIES            
@@ -153,10 +158,6 @@ mods2 = c( "isMeta",  # code this way since we expect meta to have larger effect
 # varied in RRR:
 #"trial_control" )  # causes singularity
 
-# CreateTableOne(vars = mods2,
-#                #strata = "study_type",
-#                data = d)
-
 mod.sets = list( c("isMeta"),  # naive model
                  mods2 )
 
@@ -164,50 +165,63 @@ labels = c("naive",
            "mod1")
 
 # fit the naive and moderated models
-fit_mr( .dat = d,
-        .label = "naive",
-        .mods = mod.sets[[1]],
-        .write.to.csv = TRUE,
-        .write.table = TRUE )
+# these write their results to the results csv file and table
+naiveRes = fit_mr( .dat = d,
+                   .label = "naive",
+                   .mods = mod.sets[[1]],
+                   .write.to.csv = TRUE,
+                   .write.table = TRUE,
+                   .simple.return = FALSE )
 
-fit_mr( .dat = d,
-        .label = "mod1",
-        .mods = mod.sets[[2]],
-        .write.to.csv = TRUE,
-        .write.table = TRUE )
+mod1Res = fit_mr( .dat = d,
+                  .label = "mod1",
+                  .mods = mod.sets[[2]],
+                  .write.to.csv = TRUE,
+                  .write.table = TRUE,
+                  .simple.return = FALSE )
 
 
 ############################## CROSS-MODEL INFERENCE ##############################
 
 # bm
-boot.reps = 2000 # **increase later  
 
-# works with boot() but not my_boot
-boot.res = boot( data = d, 
-                 parallel = "multicore",
-                 R = boot.reps, 
-                 statistic = function(original, indices) {
-                   # draw resample with replacement
-                   # ignore the indices passed by boot because we're
-                   #  doing clustered bootstrapping, oh yeah
-                   
-                   # # this works fine
-                   # b = original[indices,]
-                   # mean(rnorm(20))
-  
-                   b = cluster_bt(.dat = original,
-                                  .clustervar = "study_id")
-                   
-                   # WORKS with boot
-                   # multi-argument returns need to be via c(), not list or df or whatever
-                   tryCatch({
-                     fit_mr( .dat = b,
-                             .mods = mod.sets[[2]] )
-                   }, error = function(err){
-                     return( c(NA, NA, NA) )
-                   })
-
+if ( boot.from.scratch == TRUE ) {
+  boot.res = boot( data = d, 
+                   parallel = "multicore",
+                   R = boot.reps, 
+                   statistic = function(original, indices) {
+                     # draw resample with replacement
+                     # ignore the indices passed by boot because we're
+                     #  doing clustered bootstrapping, oh yeah
+                     
+                     # # this works fine
+                     # b = original[indices,]
+                     # mean(rnorm(20))
+                     
+                     b = cluster_bt(.dat = original,
+                                    .clustervar = "study_id")
+                     
+                     # WORKS with boot
+                     # multi-argument returns need to be via c(), not list or df or whatever
+                     tryCatch({
+                       fit_mr( .dat = b,
+                               .mods = mod.sets[[2]] )
+                     }, error = function(err){
+                       return( c(NA, NA, NA) )
+                     })
+                     
                    } )
+
+  # save bootstraps
+  setwd(results.dir)
+  save(boot.res, file = "saved_bootstraps.RData")
+}
+
+if ( boot.from.scratch == FALSE ){
+  # read in existing bootstraps
+  setwd(results.dir)
+  load("saved_bootstraps.RData")
+}
 
 
 # number of non-failed bootstrap reps
@@ -216,17 +230,37 @@ boot.res = boot( data = d,
 # get the bootstrapped CIs for all 3 statistics respectively using BCa method
 ( bootCIs = get_boot_CIs(boot.res, n.ests = 3) )
 
-# stats order: 
-# difference in estimated means
-# difference in Phat0
-# difference in Phat0.2
+# order of statistics in the above: 
+# between-source difference in estimated means
+# between-source difference in Phat0
+# between-source difference in Phat0.2
 
-# bm
-# next up: the fit_mr function needs to be tryCatch
-# the current bootstrapping loop above does NOT work because
-#  of mod.sets[[2]]
+# # naive model metrics of source discrepancy
+# # CIS WRONG HERE
+# statCI_result_csv( "naive avgDiff", c(naiveRes$avgDiff, bootCIs[[1]][1], bootCIs[[1]][2]) )
+# 
+# statCI_result_csv( "naive Phat0Diff", c(naiveRes$Phat0Diff, bootCIs[[2]][1], bootCIs[[2]][2]) )
+# 
+# statCI_result_csv( "naive Phat0.2Diff", c(naiveRes$Phat0.2Diff, bootCIs[[3]][1], bootCIs[[3]][2]) )
+# 
+# 
+# # moderated model metrics of metrics of source discrepancy
+# statCI_result_csv( "mod1 avgDiff", c(mod1Res$avgDiff, bootCIs[[1]][1], bootCIs[[1]][2]) )
+# 
+# statCI_result_csv( "mod1 Phat0Diff", c(mod1Res$Phat0Diff, bootCIs[[2]][1], bootCIs[[2]][2]) )
+# 
+# statCI_result_csv( "mod1 Phat0.2Diff", c(mod1Res$Phat0.2Diff, bootCIs[[3]][1], bootCIs[[3]][2]) )
 
 
+# between-model difference
+statCI_result_csv( "moderator reduction avgDiff", c(naiveRes$avgDiff - mod1Res$avgDiff, bootCIs[[1]][1], bootCIs[[1]][2]) )
+
+statCI_result_csv( "moderator reduction Phat0Diff", c(naiveRes$Phat0Diff - mod1Res$Phat0Diff, bootCIs[[2]][1], bootCIs[[2]][2]) )
+
+statCI_result_csv( "moderator reduction Phat0.2Diff", c(naiveRes$Phat0.2Diff - mod1Res$Phat0.2Diff, bootCIs[[3]][1], bootCIs[[3]][2]) )
+
+
+# ***p-values would require resampling under H0...
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 #                           2. PUBLICATION BIAS           
@@ -234,17 +268,7 @@ boot.res = boot( data = d,
 
 section = 2
 
-# ***move to data prep step
-d$pval = 2 * ( 1 - pnorm( abs(d$yi/d$sei) ) )
-d$affirm = ( d$yi > 0 ) & ( d$pval < 0.05 )
-# just the meta-analysis
-dma = d %>% filter(isMeta == TRUE)
-# *** end of stuff to move
-
-
 ##### Estimate in Meta-Analysis #####
-# ***sanity-check this against the estimate from the naive model
-
 ( meta = robu( yi ~ 1, 
                data = dma, 
                studynum = as.factor(study_id),
@@ -265,6 +289,10 @@ ests = round( est, 2 )
 pvals2 = format_stat(pval)
 # get rid of scientific notation; instead use more digits
 #pvals2[ pval < 0.01 ] = round( pval[ pval < 0.01 ], 3 )
+
+# sanity check: should be similar to naive meta-regression model
+est; 
+# bm
 
 
 update_result_csv( name = "meta est",

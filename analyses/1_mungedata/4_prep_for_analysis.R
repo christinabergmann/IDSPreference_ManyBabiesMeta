@@ -77,6 +77,8 @@ d$isMeta = (d$study_type == "MA")
 d$isRep = (d$study_type == "MB")
 
 
+d$pval = 2 * ( 1 - pnorm( abs(d$yi/d$sei) ) )
+d$affirm = ( d$yi > 0 ) & ( d$pval < 0.05 )
 
 
 ############################## SAVE DATASET ############################## 

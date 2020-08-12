@@ -102,3 +102,12 @@ mod1 avg for meta,0.25,1
 mod1 avg lo for meta,-1.24,1
 mod1 avg hi for meta,1.75,1
 mod1 avg pval for meta,0.69,1
+moderator reduction avgDiff ,0.1,1
+moderator reduction avgDiff lo,-1.32,1
+moderator reduction avgDiff hi,0.17,1
+moderator reduction Phat0Diff ,0.11,1
+moderator reduction Phat0Diff lo,-1,1
+moderator reduction Phat0Diff hi,0.77,1
+moderator reduction Phat0.2Diff ,-0.77,1
+moderator reduction Phat0.2Diff lo,-0.65,1
+moderator reduction Phat0.2Diff hi,1,1
