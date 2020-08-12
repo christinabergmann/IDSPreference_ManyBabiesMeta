@@ -47,7 +47,7 @@ source( here("analyses/2_analyze/analyze_helper.R") )
 
 # read in dataset
 setwd(data.dir)
-d = read_csv("mb_ma_combined_scrambled_prepped.csv")
+d = suppressMessages( read_csv("mb_ma_combined_scrambled_prepped.csv") )
 
 # dataset with just the meta-analysis
 dma = d %>% filter(isMeta == TRUE)
@@ -183,8 +183,6 @@ mod1Res = fit_mr( .dat = d,
 
 ############################## CROSS-MODEL INFERENCE ##############################
 
-# bm
-
 if ( boot.from.scratch == TRUE ) {
   boot.res = boot( data = d, 
                    parallel = "multicore",
@@ -268,7 +266,7 @@ statCI_result_csv( "moderator reduction Phat0.2Diff", c(naiveRes$Phat0.2Diff - m
 
 section = 2
 
-##### Estimate in Meta-Analysis #####
+##### Sanity Check: Estimate in Meta-Analysis Alone #####
 ( meta = robu( yi ~ 1, 
                data = dma, 
                studynum = as.factor(study_id),
@@ -276,42 +274,10 @@ section = 2
                modelweights = "HIER",
                small = TRUE) )
 
-est = meta$b.r
-t2 = meta$mod_info$tau.sq
-mu.lo = meta$reg_table$CI.L
-mu.hi = meta$reg_table$CI.U
-mu.se = meta$reg_table$SE
-pval = meta$reg_table$prob
-V = meta$VR.r  # variance-covariance matrix
-
-# rounded and formatted estimates for text
-ests = round( est, 2 )
-pvals2 = format_stat(pval)
-# get rid of scientific notation; instead use more digits
-#pvals2[ pval < 0.01 ] = round( pval[ pval < 0.01 ], 3 )
-
 # sanity check: should be similar to naive meta-regression model
-est; 
-# bm
-
-
-update_result_csv( name = "meta est",
-                   section = section,
-                   value = ests,
-                   print = TRUE )
-update_result_csv( name = "meta lo",
-                   section = section,
-                   value = round(mu.lo, digits),
-                   print = TRUE )
-update_result_csv( name = "meta hi",
-                   section = section,
-                   value = round(mu.hi, digits),
-                   print = TRUE )
-update_result_csv( name = "meta pval",
-                   section = section,
-                   value = pvals2,
-                   print = TRUE )
-
+expect_equal( as.numeric(meta$b.r), round(naiveRes$est.ma, digits), tol = 0.01 )
+expect_equal( as.numeric(meta$reg_table$CI.L), round(naiveRes$est.ma.lo, digits), tol = 0.01 )
+expect_equal( as.numeric(meta$reg_table$CI.U), round(naiveRes$est.ma.hi, digits), tol = 0.01 )
 
 ##### Affirmative and Nonaffirmative Counts #####
 
@@ -321,14 +287,10 @@ t = d %>% group_by(isMeta) %>%
              Paffirm = mean(affirm) )
 
 update_result_csv( name = "meta k nonaffirmative",
-                   section = 2,
-                   value = t$k.nonaffirm[ t$isMeta == TRUE ],
-                   print = FALSE )
+                   value = t$k.nonaffirm[ t$isMeta == TRUE ] )
 
 update_result_csv( name = "meta k affirmative",
-                   section = 2,
-                   value = t$k.affirm[ t$isMeta == TRUE ],
-                   print = TRUE )
+                   value = t$k.affirm[ t$isMeta == TRUE ] )
 
 ##### Hedges Selection Model #####
 # be careful about inference due to correlated point estimates
@@ -342,22 +304,15 @@ update_result_csv( name = "meta k affirmative",
 H = m1[[2]]$hessian
 ses = sqrt( diag( solve(H) ) )
 
-update_result_csv( name = "weightr mu",
-                   section = 2,
-                   value = round( m1[[2]]$par[2], digits ),
-                   print = FALSE )
-update_result_csv( name = "weightr mu lo",
-                   section = 2,
-                   value = round( m1[[2]]$par[2] - qnorm(.975) * ses[2], digits ),
-                   print = FALSE )
-update_result_csv( name = "weightr mu hi",
-                   section = 2,
-                   value = round( m1[[2]]$par[2] + qnorm(.975) * ses[2], digits ),
-                   print = FALSE )
+
+statCI_result_csv( "weightr mu",
+                   c(m1[[2]]$par[2],
+                     m1[[2]]$par[2] - qnorm(.975) * ses[2],
+                     m1[[2]]$par[2] + qnorm(.975) * ses[2]) )
+
+
 update_result_csv( name = "weightr mu pval",
-                   section = 2,
-                   value = format_stat( 2 * ( 1 - pnorm( abs(m1[[2]]$par[2]) / ses[2] ) ), cutoffs = c(0.10, pval.cutoff) ),
-                   print = TRUE )
+                   value = format_stat( 2 * ( 1 - pnorm( abs(m1[[2]]$par[2]) / ses[2] ) ), cutoffs = c(0.10, pval.cutoff) ) )
 
 
 
@@ -378,22 +333,16 @@ mu.hi.worst = meta.worst$reg_table$CI.U
 mu.se.worst = meta.worst$reg_table$SE
 pval.worst = meta.worst$reg_table$prob
 
-update_result_csv( name = "Worst mu",
-                   section = 2,
-                   value = round( mu.worst, digits),
-                   print = FALSE )
-update_result_csv( name = "Worst mu lo",
-                   section = 2,
-                   value = round( mu.lo.worst, digits),
-                   print = FALSE )
-update_result_csv( name = "Worst mu hi",
-                   section = 2,
-                   value = round( mu.hi.worst, digits),
-                   print = FALSE )
+
+
+statCI_result_csv( "Worst mu",
+                   c(meta.worst$b.r,
+                     meta.worst$reg_table$CI.L,
+                     meta.worst$reg_table$CI.U) )
+
+
 update_result_csv( name = "Worst mu pval",
-                   section = 2,
-                   value = round(pval.worst, 3),
-                   print = TRUE )
+                   value = round(pval.worst, 3) )
 
 
 # ##### S-values ######
@@ -451,15 +400,6 @@ ggsave( "funnel.pdf",
 
 
 # *** If worst-case meta-analysis estimate was less than replication estimate, report about amount of publication bias required to shift meta-analysis to match replications.
-
-
-
-
-
-
-
-
-
 
 
 
