@@ -1,7 +1,4 @@
 
-# to do: 
-# - fix categorical issue in the moderator correlation matrix ("***")
-
 ############################## PRELIMINARIES ############################## 
 
 library(tidyverse) 
@@ -25,8 +22,13 @@ results.dir = here("results_from_R")
 overleaf.dir = "~/Dropbox/Apps/Overleaf/MB-Meta/R_objects"
 code.dir = here("analyses/2_analyze")
 
+# helper fns
 setwd(code.dir)
 source("analyze_helper.R")
+# # source internal fns from boot package
+# # it's a long story
+# # see my_boot() in helper fns if you like long stories
+# source( here("analyses/2_analyze/bootfuns.R") )
 
 # should we remove existing results file instead of overwriting individual entries? 
 start.res.from.scratch = FALSE
@@ -35,18 +37,13 @@ cite.packages.anew = FALSE
 # should we bootstrap from scratch or read in old resamples?
 boot.from.scratch = FALSE
 
+# wipe results csvs if needed
+if ( start.res.from.scratch == TRUE ) wr()
+
+# constants of universe
 digits = 2
 pval.cutoff = 10^-4  # threshold for using "<"
 boot.reps = 2000 # for cross-model comparisons 
-
-if ( start.res.from.scratch == TRUE ) wr()
-
-# helper code
-source( here("analyses/2_analyze/analyze_helper.R") )
-# # source internal fns from boot package
-# # it's a long story
-# # see my_boot() in helper fns if you like long stories
-# source( here("analyses/2_analyze/bootfuns.R") )
 
 # read in dataset
 setwd(data.dir)
@@ -124,7 +121,7 @@ temp = dummy_cols( d[,cat.mods],
 temp$mean_agec = d$mean_agec 
 names(temp)
 
-# ***fix: doesn't handle categoricals
+# make correlation matrix
 corrs = temp %>%
   correlate( use = "pairwise.complete.obs" ) %>%
   stretch() %>%
@@ -135,7 +132,7 @@ corrs = temp %>%
 # save it
 setwd(results.dir)
 write.csv(corrs, "moderator_cormat.csv")
-
+# too long to put in paper
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 #                       1. NAIVE AND MODERATED META-REGRESSIONS           
