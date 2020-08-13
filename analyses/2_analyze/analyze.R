@@ -1,7 +1,6 @@
 
 # to do: 
-# - dummy-code moderators so meta-analysis mode is the reference level
-# - cross-model comparisons
+# - fix categorical issue in the moderator correlation matrix ("***")
 
 ############################## PRELIMINARIES ############################## 
 
@@ -24,6 +23,10 @@ data.dir = here("data")
 results.dir = here("results_from_R")
 # results.dir = "~/Dropbox/Personal computer/Independent studies/2020/Christina's ManyBabiesMeta (MB-Meta)/IDSPreference_ManyBabiesMeta/results_from_R"
 overleaf.dir = "~/Dropbox/Apps/Overleaf/MB-Meta/R_objects"
+code.dir = here("analyses/2_analyze")
+
+setwd(code.dir)
+source("analyze_helper.R")
 
 # should we remove existing results file instead of overwriting individual entries? 
 start.res.from.scratch = FALSE
@@ -92,7 +95,7 @@ mods = c( "study_type",
           
           # constant in RRR:
           "speech_type",
-          "speaker",
+          "own_mother",
           "presentation",
           "dependent_measure",
           "main_question_ids_preference",
@@ -150,7 +153,7 @@ mods2 = c( "isMeta",  # code this way since we expect meta to have larger effect
            
            # constant in RRR:
            "speech_type",
-           "speaker",
+           "own_mother",
            "presentation",
            #"dependent_measure",  # causes singularity
            "main_question_ids_preference" )

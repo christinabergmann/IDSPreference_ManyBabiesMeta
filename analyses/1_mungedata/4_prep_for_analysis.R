@@ -11,7 +11,10 @@ data.dir = here("data")
 results.dir = here("results_from_R")
 # results.dir = "~/Dropbox/Personal computer/Independent studies/2020/Christina's ManyBabiesMeta (MB-Meta)/IDSPreference_ManyBabiesMeta/results_from_R"
 overleaf.dir = "~/Dropbox/Apps/Overleaf/MB-Meta/R_objects"
+code.dir = here("analyses/1_mungedata")
 
+setwd(code.dir)
+source("prep_helper.R")
 
 # should we use the grateful package to scan and cite packages?
 cite.packages.anew = FALSE
@@ -26,17 +29,16 @@ setwd(data.dir)
 d = read_csv("mb_ma_combined_scrambled.csv")
 
 
-############################## RECODE VARIABLES ############################## 
+############################## RECODE MODERATORS ############################## 
 
-
-# look at moderators
+# list of moderators
 mods = c( "mean_agec",
           "test_lang",  # whether stimuli were in native language; almost constant in meta
           "method",
           
           # constant in RRR:
           "speech_type",
-          "speaker",
+          "own_mother",
           "presentation",
           "dependent_measure",
           "main_question_ids_preference",
@@ -46,37 +48,56 @@ mods = c( "mean_agec",
           "trial_control" )
 #"human_coded", # ~~~ not in the dataset
 
+# which are continuous?
+contMods = "mean_agec"
+
+
 # fix inconsistent capitalization
 d = d %>% mutate_at( .vars = c("method", "speech_type", "speaker", "presentation"),
                  .funs = tolower )
 
+# collapse categories of speaker
+d$own_mother = (d$speaker == "child’s mother")
+
+# dummies for being meta-analysis and being replication
+d$isMeta = (d$study_type == "MA")
+d$isRep = (d$study_type == "MB")
+
+
 # center continuous moderators
-d$mean_agec = d$mean_age - mean(d$mean_age, na.rm = TRUE)
+# age in months
+d$mean_agec = d$mean_age/12 - mean( d$mean_age[ d$isMeta == TRUE ]/12, na.rm = TRUE)
+
 
 # distribution of moderators in RRR and MA
+# mean of mean_agec should be 0 in the MA but nonzero in MB
+CreateTableOne(vars = mods, 
+               strata = "study_type",
+               data = d)
+
+
+# recode all moderators so reference levels are mode in meta-analysis
+#  (recode via alphabetization)
+d = d %>% mutate_at( .vars = mods[ !mods == contMods ],
+                     .funs = function(.v) code_mode_as_ref(vec = .v,
+                                                           isMeta = isMeta) )
+
+
+# same table again, after recoding
 CreateTableOne(vars = mods, 
                strata = "study_type",
                data = d)
 
 
 
-# reference levels to use:
-# mean_age = 0 (mean)
-# test_lang = 0 because constant in meta
-# method = "cf" (most common in meta)
-# 
-
+############################## MAKE OTHER VARIABLES ############################## 
 
 # rename for simplicity
 d$yi = d$d_calc
 d$vi = d$d_var_calc
 d$sei = sqrt(d$vi)
 
-
-d$isMeta = (d$study_type == "MA")
-d$isRep = (d$study_type == "MB")
-
-
+# p-values and affirmative status for publication bias analyses
 d$pval = 2 * ( 1 - pnorm( abs(d$yi/d$sei) ) )
 d$affirm = ( d$yi > 0 ) & ( d$pval < 0.05 )
 
