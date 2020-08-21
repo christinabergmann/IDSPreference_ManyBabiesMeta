@@ -1,0 +1,123 @@
+name,value,section
+m ests MA,51,0
+m ests MB,104,0
+m ests total,155,0
+k studies MA,16,0
+k studies MB,62,0
+median n MA,16,0
+median n MB,16,0
+naive tau,0,1
+naive k,155,1
+naive est X.Intercept.,0.47,1
+naive est isMetaTRUE,0.02,1
+naive lo X.Intercept.,0.37,1
+naive lo isMetaTRUE,-0.18,1
+naive hi X.Intercept.,0.57,1
+naive hi isMetaTRUE,0.22,1
+naive pval X.Intercept.,< 1e-05,1
+naive pval isMetaTRUE,0.84,1
+naive avg for meta,0.49,1
+naive avg lo for meta,0.31,1
+naive avg hi for meta,0.67,1
+naive avg pval for meta,8e-05,1
+mod1 tau,0,1
+mod1 k,155,1
+mod1 est X.Intercept.,0.33,1
+mod1 est isMetaTRUE,-0.08,1
+mod1 est mean_agec,0,1
+mod1 est test_langnonnative,-0.05,1
+mod1 est methodcht,-0.04,1
+mod1 est methodeyetracking,0,1
+mod1 est methodfc,-0.52,1
+mod1 est methodhpp,0.02,1
+mod1 est methodsinglescreen,-0.08,1
+mod1 est speech_typenaturalistic,0.32,1
+mod1 est speech_typesimulated,0.29,1
+mod1 est speech_typesynthesized,0.42,1
+mod1 est speakerunfamiliar.female,-0.41,1
+mod1 est speakerunfamiliar.females,0.37,1
+mod1 est speakerunfamiliar.male,-0.59,1
+mod1 est speakerunfamiliar.mother,-0.3,1
+mod1 est speakerunfamiliar.mother..unfamiliar.female,-0.58,1
+mod1 est presentationvideo.recording,0.06,1
+mod1 est main_question_ids_preferenceyes,0.22,1
+mod1 lo X.Intercept.,-2.11,1
+mod1 lo isMetaTRUE,-1.25,1
+mod1 lo mean_agec,0,1
+mod1 lo test_langnonnative,-0.24,1
+mod1 lo methodcht,-1.7,1
+mod1 lo methodeyetracking,-1.12,1
+mod1 lo methodfc,-0.84,1
+mod1 lo methodhpp,-1.18,1
+mod1 lo methodsinglescreen,-1.22,1
+mod1 lo speech_typenaturalistic,-1.02,1
+mod1 lo speech_typesimulated,-0.47,1
+mod1 lo speech_typesynthesized,-0.88,1
+mod1 lo speakerunfamiliar.female,-1.69,1
+mod1 lo speakerunfamiliar.females,-1.94,1
+mod1 lo speakerunfamiliar.male,-3.46,1
+mod1 lo speakerunfamiliar.mother,-1.93,1
+mod1 lo speakerunfamiliar.mother..unfamiliar.female,-1.87,1
+mod1 lo presentationvideo.recording,-1.52,1
+mod1 lo main_question_ids_preferenceyes,-0.99,1
+mod1 hi X.Intercept.,2.77,1
+mod1 hi isMetaTRUE,1.09,1
+mod1 hi mean_agec,0,1
+mod1 hi test_langnonnative,0.13,1
+mod1 hi methodcht,1.63,1
+mod1 hi methodeyetracking,1.13,1
+mod1 hi methodfc,-0.2,1
+mod1 hi methodhpp,1.21,1
+mod1 hi methodsinglescreen,1.05,1
+mod1 hi speech_typenaturalistic,1.66,1
+mod1 hi speech_typesimulated,1.06,1
+mod1 hi speech_typesynthesized,1.72,1
+mod1 hi speakerunfamiliar.female,0.86,1
+mod1 hi speakerunfamiliar.females,2.69,1
+mod1 hi speakerunfamiliar.male,2.28,1
+mod1 hi speakerunfamiliar.mother,1.33,1
+mod1 hi speakerunfamiliar.mother..unfamiliar.female,0.71,1
+mod1 hi presentationvideo.recording,1.64,1
+mod1 hi main_question_ids_preferenceyes,1.42,1
+mod1 pval X.Intercept.,0.70,1
+mod1 pval isMetaTRUE,0.83,1
+mod1 pval mean_agec,0.09,1
+mod1 pval test_langnonnative,0.56,1
+mod1 pval methodcht,0.95,1
+mod1 pval methodeyetracking,0.99,1
+mod1 pval methodfc,2e-03,1
+mod1 pval methodhpp,0.97,1
+mod1 pval methodsinglescreen,0.86,1
+mod1 pval speech_typenaturalistic,0.53,1
+mod1 pval speech_typesimulated,0.37,1
+mod1 pval speech_typesynthesized,0.42,1
+mod1 pval speakerunfamiliar.female,0.42,1
+mod1 pval speakerunfamiliar.females,0.69,1
+mod1 pval speakerunfamiliar.male,0.54,1
+mod1 pval speakerunfamiliar.mother,0.61,1
+mod1 pval speakerunfamiliar.mother..unfamiliar.female,0.24,1
+mod1 pval presentationvideo.recording,0.91,1
+mod1 pval main_question_ids_preferenceyes,0.60,1
+mod1 avg for meta,0.25,1
+mod1 avg lo for meta,-1.24,1
+mod1 avg hi for meta,1.75,1
+mod1 avg pval for meta,0.69,1
+moderator reduction avgDiff ,0.1,1
+moderator reduction avgDiff lo,-1.32,1
+moderator reduction avgDiff hi,0.17,1
+moderator reduction Phat0Diff ,0.11,1
+moderator reduction Phat0Diff lo,-1,1
+moderator reduction Phat0Diff hi,0.77,1
+moderator reduction Phat0.2Diff ,-0.77,1
+moderator reduction Phat0.2Diff lo,-0.65,1
+moderator reduction Phat0.2Diff hi,1,1
+meta k nonaffirmative,37,2
+meta k affirmative,14,2
+weightr mu ,0.69,2
+weightr mu lo,0.4,2
+weightr mu hi,0.98,2
+weightr mu pval,< 1e-04,2
+Worst mu ,0.21,2
+Worst mu lo,0.05,2
+Worst mu hi,0.36,2
+Worst mu pval,0.013,2
