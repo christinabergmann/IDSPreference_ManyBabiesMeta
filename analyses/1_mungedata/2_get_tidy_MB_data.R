@@ -2,9 +2,11 @@
 library(tidyverse)
 library(here)
 
-MB1_PATH <- "https://raw.githubusercontent.com/manybabies/mb1-analysis-public/master/processed_data/03_data_diff_main.csv"
+# Source file, same as in the ManyBabies1 main paper, using most recent commit as of October 2020.
+MB1_PATH <- "https://raw.githubusercontent.com/manybabies/mb1-analysis-public/bbf88fd546c99d0ebbc921d20abcd7e66e5f4c7a/processed_data/03_data_diff_main.csv"
 MB_OUT_PATH <- here("data/mb_data_tidy.csv")
 
+# Variables possibly relevant for analysis
 TARGET_VARS <- c("lab", "subid_unique", "trial_num", "method", "age_days", "age_group",
                  "lang_group", "lang1", "lang1_exposure", "parenta_education", "parentb_education",
                  "caregiver_seat", "preterm",
@@ -57,6 +59,7 @@ d_var_calc <- function(n, d) {
   (2/n) + (d ^ 2 / (4 * n))
 }
 
+# Each age group within lab contributes an effect size
 es_by_study <- mb_data_tidy_fct %>%
   group_by(lab, age_group, subid_unique) %>%
   summarise(d = mean(diff, na.rm = TRUE)) %>%
