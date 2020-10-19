@@ -35,7 +35,7 @@ mb_data_tidy <- mb_data_raw %>%
 
 ma_data_tidy <- ma_data_raw %>%
   mutate(study_type = "MA",
-         prop_nae = case_when(native_lang %in% c("American English", "British English") ~ 1,
+         prop_nae = case_when(native_lang %in% c("American English", "Canadian English") ~ 1,
                               TRUE ~ 0),
          native_lang =case_when(str_detect(native_lang, "English") ~ "english",
                                 TRUE ~ tolower(native_lang)),
