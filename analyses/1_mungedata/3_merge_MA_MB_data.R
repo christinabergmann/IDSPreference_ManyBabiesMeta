@@ -34,6 +34,8 @@ mb_data_tidy <- mb_data_raw %>%
 
 
 ma_data_tidy <- ma_data_raw %>%
+  rename(d_calc = d,
+         d_var_calc = d_var) %>%
   mutate(study_type = "MA",
          prop_nae = case_when(native_lang %in% c("American English", "Canadian English") ~ 1,
                               TRUE ~ 0),
