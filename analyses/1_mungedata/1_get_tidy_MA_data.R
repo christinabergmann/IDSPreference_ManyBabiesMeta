@@ -25,13 +25,13 @@ ma_data_tidy <- ma_data_raw %>%
   filter(original_ma == "yes")
 
 # calculate effect sizes - not needed as we use the ones from Dunst et al.
-%ma_data_tidy_with_es <-  ma_data_tidy %>%
-%  group_by(id) %>%
-%  nest() %>%
-%  mutate(es_data = map(data, compute_es)) %>%
-%  unnest() %>%
-%  select(id, d_calc, d_var_calc, es_method) %>%
-%  ungroup()
+#ma_data_tidy_with_es <-  ma_data_tidy %>%
+#  group_by(id) %>%
+#  nest() %>%
+#  mutate(es_data = map(data, compute_es)) %>%
+#  unnest() %>%
+#  select(id, d_calc, d_var_calc, es_method) %>% 
+#  ungroup()
 
 # get study characteristics
 study_moderators <- ma_data_tidy %>%
