@@ -13,8 +13,6 @@ results.dir = here("results_from_R")
 overleaf.dir = "~/Dropbox/Apps/Overleaf/MB-Meta/R_objects"
 code.dir = here("analyses/1_mungedata")
 
-setwd(code.dir)
-source("prep_helper.R")
 
 # should we use the grateful package to scan and cite packages?
 cite.packages.anew = FALSE
@@ -26,7 +24,32 @@ cite.packages.anew = FALSE
 # scrambling was done by the "outline" Rmd file
 setwd(data.dir)
 # codebook: https://github.com/langcog/metalab2/blob/master/metadata/spec.yaml
-d = read_csv("mb_ma_combined_scrambled.csv")
+
+
+# adding scrambling code here for transparency
+
+prereg = T
+
+if(prereg){
+  
+  COMBINED_DATASET <- here("data/mb_ma_combined.csv")
+  OUTFILE <- here("data/mb_ma_combined_scrambled.csv")
+  
+  full_dataset <- read_csv(COMBINED_DATASET)
+  
+  set.seed(1819)
+  full_dataset_shuffled <- full_dataset %>%
+    mutate(d_calc = sample(d_calc, replace = F), 
+           d_var_calc = sample(d_var_calc, replace = F))
+  
+  write_csv(full_dataset_shuffled, OUTFILE)
+  
+  d = full_dataset_shuffled
+  
+}else
+  d = read_csv("mb_ma_combined.csv")
+  
+
 
 
 ############################## RECODE MODERATORS ############################## 
@@ -41,11 +64,12 @@ mods = c( "mean_agec",
           "own_mother",
           "presentation",
           "dependent_measure",
-          "main_question_ids_preference",
+          "main_question_ids_preference"#,
           
           # varied in RRR:
-          #"stimulus_set", # ~~~ not in the dataset# ~~~ not in the datasete
-          "trial_control" )
+          #"stimulus_set", # ~~~ not in the dataset 
+          #"trial_control" # ~~~ not in the dataset
+          ) 
 #"human_coded", # ~~~ not in the dataset
 
 # which are continuous?
@@ -64,6 +88,10 @@ d$isMeta = (d$study_type == "MA")
 d$isRep = (d$study_type == "MB")
 
 
+setwd(code.dir)
+source("prep_helper.R")
+
+
 # center continuous moderators
 # age in months
 d$mean_agec = d$mean_age/12 - mean( d$mean_age[ d$isMeta == TRUE ]/12, na.rm = TRUE)
@@ -76,11 +104,15 @@ CreateTableOne(vars = mods,
                data = d)
 
 
+# Now fix method names, could be prettier
+d$method <- ifelse(d$method %in% c("singlescreen", "eyetracking"), "cf", d$method)
+
+
 # recode all moderators so reference levels are mode in meta-analysis
 #  (recode via alphabetization)
 d = d %>% mutate_at( .vars = mods[ !mods == contMods ],
                      .funs = function(.v) code_mode_as_ref(vec = .v,
-                                                           isMeta = isMeta) )
+                                                           isMeta = d$isMeta) ) #Needed to hack this
 
 
 # same table again, after recoding

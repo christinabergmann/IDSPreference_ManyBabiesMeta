@@ -30,7 +30,8 @@ mb_data_tidy <- mb_data_raw %>%
          -prop_hearing_vision, -prop_cognitive_developmental,
          -prop_monolingual, -mean_lang1_exposure) %>%
   group_by(study_id) %>%
-  mutate(same_infant = 1:n())
+  mutate(same_infant = 1:n()) %>%
+  mutate(same_infant = as.character(same_infant))
 
 
 ma_data_tidy <- ma_data_raw %>%
