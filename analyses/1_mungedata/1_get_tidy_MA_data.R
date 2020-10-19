@@ -5,7 +5,7 @@ library(janitor)
 source(here("analyses/1_mungedata/compute_es_IDS.R"))
 
 MONTH_IN_DAYS <- 365.25/12
-MA1_PATH <- here("data/IDS Preference Meta-Analytic Dataset - Sheet1.csv")
+MA1_PATH <- here("data/Copy of IDS Preference Meta-Analytic Dataset - DUNST ONLY - Sheet1.csv")
 MA_OUT_PATH <- here("data/ma_data_tidy.csv")
 
 TARGET_VARS <- c("study_id", "short_cite", "original_ma", "main_question_ids_preference", "trial_control",
@@ -24,14 +24,14 @@ ma_data_tidy <- ma_data_raw %>%
   mutate(id = 1:n()) %>%
   filter(original_ma == "yes")
 
-# calculate effect sizes
-ma_data_tidy_with_es <-  ma_data_tidy %>%
-  group_by(id) %>%
-  nest() %>%
-  mutate(es_data = map(data, compute_es)) %>%
-  unnest() %>%
-  select(id, d_calc, d_var_calc, es_method) %>%
-  ungroup()
+# calculate effect sizes - not needed as we use the ones from Dunst et al.
+%ma_data_tidy_with_es <-  ma_data_tidy %>%
+%  group_by(id) %>%
+%  nest() %>%
+%  mutate(es_data = map(data, compute_es)) %>%
+%  unnest() %>%
+%  select(id, d_calc, d_var_calc, es_method) %>%
+%  ungroup()
 
 # get study characteristics
 study_moderators <- ma_data_tidy %>%
@@ -50,7 +50,7 @@ study_moderators <- ma_data_tidy %>%
          -month, -r,-t, -corr, -original_ma)
 
 
-ma_data <- full_join(ma_data_tidy_with_es, study_moderators) %>%
+ma_data <- full_join(ma_data_tidy, study_moderators) %>%
   select(-id) %>%
   rename(prop_female = gender)
 
