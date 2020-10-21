@@ -91,6 +91,8 @@ update_result_csv( name = paste( "median n", t$study_type, sep = " "),
 mods = c( "study_type",
           "mean_agec",
           "test_lang",  # whether stimuli were in native language; almost constant in meta
+          "native_lang",
+          "prop_nae",
           "method",
           
           # constant in RRR:
