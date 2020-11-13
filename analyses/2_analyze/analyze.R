@@ -92,7 +92,7 @@ mods = c( "study_type",
           "mean_agec",
           "test_lang",  # whether stimuli were in native language; almost constant in meta
           "native_lang",
-          "prop_nae",
+          #"prop_nae", # ~~~ not motivated, was basis for test_lang
           "method",
           
           # constant in RRR:
@@ -101,12 +101,12 @@ mods = c( "study_type",
           "presentation",
           "dependent_measure",
           "main_question_ids_preference",
+         #"stimulus_set", # ~~~ not in the dataset 
           
-          # varied in RRR:
-          #"stimulus_set", # ~~~ not in the dataset# ~~~ not in the datasete
-          "trial_control" )
-#"human_coded", # ~~~ not in the dataset
-
+          # varied in RRR and MA:          
+          #"trial_control", # ~~~ not in the dataset
+         #"human_coded", # ~~~ not in the dataset
+)
 # distribution of moderators in RRR and MA
 t = CreateTableOne(vars = mods, 
                    strata = "study_type",
