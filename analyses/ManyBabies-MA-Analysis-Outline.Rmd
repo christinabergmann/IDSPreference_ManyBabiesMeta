@@ -1,7 +1,7 @@
 ---
 title: "Preregistration outline"
 author: "Christina Bergmann, Molly Lewis, Jessica Kosie "
-date: "2020-7-17"
+date: "2020-12-14"
 output: html_document
 ---
 
@@ -20,6 +20,7 @@ theme_set(theme_classic())
 
 # Introduction
 
+This document is superceded by the preregistration pdf on osf.io/
 
 ## Goals / Hypotheses
 

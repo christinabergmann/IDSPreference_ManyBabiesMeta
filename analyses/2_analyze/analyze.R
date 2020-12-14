@@ -91,8 +91,7 @@ update_result_csv( name = paste( "median n", t$study_type, sep = " "),
 mods = c( "study_type",
           "mean_agec",
           "test_lang",  # whether stimuli were in native language; almost constant in meta
-          "native_lang",
-          #"prop_nae", # ~~~ not motivated, was basis for test_lang
+          "native_lang", #Won't be used in main analyses
           "method",
           
           # constant in RRR:
@@ -100,7 +99,7 @@ mods = c( "study_type",
           "own_mother",
           "presentation",
           "dependent_measure",
-          "main_question_ids_preference",
+          "main_question_ids_preference"
          #"stimulus_set", # ~~~ not in the dataset 
           
           # varied in RRR and MA:          
@@ -122,7 +121,7 @@ cat.mods = mods[ !mods == "mean_agec" ]
 temp = dummy_cols( d[,cat.mods],
                    select_columns = cat.mods,
                    remove_selected_columns = TRUE,
-                   ignore_na =  TRUE )  # removes the "parent" column
+                   ignore_na =  TRUE )  
 temp$mean_agec = d$mean_agec 
 names(temp)
 
@@ -157,11 +156,10 @@ mods2 = c( "isMeta",  # code this way since we expect meta to have larger effect
            "speech_type",
            "own_mother",
            "presentation",
-           #"dependent_measure",  # causes singularity
+           "dependent_measure",  # causes singularity
            "main_question_ids_preference" )
 
-# varied in RRR:
-#"trial_control" )  # causes singularity
+
 
 mod.sets = list( c("isMeta"),  # naive model
                  mods2 )

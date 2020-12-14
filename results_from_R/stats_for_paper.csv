@@ -4,9 +4,9 @@ m ests MB,104,0
 m ests total,155,0
 k studies MA,16,0
 k studies MB,62,0
-median n MA,16,0
+median n MA,20,0
 median n MB,16,0
-naive tau,0,1
+naive tau,0,2
 naive k,155,1
 naive est X.Intercept.,0.47,1
 naive est isMetaTRUE,0.02,1
@@ -111,13 +111,13 @@ moderator reduction Phat0Diff hi,0.77,1
 moderator reduction Phat0.2Diff ,-0.77,1
 moderator reduction Phat0.2Diff lo,-0.65,1
 moderator reduction Phat0.2Diff hi,1,1
-meta k nonaffirmative,37,2
-meta k affirmative,14,2
-weightr mu ,0.69,2
-weightr mu lo,0.4,2
-weightr mu hi,0.98,2
+meta k nonaffirmative,36,2
+meta k affirmative,15,2
+weightr mu ,0.66,2
+weightr mu lo,0.38,2
+weightr mu hi,0.94,2
 weightr mu pval,< 1e-04,2
-Worst mu ,0.21,2
-Worst mu lo,0.05,2
-Worst mu hi,0.36,2
-Worst mu pval,0.013,2
+Worst mu ,0.19,2
+Worst mu lo,0.04,2
+Worst mu hi,0.34,2
+Worst mu pval,0.019,2

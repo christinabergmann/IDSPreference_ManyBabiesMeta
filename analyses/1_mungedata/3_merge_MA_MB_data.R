@@ -43,13 +43,11 @@ ma_data_tidy <- ma_data_raw %>%
          native_lang =case_when(str_detect(native_lang, "English") ~ "english",
                                 TRUE ~ tolower(native_lang)),
          infant_type = case_when(infant_type != "typical" ~ "non-typical",
-                                 TRUE ~ infant_type),
-         prop_caregiver_seat = NA,
-         parent_education = NA)
+                                 TRUE ~ infant_type))
 
 tidy_df <- bind_rows(mb_data_tidy, ma_data_tidy) %>%
   select(study_type, study_id, short_cite,  mean_age, age_group,
-         n, d_calc, d_var_calc, native_lang, prop_female, prop_nae, infant_type,
+         n, d_calc, d_var_calc, native_lang, prop_nae, infant_type,
          main_question_ids_preference, same_infant, method, dependent_measure,  presentation, response_mode,
          everything())
 

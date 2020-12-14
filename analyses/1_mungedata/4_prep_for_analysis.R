@@ -6,6 +6,9 @@ library(knitr)
 library(here)
 library(tableone)
 
+# If working on the preregistration, set this to T, otherwise F to use the veridical dataset without scrambling.
+prereg = T
+
 data.dir = here("data")
 # where to save results
 results.dir = here("results_from_R")
@@ -21,15 +24,12 @@ cite.packages.anew = FALSE
 # source( here("analyses/2_analyze/analyze_helper.R") )
 
 # read in dataset
-# scrambling was done by the "outline" Rmd file
+
 setwd(data.dir)
 # codebook: https://github.com/langcog/metalab2/blob/master/metadata/spec.yaml
 
 
-# adding scrambling code here for transparency
-
-prereg = T
-
+# For preregistration, we use a scrambed dataset
 if(prereg){
   
   COMBINED_DATASET <- here("data/mb_ma_combined.csv")
@@ -56,7 +56,7 @@ if(prereg){
 
 # list of moderators
 mods = c( "mean_agec",
-          "test_lang",  # whether stimuli were in native language; almost constant in meta
+          "test_lang",  # whether stimuli were in native language
           "method",
           
           # constant in RRR:
@@ -97,15 +97,21 @@ source("prep_helper.R")
 d$mean_agec = d$mean_age/12 - mean( d$mean_age[ d$isMeta == TRUE ]/12, na.rm = TRUE)
 
 
+
+# Now fix method names
+d = d  %>% mutate(method = ifelse(method %in% c("singlescreen", "eyetracking"), "cf", 
+                                  ifelse(method %in% c("fc", "cht"), "other", method)))
+
+# And collapse dependent variable 
+d = d %>% mutate(dependent_measure = ifelse(dependent_measure == "facial_expression", "affect", "preference"))
+
+
 # distribution of moderators in RRR and MA
 # mean of mean_agec should be 0 in the MA but nonzero in MB
 CreateTableOne(vars = mods, 
                strata = "study_type",
                data = d)
 
-
-# Now fix method names, could be prettier
-d$method <- ifelse(d$method %in% c("singlescreen", "eyetracking"), "cf", d$method)
 
 
 # recode all moderators so reference levels are mode in meta-analysis

@@ -8,7 +8,7 @@ MONTH_IN_DAYS <- 365.25/12
 MA1_PATH <- here("data/Copy of IDS Preference Meta-Analytic Dataset - DUNST ONLY - Sheet1.csv")
 MA_OUT_PATH <- here("data/ma_data_tidy.csv")
 
-TARGET_VARS <- c("study_id", "short_cite", "original_ma", "main_question_ids_preference", "trial_control",
+TARGET_VARS <- c("study_id", "short_cite", "original_ma", "main_question_ids_preference", 
                  "response_mode", "exposure_phase", "method", "dependent_measure", "participant_design",
                  "native_lang", "test_lang", "infant_type", "group_name_1", "group_name_2",
                  "t", "n_1", "n_2", "mean_age_1", "same_infant", "mean_age_2", "x_1", "x_2", "sd_1", "sd_2", "d", "d_var",
@@ -55,4 +55,3 @@ ma_data <- full_join(ma_data_tidy, study_moderators) %>%
   rename(prop_female = gender)
 
 write_csv(ma_data, MA_OUT_PATH)
-# rename variables so they match up

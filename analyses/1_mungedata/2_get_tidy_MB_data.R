@@ -2,16 +2,13 @@
 library(tidyverse)
 library(here)
 
-# Source file, same as in the ManyBabies1 main paper, using most recent commit as of October 2020.
-MB1_PATH <- "https://raw.githubusercontent.com/manybabies/mb1-analysis-public/bbf88fd546c99d0ebbc921d20abcd7e66e5f4c7a/processed_data/03_data_diff_main.csv"
+MB1_PATH <- "https://raw.githubusercontent.com/manybabies/mb1-analysis-public/master/processed_data/03_data_diff_main.csv"
 MB_OUT_PATH <- here("data/mb_data_tidy.csv")
 
-# Variables possibly relevant for analysis
 TARGET_VARS <- c("lab", "subid_unique", "trial_num", "method", "age_days", "age_group",
-                 "lang_group", "lang1", "lang1_exposure", "parenta_education", "parentb_education",
-                 "caregiver_seat", "preterm",
-                 "curr_earinfection", "hearing_vision", "cognitive_developmental",
-                 "gender", "nae", "ADS", "IDS", "diff")
+                 "lang_group", "lang1", "lang1_exposure",
+                 "preterm", "curr_earinfection", "hearing_vision", "cognitive_developmental",
+                 "nae", "ADS", "IDS", "diff")
 
 mb_data_raw <- read_csv(MB1_PATH)
 
@@ -22,7 +19,7 @@ mb_data_tidy <- mb_data_raw %>%
 # tidy factors
 mb_data_tidy_fct <- mb_data_tidy %>%
   mutate_at(vars(lang1, 
-                 caregiver_seat, preterm, curr_earinfection, hearing_vision, cognitive_developmental
+                 preterm, curr_earinfection, hearing_vision, cognitive_developmental
   ), tolower) %>%
   mutate(lang_group = case_when(
     lang_group %in%  c("monolingual", "monilingual", "monolingual, not english", "monolinugal") ~ "monolingual",
@@ -30,9 +27,6 @@ mb_data_tidy_fct <- mb_data_tidy %>%
     lang1 = case_when(
       str_detect(lang1, "english") ~ "english", 
       TRUE ~ lang1),
-    caregiver_seat = case_when(
-      str_detect(caregiver_seat, "caregiver") ~ "caregiver",
-      TRUE ~ "seat"),
     preterm = case_when(
       preterm %in% c("preterm", "y") ~ "preterm",
       preterm %in% c("full", "n", "0") ~ "full"),
@@ -59,7 +53,6 @@ d_var_calc <- function(n, d) {
   (2/n) + (d ^ 2 / (4 * n))
 }
 
-# Each age group within lab contributes an effect size
 es_by_study <- mb_data_tidy_fct %>%
   group_by(lab, age_group, subid_unique) %>%
   summarise(d = mean(diff, na.rm = TRUE)) %>%
@@ -77,14 +70,10 @@ study_moderators <-  mb_data_tidy_fct %>%
          prop_monolingual = map(data, ~sum(.$lang_group == "monolingual")/nrow(.[!is.na("lab_group"),])),
          modal_lang1 = map(data, ~count(., lang1) %>% arrange(-n) %>% slice(1) %>% pull(lang1)),
          mean_lang1_exposure = map(data, ~mean(.$lang1_exposure, na.rm = T)),
-         parent_education = map(data, ~mean(c(mean(.$parenta_education, na.rm = T), mean(.$parentb_education, na.rm = T)))),
-         prop_caregiver_seat = map(data, ~sum(.$caregiver_seat == "caregiver", na.rm = T)/nrow(.[!is.na("caregiver"),])),
          prop_preterm = map(data, ~sum(.$preterm == "preterm")/nrow(.[!is.na("preterm"),])),
          prop_curr_earinfection = map(data, ~sum(.$curr_earinfection == "yes", na.rm = T)/nrow(.[!is.na("curr_earinfection"),])),
          prop_hearing_vision = map(data, ~sum(.$hearing_vision == "yes", na.rm = T)/nrow(.[!is.na("hearing_vision"),])),
          prop_cognitive_developmental = map(data, ~sum(.$cognitive_developmental == "yes",na.rm = T)/nrow(.[!is.na("cognitive_developmental"),])),
-         prop_female = map(data, ~sum(.$gender == "F", na.rm = T)/nrow(.[!is.na("gender"),])),
-         #prop_beard = map(data, ~sum(.$beard == "yes", na.rm = T)/nrow(.[!is.na("beard"),])),
          prop_nae = map(data, ~sum(.$nae, na.rm = T)/nrow(.[!is.na("nae"),]))) %>%
   select(-data) %>%
   unnest()

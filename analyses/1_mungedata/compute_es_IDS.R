@@ -27,17 +27,24 @@ compute_es <- function(ma_df) {
   es_method <- "missing"
 
   #effect size calculation
- if (complete(x_1, x_2, n_1, n_2, SD_1, SD_2)) {
+ if (participant_design == "between" & complete(x_1, x_2, n_1, n_2, SD_1, SD_2)) {
     pooled_SD <- sqrt((((n_1 - 1) * SD_1 ^ 2) + ((n_2 - 1) * SD_2 ^ 2)) / (n_1 + n_2 - 2)) # "classic" Cohen's d with marginal SD
     d_calc <- (x_1 - x_2) / pooled_SD
     d_var_calc <- ((n_1 + n_2) / (n_1 * n_2)) + (d_calc ^ 2 / (2 * (n_1 + n_2)))
-    es_method  <- "classic_cohen_d"
+    es_method  <- "classic_cohen_d_between"
 
   } else if (complete(d, d_var)) { # if raw data are not available do we want to use d already reported (using who knows what method)? I'd vote for no.
     d_calc <- d
     d_var_calc <- d_var
     es_method  <- "reported_d"
-  }
+  } else if (participant_design == "within_two" & complete(x_1, x_2, n_1, SD_1, SD_2)) {
+    pooled_SD <- sqrt((SD_1 ^ 2) + (SD_2 ^ 2) / 2) 
+    d_calc <- (x_1 - x_2) / pooled_SD
+    d_var_calc <- ((2 / n_1)  + (d_calc ^ 2 / (2 * n_1)))
+    es_method  <- "classic_cohen_d_within"
+    
+  } 
+  
 
   data_frame("d_calc" = d_calc,
              "d_var_calc" = d_var_calc,
