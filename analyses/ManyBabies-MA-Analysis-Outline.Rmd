@@ -20,7 +20,7 @@ theme_set(theme_classic())
 
 # Introduction
 
-This document is superceded by the preregistration pdf on osf.io/
+This document is superceded by the preregistration pdf on https://osf.io/amj7u/
 
 ## Goals / Hypotheses
 
