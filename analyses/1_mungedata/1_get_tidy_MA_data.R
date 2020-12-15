@@ -5,7 +5,7 @@ library(janitor)
 source(here("analyses/1_mungedata/compute_es_IDS.R"))
 
 MONTH_IN_DAYS <- 365.25/12
-MA1_PATH <- here("data/Copy of IDS Preference Meta-Analytic Dataset - DUNST ONLY - Sheet1.csv")
+MA1_PATH <- here("data/Dunst.csv")
 MA_OUT_PATH <- here("data/ma_data_tidy.csv")
 
 TARGET_VARS <- c("study_id", "short_cite", "original_ma", "main_question_ids_preference", 
