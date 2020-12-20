@@ -1,7 +1,6 @@
 
 
  
-
 ############################## PRELIMINARIES ############################## 
 
 library(tidyverse) 
@@ -145,6 +144,11 @@ write.csv(corrs, "moderator_cormat.csv")
 section = 1
 
 ############################## FIT NAIVE AND MODERATED META-REGRESSIONS ############################## 
+# order of importance given in prereg:
+# age, test_lang, method, speaker, speech_type, own_mother, presentation, DV, main question
+
+# per prereg, if model isn't estimable, the moderators are to be removed in the opposite order
+#  of this importance list
 
 # try to fit meta-regression
 mods2 = c( "isMeta",  # code this way since we expect meta to have larger effect sizes
@@ -176,12 +180,37 @@ naiveRes = fit_mr( .dat = d,
                    .write.table = TRUE,
                    .simple.return = FALSE )
 
-mod1Res = fit_mr( .dat = d,
-                  .label = "mod1",
-                  .mods = mod.sets[[2]],
-                  .write.to.csv = TRUE,
-                  .write.table = TRUE,
-                  .simple.return = FALSE )
+
+gotError = TRUE  # initialize so the while-loop is entered
+
+while ( gotError == TRUE ) {
+  
+  tryCatch({
+    mod1Res = fit_mr( .dat = d,
+                      .label = "mod1",
+                      .mods = mod.sets[[2]],
+                      .write.to.csv = TRUE,
+                      .write.table = TRUE,
+                      .simple.return = FALSE )
+    gotError = FALSE
+    
+  }, error = function(err){
+    gotError <<- TRUE
+    
+    # remove one moderator from the end of the list
+    cat( paste( "\n Removing ", 
+                mod.sets[[2]][ length(mod.sets[[2]]) ],
+                " from moderators and trying again" ) )
+    mod.sets[[2]] <<- mod.sets[[2]][ 1 : ( length(mod.sets[[2]]) - 1 ) ]
+    
+
+  })
+  
+}
+
+
+
+
 
 
 ############################## CROSS-MODEL INFERENCE ##############################
@@ -388,7 +417,7 @@ update_result_csv( name = "Worst mu pval",
 significance_funnel(yi = dma$yi,
                     vi = dma$vi,
                     est.N = mu.worst,
-                    est.all = ests,
+                    est.all = as.numeric(meta$b.r),
                     favor.positive = TRUE)
 
 setwd(results.dir)
