@@ -144,8 +144,9 @@ d$affirm = ( d$yi > 0 ) & ( d$pval < 0.05 )
 ############################## SAVE DATASET ############################## 
 
 setwd(data.dir)
-write.csv(d, "mb_ma_combined_scrambled_prepped.csv")
 
+if ( prereg == TRUE ) write.csv(d, "mb_ma_combined_scrambled_prepped.csv")
+if ( prereg == FALSE ) write.csv(d, "mb_ma_combined_prepped.csv")
 
 
 
