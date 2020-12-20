@@ -16,6 +16,7 @@ library(PublicationBias)
 library(xtable)
 library(boot)
 library(testthat)
+library(ggplot2)
 
 data.dir = here("data")
 # where to save results
@@ -136,6 +137,48 @@ corrs = temp %>%
 setwd(results.dir)
 write.csv(corrs, "moderator_cormat.csv")
 # too long to put in paper
+
+
+
+############################## DENSITY PLOT OF META-ANALYSIS VS. REPLICATION ESTIMATES ##############################
+
+colors = c("black", "orange")
+
+# choose axis scaling
+summary(d$yi)
+xmin = -0.6
+xmax = 3.2
+tickJump = 0.2  # space between tick marks
+
+ggplot( data = d,
+        aes( x = yi,
+             fill = isMeta,
+             color = isMeta ) ) +
+  
+  # shifted threshold for Z=z
+  geom_vline(xintercept = 0,
+             color = "gray",
+             lty = 2) +
+  
+  # ensemble estimates shifted to Z=0
+  geom_density(alpha = 0.3) +
+  
+  theme_bw() +
+  
+  xlab("Estimate (SMD)") +
+  scale_x_continuous( limits = c(xmin, xmax), breaks = seq(xmin, xmax, tickJump)) +
+  
+  ylab("Density") +
+  
+  scale_color_manual( values = colors ) +
+  scale_fill_manual( values = colors ) +
+  
+  theme(axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 #                       1. NAIVE AND MODERATED META-REGRESSIONS           
@@ -298,14 +341,12 @@ statCI_result_csv( "moderator reduction Phat0.2Diff", c(naiveRes$Phat0.2Diff - m
 
 section = 2
 
-##### Sanity Check: Estimate in Meta-Analysis Alone #####
 ( meta = robu( yi ~ 1, 
                data = dma, 
                studynum = as.factor(study_id),
                var.eff.size = vi,
                modelweights = "HIER",
                small = TRUE) )
-
 # sanity check: should be similar to naive meta-regression model
 expect_equal( as.numeric(meta$b.r), round(naiveRes$est.ma, digits), tol = 0.01 )
 expect_equal( as.numeric(meta$reg_table$CI.L), round(naiveRes$est.ma.lo, digits), tol = 0.01 )
