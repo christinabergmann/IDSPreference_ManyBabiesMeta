@@ -8,7 +8,7 @@ library(here)
 library(tableone)
 
 # If working on the preregistration, set this to T, otherwise F to use the veridical dataset without scrambling.
-prereg = T
+prereg = FALSE
 
 data.dir = here("data")
 # where to save results

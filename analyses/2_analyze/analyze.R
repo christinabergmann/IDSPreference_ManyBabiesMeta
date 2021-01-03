@@ -9,7 +9,6 @@ library(here)
 library(tableone)
 library(corrr)
 library(robumeta)
-library(MetaUtility)
 library(fastDummies)
 library(weightr)
 library(PublicationBias)
@@ -28,17 +27,18 @@ code.dir = here("analyses/2_analyze")
 # helper fns
 setwd(code.dir)
 source("analyze_helper.R")
-# # source internal fns from boot package
-# # it's a long story
-# # see my_boot() in helper fns if you like long stories
-# source( here("analyses/2_analyze/bootfuns.R") )
+
+# package update not yet on CRAN, but we need the cluster-bootstrap functionality
+source("MetaUtility development functions.R")
+
+
 
 # should we remove existing results file instead of overwriting individual entries? 
 start.res.from.scratch = FALSE
 # should we use the grateful package to scan and cite packages?
 cite.packages.anew = FALSE
 # should we bootstrap from scratch or read in old resamples?
-boot.from.scratch = FALSE
+boot.from.scratch = TRUE
 
 # wipe results csvs if needed
 if ( start.res.from.scratch == TRUE ) wr()
@@ -48,12 +48,18 @@ digits = 2
 pval.cutoff = 10^-4  # threshold for using "<"
 boot.reps = 2000 # for cross-model comparisons 
 
-# read in dataset
+# stop sci notation
+options(scipen=999)
+
+s# read in dataset
 setwd(data.dir)
-d = suppressMessages( read_csv("mb_ma_combined_scrambled_prepped.csv") )
+d = suppressMessages( read_csv("mb_ma_combined_prepped.csv") )
 
 # dataset with just the meta-analysis
 dma = d %>% filter(isMeta == TRUE)
+
+# dataset with just the replications
+dr = d %>% filter(isMeta == FALSE)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 #                       0. CHARACTERISTICS OF INCLUDED STUDIES            
@@ -99,13 +105,8 @@ mods = c( "study_type",
           "own_mother",
           "presentation",
           "dependent_measure",
-          "main_question_ids_preference"
-         #"stimulus_set", # ~~~ not in the dataset 
-          
-          # varied in RRR and MA:          
-          #"trial_control", # ~~~ not in the dataset
-         #"human_coded", # ~~~ not in the dataset
-)
+          "main_question_ids_preference" )
+
 # distribution of moderators in RRR and MA
 t = CreateTableOne(vars = mods, 
                    strata = "study_type",
@@ -140,45 +141,6 @@ write.csv(corrs, "moderator_cormat.csv")
 
 
 
-############################## DENSITY PLOT OF META-ANALYSIS VS. REPLICATION ESTIMATES ##############################
-
-colors = c("black", "orange")
-
-# choose axis scaling
-summary(d$yi)
-xmin = -0.6
-xmax = 3.2
-tickJump = 0.2  # space between tick marks
-
-ggplot( data = d,
-        aes( x = yi,
-             fill = isMeta,
-             color = isMeta ) ) +
-  
-  # shifted threshold for Z=z
-  geom_vline(xintercept = 0,
-             color = "gray",
-             lty = 2) +
-  
-  # ensemble estimates shifted to Z=0
-  geom_density(alpha = 0.3) +
-  
-  theme_bw() +
-  
-  xlab("Estimate (SMD)") +
-  scale_x_continuous( limits = c(xmin, xmax), breaks = seq(xmin, xmax, tickJump)) +
-  
-  ylab("Density") +
-  
-  scale_color_manual( values = colors ) +
-  scale_fill_manual( values = colors ) +
-  
-  theme(axis.text.y = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
-
-
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 #                       1. NAIVE AND MODERATED META-REGRESSIONS           
@@ -194,6 +156,8 @@ section = 1
 #  of this importance list
 
 # try to fit meta-regression
+# same list as mods except has isMeta instead of study_type
+#  and does not have native_lang
 mods2 = c( "isMeta",  # code this way since we expect meta to have larger effect sizes
            "mean_agec",
            "test_lang",  # whether stimuli were in native language; almost constant in meta
@@ -212,10 +176,10 @@ mod.sets = list( c("isMeta"),  # naive model
                  mods2 )
 
 labels = c("naive",
-           "mod1")
+           "moderated")
 
-# fit the naive and moderated models
-# these write their results to the results csv file and table
+# fit the naive model
+# fit_mr automatically writes results to the results csv file and table
 naiveRes = fit_mr( .dat = d,
                    .label = "naive",
                    .mods = mod.sets[[1]],
@@ -223,6 +187,11 @@ naiveRes = fit_mr( .dat = d,
                    .write.table = TRUE,
                    .simple.return = FALSE )
 
+
+
+# fit the meta-regression with all covariates 
+#  and remove them in prespecified order if needed until 
+#  model becomes estimables
 
 gotError = TRUE  # initialize so the while-loop is entered
 
@@ -241,7 +210,7 @@ while ( gotError == TRUE ) {
     gotError <<- TRUE
     
     # remove one moderator from the end of the list
-    cat( paste( "\n Removing ", 
+    message( paste( "\n Removing ", 
                 mod.sets[[2]][ length(mod.sets[[2]]) ],
                 " from moderators and trying again" ) )
     mod.sets[[2]] <<- mod.sets[[2]][ 1 : ( length(mod.sets[[2]]) - 1 ) ]
@@ -251,6 +220,112 @@ while ( gotError == TRUE ) {
   
 }
 
+# look at the surviving moderators
+mod.sets[[2]]
+
+
+
+
+############################## SUBSET MODELS ##############################
+
+# subset to MA and replications separately
+
+( naiveMAonly = fit_subset_meta( .dat = dma,
+                               .mods = "1",
+                               .label = "MA subset naive" ) )
+
+( naiveRepsonly = fit_subset_meta( .dat = dr,
+                                 .mods = "1",
+                                 .label = "Reps subset naive" ) )
+
+
+
+############################## PROPORTION MEANINGFULLY STRONG EFFECTS ##############################
+
+
+
+
+get_and_write_phat( .dat = dma,
+                     .q = 0,
+                     prefix = "Phat0MA")
+
+get_and_write_phat( .dat = dma,
+                    .q = 0.2,
+                    prefix = "Phat0.2MA")
+
+get_and_write_phat( .dat = dr,
+                    .q = 0,
+                    prefix = "Phat0R")
+
+get_and_write_phat( .dat = dr,
+                    .q = 0.2,
+                    prefix = "Phat0.2R")
+
+
+#bm
+# curious that estimates are actually better for the replication?
+
+calibR = calib_ests(yi = dr$yi, sei = sqrt(dr$vi) )
+mean(calibR>0.2)
+mean(calibR)
+
+calibMA = calib_ests(yi = dma$yi, sei = sqrt(dma$vi) )
+mean(calibMA>0.2)
+mean(calibMA)
+
+d$calib = NA
+d$calib[ d$isMeta == FALSE ] = calibR
+d$calib[ d$isMeta == TRUE ] = calibMA
+
+#bm: very interesting. next up, should I incorporate this into the fit_mr fn?
+
+
+
+############################## DENSITY PLOT OF META-ANALYSIS VS. REPLICATION CALIBRATED ESTIMATES ##############################
+
+colors = c("black", "orange")
+
+#@move to prep
+d$studyTypePretty = NA
+d$studyTypePretty[ d$isMeta == TRUE ] = "Meta-analysis"
+d$studyTypePretty[ d$isMeta == FALSE ] = "Replications"
+
+# choose axis scaling
+summary(d$yi)
+xmin = -1
+xmax = 3.5
+tickJump = 0.5  # space between tick marks
+
+ggplot( data = d,
+        aes( x = calib,
+             fill = studyTypePretty,
+             color = studyTypePretty ) ) +
+  
+  #Bm put estimates from subset models
+  geom_hline( xintercept = )
+  
+  # shifted threshold for Z=z
+  geom_vline(xintercept = 0,
+             color = "gray",
+             lty = 2) +
+  
+  # ensemble estimates shifted to Z=0
+  geom_density(alpha = 0.3) +
+  
+  theme_bw() +
+  
+  xlab("Calibrated study estimate (SMD)") +
+  scale_x_continuous( limits = c(xmin, xmax), breaks = seq(xmin, xmax, tickJump)) +
+  
+  ylab("Density") +
+  
+  scale_color_manual( values = colors, name = "Source" ) +
+  scale_fill_manual( values = colors, name = "Source" ) +
+  
+  theme(axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
 
 
 
