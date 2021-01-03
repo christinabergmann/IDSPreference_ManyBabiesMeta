@@ -216,12 +216,13 @@ fit_mr = function( .dat,
   linpred.string2 = paste( .mods2, collapse=" + ")
   string2 = paste( "yi ~ ", linpred.string2, collapse = "")
   ( meta2 = robu( eval( parse( text = string2 ) ), 
-                  data = d, 
+                  data = .dat, 
                   studynum = as.factor(study_id),
                   var.eff.size = vi,
                   modelweights = "HIER",
                   small = TRUE) )
   
+
   pval = meta2$reg_table$prob[meta$labels == "X.Intercept."]
   pval2 = format_stat(pval)
   
@@ -262,18 +263,20 @@ fit_mr = function( .dat,
   # sanity check
   expect_equal( est.ma - est.rep, meta$b.r[ meta$labels == "isMetaTRUE"] )
   
-  .res$avgDiff = meta$b.r[ meta$labels == "isMetaTRUE"]
-  # .res$avgDiffLo = meta$reg_table$CI.L[ meta$labels == "isMetaTRUE"]
-  # .res$avgDiffHi = meta$reg_table$CI.U[ meta$labels == "isMetaTRUE"]
-  # .res$avgDiff
+  if ( .simple.return == FALSE ) {
+    .res$avgDiff = meta$b.r[ meta$labels == "isMetaTRUE"]
+    # .res$avgDiffLo = meta$reg_table$CI.L[ meta$labels == "isMetaTRUE"]
+    # .res$avgDiffHi = meta$reg_table$CI.U[ meta$labels == "isMetaTRUE"]
+    # .res$avgDiff
+    
+    .res$Phat0Diff = runif(n=1, -1,1) # ***obviously fake
+    # .res$Phat0DiffLo = runif(n=1, -1,1) # ***obviously fake
+    # .res$Phat0DiffHi = runif(n=1, -1,1) # ***obviously fake
+    
+    .res$Phat0.2Diff = runif(n=1, -1,1) # ***obviously fake
+  }
   
-  .res$Phat0Diff = runif(n=1, -1,1) # ***obviously fake
-  # .res$Phat0DiffLo = runif(n=1, -1,1) # ***obviously fake
-  # .res$Phat0DiffHi = runif(n=1, -1,1) # ***obviously fake
-  
-  .res$Phat0.2Diff = runif(n=1, -1,1) # ***obviously fake
-  
-  
+
   if ( .simple.return == TRUE ){
     # return as a numeric vector for compatibility with boot()
     return( c( est.ma - est.rep,

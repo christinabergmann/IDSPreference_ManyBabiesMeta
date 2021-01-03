@@ -51,7 +51,7 @@ boot.reps = 2000 # for cross-model comparisons
 # stop sci notation
 options(scipen=999)
 
-s# read in dataset
+# read in dataset
 setwd(data.dir)
 d = suppressMessages( read_csv("mb_ma_combined_prepped.csv") )
 
@@ -225,7 +225,15 @@ while ( gotError == TRUE ) {
 # look at the surviving moderators
 mod.sets[[2]]
 
-# sanity check: refit the pruned model manually
+# sanity check: refit the naive and pruned models manually
+
+robu( yi ~ isMeta, 
+      data = d, 
+      studynum = as.factor(study_id),
+      var.eff.size = vi,
+      modelweights = "HIER",
+      small = TRUE)
+
 robu( yi ~ isMeta + mean_agec + test_lang + method, 
       data = d, 
       studynum = as.factor(study_id),
@@ -345,6 +353,15 @@ my_ggsave( name = "calibrated_plot.pdf",
 
 ############################## CROSS-MODEL INFERENCE ##############################
 
+
+# refit mod1Res for each boot iterate, each time estimating avgDiff and two currently fake stats
+#  for Phat
+
+#bm
+# @temp only
+# @increase later
+boot.reps = 500
+
 if ( boot.from.scratch == TRUE ) {
   boot.res = boot( data = d, 
                    parallel = "multicore",
@@ -361,7 +378,6 @@ if ( boot.from.scratch == TRUE ) {
                      b = cluster_bt(.dat = original,
                                     .clustervar = "study_id")
                      
-                     # WORKS with boot
                      # multi-argument returns need to be via c(), not list or df or whatever
                      tryCatch({
                        fit_mr( .dat = b,
@@ -392,8 +408,8 @@ if ( boot.from.scratch == FALSE ){
 
 # order of statistics in the above: 
 # between-source difference in estimated means
-# between-source difference in Phat0
-# between-source difference in Phat0.2
+# between-source difference in Phat0 (**FAKE)
+# between-source difference in Phat0.2 (**FAKE)
 
 # # naive model metrics of source discrepancy
 # # CIS WRONG HERE
@@ -413,11 +429,14 @@ if ( boot.from.scratch == FALSE ){
 
 
 # between-model difference
-statCI_result_csv( "moderator reduction avgDiff", c(naiveRes$avgDiff - mod1Res$avgDiff, bootCIs[[1]][1], bootCIs[[1]][2]) )
+# framed as the INCREASED discrepancy after controlling for moderators
+statCI_result_csv( "moderator increase avgDiff", c(mod1Res$avgDiff - naiveRes$avgDiff, bootCIs[[1]][1], bootCIs[[1]][2]) )
 
-statCI_result_csv( "moderator reduction Phat0Diff", c(naiveRes$Phat0Diff - mod1Res$Phat0Diff, bootCIs[[2]][1], bootCIs[[2]][2]) )
-
-statCI_result_csv( "moderator reduction Phat0.2Diff", c(naiveRes$Phat0.2Diff - mod1Res$Phat0.2Diff, bootCIs[[3]][1], bootCIs[[3]][2]) )
+# SAVE
+# currently these are fake
+# statCI_result_csv( "moderator reduction Phat0Diff", c(naiveRes$Phat0Diff - mod1Res$Phat0Diff, bootCIs[[2]][1], bootCIs[[2]][2]) )
+# 
+# statCI_result_csv( "moderator reduction Phat0.2Diff", c(naiveRes$Phat0.2Diff - mod1Res$Phat0.2Diff, bootCIs[[3]][1], bootCIs[[3]][2]) )
 
 
 # ***p-values would require resampling under H0...
@@ -428,16 +447,12 @@ statCI_result_csv( "moderator reduction Phat0.2Diff", c(naiveRes$Phat0.2Diff - m
 
 section = 2
 
-( meta = robu( yi ~ 1, 
-               data = dma, 
-               studynum = as.factor(study_id),
-               var.eff.size = vi,
-               modelweights = "HIER",
-               small = TRUE) )
+# @MOVE THIS
 # sanity check: should be similar to naive meta-regression model
-expect_equal( as.numeric(meta$b.r), round(naiveRes$est.ma, digits), tol = 0.01 )
-expect_equal( as.numeric(meta$reg_table$CI.L), round(naiveRes$est.ma.lo, digits), tol = 0.01 )
-expect_equal( as.numeric(meta$reg_table$CI.U), round(naiveRes$est.ma.hi, digits), tol = 0.01 )
+#  but not necessarily equal
+expect_equal( as.numeric(naive.MA.only$b.r), round(naiveRes$est.ma, digits), tol = 0.03 )
+expect_equal( as.numeric(naive.MA.only$reg_table$CI.L), round(naiveRes$est.ma.lo, digits), tol = 0.03 )
+expect_equal( as.numeric(naive.MA.only$reg_table$CI.U), round(naiveRes$est.ma.hi, digits), tol = 0.03 )
 
 ##### Affirmative and Nonaffirmative Counts #####
 
@@ -446,10 +461,10 @@ t = d %>% group_by(isMeta) %>%
              k.nonaffirm = sum(affirm == FALSE),
              Paffirm = mean(affirm) )
 
-update_result_csv( name = "meta k nonaffirmative",
+update_result_csv( name = "MA k nonaffirmative",
                    value = t$k.nonaffirm[ t$isMeta == TRUE ] )
 
-update_result_csv( name = "meta k affirmative",
+update_result_csv( name = "MA k affirmative",
                    value = t$k.affirm[ t$isMeta == TRUE ] )
 
 ##### Hedges Selection Model #####
@@ -494,6 +509,14 @@ mu.se.worst = meta.worst$reg_table$SE
 pval.worst = meta.worst$reg_table$prob
 
 
+# sanity check
+corrected_meta(yi = dma$yi,
+               vi = dma$vi,
+               eta = 1000,
+               clustervar = dma$study_id,
+               favor.positive = TRUE,
+               model = "robust")
+
 
 statCI_result_csv( "Worst mu",
                    c(meta.worst$b.r,
@@ -507,12 +530,16 @@ update_result_csv( name = "Worst mu pval",
 
 # ##### S-values ######
 # omitted because not very informative given the worst-case results above
-# # s-values to reduce to null
-# ( res = svalue( yi = d$logRR,
-#                 vi = d$varlogRR,
-#                 q = log(1), 
-#                 clustervar = d$authoryear,
-#                 model = "robust" ) )
+# s-values to reduce to null
+( Sval0 = svalue( yi = dma$yi,
+                vi = dma$vi,
+                q = 0,
+                clustervar = dma$study_id,
+                favor.positive = TRUE,
+                model = "robust" ) )
+
+
+
 # # N.P. for both point estimate and CI
 # update_result_csv( name = "sval est to 1",
 #                    section = 2,
@@ -522,30 +549,33 @@ update_result_csv( name = "Worst mu pval",
 #                    section = 2,
 #                    value = res$sval.ci,
 #                    print = FALSE )
-# 
-# 
-# # s-values to reduce effect size to RR=1.1
-# ( res = svalue( yi = d$logRR,
-#                 vi = d$varlogRR,
-#                 q = log(1.1), 
-#                 clustervar = d$authoryear,
-#                 model = "robust" ) )
-# # N.P. for estimate
-# update_result_csv( name = "sval est to 1.1",
-#                    section = 2,
-#                    value = res$sval.est,
-#                    print = FALSE )
-# update_result_csv( name = "sval CI to 1.1",
-#                    section = 2,
-#                    value = round( res$sval.ci, 2 ),
-#                    print = FALSE )
+
+#@not possible even though worst-case estimate has CI crossing null
+# must be the weight thing again
+
+
+# s-values to reduce effect size to match replications
+( SvalR = svalue( yi = dma$yi,
+                  vi = dma$vi,
+                  q = naive.reps.only$b.r,
+                  clustervar = dma$study_id,
+                  favor.positive = TRUE,
+                  model = "robust" ) )
+
+# N.P. for estimate
+update_result_csv( name = "sval est to reps",
+                   value = round( SvalR$sval.est, 2 ),
+                   print = FALSE )
+update_result_csv( name = "sval CI to reps",
+                   value = round( SvalR$sval.ci, 2 ),
+                   print = FALSE )
 
 
 ##### Significance Funnel ######
 significance_funnel(yi = dma$yi,
                     vi = dma$vi,
                     est.N = mu.worst,
-                    est.all = as.numeric(meta$b.r),
+                    est.all = as.numeric(naive.MA.only$b.r),
                     favor.positive = TRUE)
 
 setwd(results.dir)
@@ -557,9 +587,6 @@ setwd(overleaf.dir)
 ggsave( "funnel.pdf",
         width = 8,
         height = 6 )
-
-
-# *** If worst-case meta-analysis estimate was less than replication estimate, report about amount of publication bias required to shift meta-analysis to match replications.
 
 
 
