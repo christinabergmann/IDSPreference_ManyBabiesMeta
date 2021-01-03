@@ -200,6 +200,11 @@ fit_mr = function( .dat,
     write.csv( temp,
                paste("model_", .label, "_table.csv", sep = "" ),
                row.names = FALSE)
+    
+    # also print it as an xtable
+    #browser()
+    print( xtable(temp), include.rownames = FALSE)
+    
   }
   
   ##### 3. Get Estimated Mean for Meta-Analysis #####
@@ -371,6 +376,46 @@ get_and_write_phat = function( .dat,
 }
 
 
+################################ FNS FOR BOOTSTRAPPING ################################
+
+# this is Davison & Hinkley's recommendation 
+#  see section 3.8 in "Further Topics" chapter
+cluster_bt = function(.dat,
+                      .clustervar){
+  .dat$cluster = .dat[[.clustervar]]
+  
+  # resample clusters, leaving observations intact
+  #https://stats.stackexchange.com/questions/46821/bootstrapping-hierarchical-multilevel-data-resampling-clusters
+  # see answer by dash2
+  cluster.ids = data.frame(cluster = sample(.dat$cluster, replace = TRUE))
+  datb = .dat %>% inner_join(cluster.ids, by = 'cluster')
+  return(datb)
+}
+
+# # sanity check
+# d %>% group_by(study_id) %>% 
+#   summarise( mean(yi) )
+# # since we're resampling clusters, below should have different clusters but same 
+# #  mean for a given cluster as the above:
+# b = cluster_bt(.dat = d, "study_id")
+# b %>% group_by(study_id) %>% 
+#   summarise( mean(yi) )
+
+# get BCa-bootstrapped confidence intervals for a vector of parameters (not just one)
+# boot.res: an object from boot()
+# type: what kind of bootstrapping to use? (as in boot.ci())
+# n.ests: how many parameters were estimated?
+get_boot_CIs = function(boot.res,
+                        type = "bca",
+                        n.ests) {
+  bootCIs = lapply( 1:n.ests, function(x) boot.ci(boot.res, type = type, index = x) )
+  
+  # list with one entry per estimate
+  # the middle index "4" on the bootCIs accesses the stats vector
+  # the final index chooses the CI lower (4) or upper (5) bound
+  bootCIs = lapply( 1:n.ests, function(x) c( bootCIs[[x]][[4]][4],
+                                             bootCIs[[x]][[4]][5] ) )
+}
 
 
 

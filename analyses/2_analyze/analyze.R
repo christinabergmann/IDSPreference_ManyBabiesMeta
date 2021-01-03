@@ -195,6 +195,8 @@ naiveRes = fit_mr( .dat = d,
 
 gotError = TRUE  # initialize so the while-loop is entered
 
+
+# this will print an xtable with the moderator estimates for use in the paper
 while ( gotError == TRUE ) {
   
   tryCatch({
@@ -222,6 +224,14 @@ while ( gotError == TRUE ) {
 
 # look at the surviving moderators
 mod.sets[[2]]
+
+# sanity check: refit the pruned model manually
+robu( yi ~ isMeta + mean_agec + test_lang + method, 
+      data = d, 
+      studynum = as.factor(study_id),
+      var.eff.size = vi,
+      modelweights = "HIER",
+      small = TRUE)
 
 
 
