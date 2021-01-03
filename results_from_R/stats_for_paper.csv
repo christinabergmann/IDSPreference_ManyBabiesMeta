@@ -50,16 +50,16 @@ mod1 avg pval for meta,2e-03,1
 Phat0 MA lo,76,1
 Phat0 MA hi,96,1
 Phat0MA est,90,1
-Phat0MA lo,76,1
-Phat0MA hi,94,1
+Phat0MA lo,74,1
+Phat0MA hi,98,1
 Phat0.2MA est,86,1
-Phat0.2MA lo,71,1
-Phat0.2MA hi,94,1
+Phat0.2MA lo,70,1
+Phat0.2MA hi,98,1
 Phat0R est,100,1
-Phat0R lo,85,1
+Phat0R lo,86,1
 Phat0R hi,100,1
 Phat0.2R est,90,1
-Phat0.2R lo,65,1
+Phat0.2R lo,66,1
 Phat0.2R hi,100,1
 Reps subset naive tau,0.11,1
 Reps subset naive k,104,1

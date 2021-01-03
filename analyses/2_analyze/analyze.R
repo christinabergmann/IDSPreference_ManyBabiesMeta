@@ -16,6 +16,7 @@ library(xtable)
 library(boot)
 library(testthat)
 library(ggplot2)
+library(metafor)
 
 data.dir = here("data")
 # where to save results
@@ -30,7 +31,6 @@ source("analyze_helper.R")
 
 # package update not yet on CRAN, but we need the cluster-bootstrap functionality
 source("MetaUtility development functions.R")
-
 
 
 # should we remove existing results file instead of overwriting individual entries? 
@@ -230,11 +230,11 @@ mod.sets[[2]]
 
 # subset to MA and replications separately
 
-( naiveMAonly = fit_subset_meta( .dat = dma,
+( naive.MA.only = fit_subset_meta( .dat = dma,
                                .mods = "1",
                                .label = "MA subset naive" ) )
 
-( naiveRepsonly = fit_subset_meta( .dat = dr,
+( naive.reps.only = fit_subset_meta( .dat = dr,
                                  .mods = "1",
                                  .label = "Reps subset naive" ) )
 
@@ -242,28 +242,24 @@ mod.sets[[2]]
 
 ############################## PROPORTION MEANINGFULLY STRONG EFFECTS ##############################
 
-
-
-
 get_and_write_phat( .dat = dma,
                      .q = 0,
-                     prefix = "Phat0MA")
+                     label = "Phat0MA")
 
 get_and_write_phat( .dat = dma,
                     .q = 0.2,
-                    prefix = "Phat0.2MA")
+                    label = "Phat0.2MA")
 
 get_and_write_phat( .dat = dr,
                     .q = 0,
-                    prefix = "Phat0R")
+                    label = "Phat0R")
 
 get_and_write_phat( .dat = dr,
                     .q = 0.2,
-                    prefix = "Phat0.2R")
+                    label = "Phat0.2R")
 
 
-#bm
-# curious that estimates are actually better for the replication?
+
 
 calibR = calib_ests(yi = dr$yi, sei = sqrt(dr$vi) )
 mean(calibR>0.2)
@@ -276,9 +272,6 @@ mean(calibMA)
 d$calib = NA
 d$calib[ d$isMeta == FALSE ] = calibR
 d$calib[ d$isMeta == TRUE ] = calibMA
-
-#bm: very interesting. next up, should I incorporate this into the fit_mr fn?
-
 
 
 ############################## DENSITY PLOT OF META-ANALYSIS VS. REPLICATION CALIBRATED ESTIMATES ##############################
@@ -301,13 +294,19 @@ ggplot( data = d,
              fill = studyTypePretty,
              color = studyTypePretty ) ) +
   
-  #Bm put estimates from subset models
-  geom_hline( xintercept = )
+  # mean estimates from subset models
+  geom_vline( xintercept = naive.MA.only$b.r,
+              color = colors[1],
+              lty = 2 ) +
+  
+  geom_vline( xintercept = naive.reps.only$b.r,
+              color = colors[2],
+              lty = 2) +
   
   # shifted threshold for Z=z
   geom_vline(xintercept = 0,
              color = "gray",
-             lty = 2) +
+             lty = 1) +
   
   # ensemble estimates shifted to Z=0
   geom_density(alpha = 0.3) +
@@ -328,6 +327,9 @@ ggplot( data = d,
         panel.grid.minor = element_blank())
 
 
+my_ggsave( name = "calibrated_plot.pdf",
+           width = 8,
+           height = 5 )
 
 
 

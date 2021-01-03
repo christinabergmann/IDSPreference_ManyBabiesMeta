@@ -1,6 +1,24 @@
 
 ################################ MISCELLANEOUS ################################
 
+
+my_ggsave = function(name,
+                     width,
+                     height,
+                     .results.dir = results.dir,
+                     .overleaf.dir = overleaf.dir) {
+  
+  setwd(.results.dir)
+  ggsave( name,
+          width = width, 
+          height = height)
+  
+  setwd(.overleaf.dir)
+  ggsave( name,
+          width = width, 
+          height = height)
+}
+
 # wrapper for update_result_csv to easily at stat and confidence interval
 statCI_result_csv = function(name,
                              vec){
@@ -328,10 +346,10 @@ fit_subset_meta = function( .dat,
 
 
 
-#bm
+
 get_and_write_phat = function( .dat,
                                .q,
-                               prefix ) {
+                               label ) {
   
   
   Phat = prop_stronger( q = .q,
@@ -341,13 +359,13 @@ get_and_write_phat = function( .dat,
                         vi.name = "vi",
                         cluster.name = "study_id" )
   
-  update_result_csv( name = paste( prefix, "est" ),
+  update_result_csv( name = paste( label, "est" ),
                      value = round( 100 * Phat$est ) )
   
-  update_result_csv( name = paste( prefix, "lo" ),
+  update_result_csv( name = paste( label, "lo" ),
                      value = round( 100 * Phat$lo ) )
   
-  update_result_csv( name = paste( prefix, "hi" ),
+  update_result_csv( name = paste( label, "hi" ),
                      value = round( 100 * Phat$hi ) )
   
 }
