@@ -629,7 +629,7 @@ xmin = min(yi)
 xmax = max(yi)
 ymin = 0  # so that pooled points are shown
 ymax = max( sqrt(vi) )
-xlab = "Point estimate"
+xlab = "Point estimate (SMD)"
 ylab = "Estimated standard error"
 favor.positive = TRUE
 alpha.select = 0.05
@@ -703,29 +703,30 @@ int = 0
 # replications, originals
 colors = c("darkgray", "red")
 
-p.funnel = ggplot( data = d, aes( x = d$yi,
-                                  y = d$sei,
-                                  color = d$isMeta,
-                                  shape = d$affirm ) )
+p.funnel = ggplot( data = d, aes( x = yi,
+                                  y = sei,
+                                  color = isMeta ) )
 
 if ( plot.pooled == TRUE ) {
   
   # plot the pooled points
+  # outer part of diamonds
   p.funnel = p.funnel + geom_point(
     data = pooled.pts,
     aes( x = yi, y = sei ),
     size = 4,
     shape = 5,
     fill = NA,
-    color = c("red", "black", "orange", "darkgray")
+    color = c("red", "darkgray", NA, NA)
   ) +
     
+    # inner part of diamonds
     geom_point(
       data = pooled.pts,
       aes( x = yi, y = sei ),
       size = 4,
       shape = 18,
-      color =  c("red", "black", "orange", "darkgray"),
+      color =  c("red", "darkgray", "red", "orange"),
       alpha = 1
     ) +
     
@@ -738,12 +739,14 @@ if ( plot.pooled == TRUE ) {
 
 p.funnel = p.funnel +
   
-  # semi-transparent points with solid circles around them
-  geom_point( size = 3, alpha=.4) +
-  geom_point( size = 3, shape = 1) +
+  # # semi-transparent points with solid circles around them
+  # geom_point( size = 3, alpha=.4) +
+  # geom_point( size = 3, shape = 1) +
+  
+  geom_point(size = 3, shape = 1) +
   
   scale_color_manual(values = colors) +
-  scale_shape_manual(values = c(1,19)) +
+  #scale_shape_manual(values = c(1,2)) +
   
   xlab(xlab) +
   ylab(ylab) +
@@ -756,6 +759,11 @@ p.funnel = p.funnel +
   theme(legend.position = "none")
 
 plot(p.funnel)
+
+
+
+
+
 
 setwd(overleaf.dir)
 ggsave(plot = p.funnel,
