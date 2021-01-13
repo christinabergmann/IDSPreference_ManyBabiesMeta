@@ -128,8 +128,15 @@ fit_mr = function( .dat,
   # .write.table = FALSE
   # .write.to.csv = FALSE
   # .simple.return = FALSE
-  
-  
+
+  # find out if dataset has both MLR and MA
+  if ( length( unique(.dat$isMeta) ) != 2 ) {
+    message("FYI, dataset has only one source (MLR or MA), so not looking at isMeta discrepancy")
+    hasBoth = FALSE
+  } else {
+    hasBoth = TRUE
+  }
+
   ##### 1. Fit Meta-Regression #####
   linpred.string = paste( .mods, collapse=" + ")
   string = paste( "yi ~ ", linpred.string, collapse = "")
@@ -150,7 +157,7 @@ fit_mr = function( .dat,
   V = meta$VR.r  # variance-covariance matrix
   
   # save this one separately since it will ultimately be returned
-  est.rep = est[ meta$labels == "X.Intercept."]
+  if (hasBoth == TRUE) est.rep = est[ meta$labels == "X.Intercept."]
   
   # rounded and formatted estimates for text
   # expects pval.cutoff to be a global var
@@ -179,11 +186,11 @@ fit_mr = function( .dat,
   }
   
   # also save selected results to a df to be returned
-  if ( .simple.return == FALSE ) .res = data.frame( est.rep = est.rep,
+  if ( hasBoth == TRUE & .simple.return == FALSE ) .res = data.frame( est.rep = est.rep,
                                                     est.rep.lo = mu.lo[ meta$labels == "X.Intercept." ], 
                                                     est.rep.hi = mu.hi[ meta$labels == "X.Intercept." ] )
   
-  
+
   
   ##### 2. Write Meta-Regression Table #####
   if ( .write.table == TRUE ){
@@ -207,92 +214,105 @@ fit_mr = function( .dat,
     
   }
   
-  ##### 3. Get Estimated Mean for Meta-Analysis #####
-  # could use linear combo of coefficients and vars, but df are complicated
-  #  for robumeta
-  # so easiest way is to just refit the model, reversing coding of study type variable
-  .mods2 = .mods
-  .mods2[ .mods == "isMeta" ] = "isRep"  # now intercept will be for meta-analysis
-  linpred.string2 = paste( .mods2, collapse=" + ")
-  string2 = paste( "yi ~ ", linpred.string2, collapse = "")
-  ( meta2 = robu( eval( parse( text = string2 ) ), 
-                  data = .dat, 
-                  studynum = as.factor(study_id),
-                  var.eff.size = vi,
-                  modelweights = "HIER",
-                  small = TRUE) )
   
+  if ( hasBoth == TRUE ) {
+    ##### 3. Get Estimated Mean for Meta-Analysis #####
+    # could use linear combo of coefficients and vars, but df are complicated
+    #  for robumeta
+    # so easiest way is to just refit the model, reversing coding of study type variable
+    
+    
+    .mods2 = .mods
+    .mods2[ .mods == "isMeta" ] = "isRep"  # now intercept will be for meta-analysis
+    linpred.string2 = paste( .mods2, collapse=" + ")
+    string2 = paste( "yi ~ ", linpred.string2, collapse = "")
+    ( meta2 = robu( eval( parse( text = string2 ) ), 
+                    data = .dat, 
+                    studynum = as.factor(study_id),
+                    var.eff.size = vi,
+                    modelweights = "HIER",
+                    small = TRUE) )
+    
+    
+    pval = meta2$reg_table$prob[meta$labels == "X.Intercept."]
+    pval2 = format_stat(pval)
+    
+    est.ma = meta2$b.r[meta2$labels == "X.Intercept."]
+    
+    # save results to csv
+    if ( .write.to.csv == TRUE ){
+      update_result_csv( name = paste( .label, "avg for meta" ),
+                         value = round( est.ma, digits ) )
+      
+      update_result_csv( name = paste( .label, "avg lo for meta" ),
+                         value = round( meta2$reg_table$CI.L[meta$labels == "X.Intercept."], digits ) )
+      
+      update_result_csv( name = paste( .label, "avg hi for meta" ),
+                         value = round( meta2$reg_table$CI.U[meta$labels == "X.Intercept."], digits ) )
+      
+      update_result_csv( name = paste( .label, "avg pval for meta" ),
+                         value = pval2 )
+    }
+    
+    # also save selected results to a df to be returned
+    if ( .simple.return == FALSE ){
+      .res$est.ma = est.ma
+      .res$est.ma.lo = meta2$reg_table$CI.L[meta$labels == "X.Intercept."]
+      .res$est.ma.hi = meta2$reg_table$CI.U[meta$labels == "X.Intercept."]
+    }
+    
+    # sanity check
+    expect_equal( est.ma - est.rep, meta$b.r[ meta$labels == "isMetaTRUE"]
+                  
+                  
+                  ##### 4. Get Phat for Meta, Replications, and Differencee #####
+                  # ***will fill later if tau^2 > 0
+                  
+                  
+                  ##### 5. Write Results #####
+                  # row = data.frame( avgDiff = est.ma - est.rep,
+                  #                   Phat0Diff = runif(n=1, -1,1), # ***obviously fake
+                  #                   Phat0.2Diff = runif(n=1, -1,1) ) # ***obviously fake
+                  # return(row)
+                  
+    )
+    
+    if ( .simple.return == FALSE ) {
+      .res$avgDiff = meta$b.r[ meta$labels == "isMetaTRUE"]
+      # .res$avgDiffLo = meta$reg_table$CI.L[ meta$labels == "isMetaTRUE"]
+      # .res$avgDiffHi = meta$reg_table$CI.U[ meta$labels == "isMetaTRUE"]
+      # .res$avgDiff
+      
+      .res$Phat0Diff = runif(n=1, -1,1) # ***obviously fake
+      # .res$Phat0DiffLo = runif(n=1, -1,1) # ***obviously fake
+      # .res$Phat0DiffHi = runif(n=1, -1,1) # ***obviously fake
+      
+      .res$Phat0.2Diff = runif(n=1, -1,1) # ***obviously fake
+    }
+    
+    
+    if ( .simple.return == TRUE ){
+      # return as a numeric vector for compatibility with boot()
+      return( c( est.ma - est.rep,
+                 runif(n=1, -1,1), # ***obviously fake
+                 runif(n=1, -1,1) ) ) # ***obviously fake
+      
+    } else return(.res)
+  }
 
-  pval = meta2$reg_table$prob[meta$labels == "X.Intercept."]
-  pval2 = format_stat(pval)
-  
-  est.ma = meta2$b.r[meta2$labels == "X.Intercept."]
-  
-  # save results to csv
-  if ( .write.to.csv == TRUE ){
-    update_result_csv( name = paste( .label, "avg for meta" ),
-                       value = round( est.ma, digits ) )
-    
-    update_result_csv( name = paste( .label, "avg lo for meta" ),
-                       value = round( meta2$reg_table$CI.L[meta$labels == "X.Intercept."], digits ) )
-    
-    update_result_csv( name = paste( .label, "avg hi for meta" ),
-                       value = round( meta2$reg_table$CI.U[meta$labels == "X.Intercept."], digits ) )
-    
-    update_result_csv( name = paste( .label, "avg pval for meta" ),
-                       value = pval2 )
-  }
-  
-  # also save selected results to a df to be returned
-  if ( .simple.return == FALSE ){
-    .res$est.ma = est.ma
-    .res$est.ma.lo = meta2$reg_table$CI.L[meta$labels == "X.Intercept."]
-    .res$est.ma.hi = meta2$reg_table$CI.U[meta$labels == "X.Intercept."]
-  }
-  
-  ##### 4. Get Phat for Meta, Replications, and Differencee #####
-  # ***will fill later if tau^2 > 0
-  
-  
-  ##### 5. Write Results #####
-  # row = data.frame( avgDiff = est.ma - est.rep,
-  #                   Phat0Diff = runif(n=1, -1,1), # ***obviously fake
-  #                   Phat0.2Diff = runif(n=1, -1,1) ) # ***obviously fake
-  # return(row)
-  
-  # sanity check
-  expect_equal( est.ma - est.rep, meta$b.r[ meta$labels == "isMetaTRUE"] )
-  
-  if ( .simple.return == FALSE ) {
-    .res$avgDiff = meta$b.r[ meta$labels == "isMetaTRUE"]
-    # .res$avgDiffLo = meta$reg_table$CI.L[ meta$labels == "isMetaTRUE"]
-    # .res$avgDiffHi = meta$reg_table$CI.U[ meta$labels == "isMetaTRUE"]
-    # .res$avgDiff
-    
-    .res$Phat0Diff = runif(n=1, -1,1) # ***obviously fake
-    # .res$Phat0DiffLo = runif(n=1, -1,1) # ***obviously fake
-    # .res$Phat0DiffHi = runif(n=1, -1,1) # ***obviously fake
-    
-    .res$Phat0.2Diff = runif(n=1, -1,1) # ***obviously fake
-  }
-  
-
-  if ( .simple.return == TRUE ){
-    # return as a numeric vector for compatibility with boot()
-    return( c( est.ma - est.rep,
-               runif(n=1, -1,1), # ***obviously fake
-               runif(n=1, -1,1) ) ) # ***obviously fake
-    
-  } else return(.res)
   
 }
 
 
 
 
+
+
+
 fit_subset_meta = function( .dat,
                             .label = NA,  # name of the analysis for the results csv
-                            .mods ) {
+                            .mods,
+                            .simple.return = FALSE) {
   
   # # TEST ONLY
   # .dat = dma
@@ -302,6 +322,17 @@ fit_subset_meta = function( .dat,
   # .write.table = FALSE
   # .write.to.csv = FALSE
   # .simple.return = FALSE
+  
+  # catch case where subset is empty
+  if ( nrow(.dat) == 0 ) {
+    message("Subset is empty")
+    
+    # return something whose structure is compatible with .simple.return = TRUE
+    return( data.frame( intercept = NA,
+                        intercept.lo = NA,
+                        intercept.hi = NA,
+                        k = NA ) )
+  }
   
   
   ##### 1. Fit Meta-Regression #####
@@ -349,9 +380,19 @@ fit_subset_meta = function( .dat,
                        value = pvals2 )
   }
 
+  if ( .simple.return == FALSE ) return(meta)
   
-
-  return(meta)
+  if ( .simple.return == TRUE ) {
+    
+    # if you update this return structure, also update the placeholder at top
+    #  for when subset is empty
+    return( data.frame( intercept = est[1],
+                        intercept.lo = mu.lo[1],
+                        intercept.hi = mu.hi[1],
+                        k = nrow(.dat) ) )
+  }
+  
+  
 }
 
 

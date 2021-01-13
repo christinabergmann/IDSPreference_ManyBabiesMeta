@@ -61,18 +61,18 @@ Phat0R hi,100,1
 Phat0.2R est,90,1
 Phat0.2R lo,66,1
 Phat0.2R hi,100,1
-Reps subset naive tau,0.11,2
-Reps subset naive k,104,2
-Reps subset naive est X.Intercept.,0.35,2
-Reps subset naive lo X.Intercept.,0.28,2
-Reps subset naive hi X.Intercept.,0.43,2
-Reps subset naive pval X.Intercept.,< 0.0001,2
-MA subset naive tau,0.45,2
-MA subset naive k,51,2
-MA subset naive est X.Intercept.,0.7,2
-MA subset naive lo X.Intercept.,0.37,2
-MA subset naive hi X.Intercept.,1.02,2
-MA subset naive pval X.Intercept.,0.00056364,2
+Reps subset naive tau,0.11,1
+Reps subset naive k,104,1
+Reps subset naive est X.Intercept.,0.35,1
+Reps subset naive lo X.Intercept.,0.28,1
+Reps subset naive hi X.Intercept.,0.43,1
+Reps subset naive pval X.Intercept.,< 0.0001,1
+MA subset naive tau,0.45,1
+MA subset naive k,51,1
+MA subset naive est X.Intercept.,0.7,1
+MA subset naive lo X.Intercept.,0.37,1
+MA subset naive hi X.Intercept.,1.02,1
+MA subset naive pval X.Intercept.,0.00056364,1
 moderator reduction avgDiff ,-0.15,1
 moderator reduction avgDiff lo,0.13,1
 moderator reduction avgDiff hi,0.47,1
@@ -145,3 +145,40 @@ Corr MA pval,0.0099117,2
 *naive avg lo for meta,0.35,1
 *naive avg hi for meta,1,1
 *naive avg pval for meta,8e-04,1
+*mod1_mlr_only tau,0.48,1
+*mod1_mlr_only k,51,1
+*mod1_mlr_only est X.Intercept.,0.77,1
+*mod1_mlr_only est mean_agec,0.04,1
+*mod1_mlr_only est test_langb.nonnative,-0.3,1
+*mod1_mlr_only est test_langc.artificial,-0.51,1
+*mod1_mlr_only est methodb.hpp,-0.39,1
+*mod1_mlr_only est methodc.other,0.57,1
+*mod1_mlr_only lo X.Intercept.,0.36,1
+*mod1_mlr_only lo mean_agec,-0.01,1
+*mod1_mlr_only lo test_langb.nonnative,-1.02,1
+*mod1_mlr_only lo test_langc.artificial,-2.02,1
+*mod1_mlr_only lo methodb.hpp,-2.3,1
+*mod1_mlr_only lo methodc.other,-0.9,1
+*mod1_mlr_only hi X.Intercept.,1.18,1
+*mod1_mlr_only hi mean_agec,0.09,1
+*mod1_mlr_only hi test_langb.nonnative,0.42,1
+*mod1_mlr_only hi test_langc.artificial,1.01,1
+*mod1_mlr_only hi methodb.hpp,1.52,1
+*mod1_mlr_only hi methodc.other,2.03,1
+*mod1_mlr_only pval X.Intercept.,0.0060568,1
+*mod1_mlr_only pval mean_agec,0.1078098,1
+*mod1_mlr_only pval test_langb.nonnative,0.2709201,1
+*mod1_mlr_only pval test_langc.artificial,0.3249946,1
+*mod1_mlr_only pval methodb.hpp,0.5854501,1
+*mod1_mlr_only pval methodc.other,0.3002101,1
+*mod1_mlr_only avg for meta,0.77,1
+*mod1_mlr_only avg lo for meta,0.36,1
+*mod1_mlr_only avg hi for meta,1.18,1
+*mod1_mlr_only avg pval for meta,6e-03,1
+m ests MA,51,0
+m ests MB,104,0
+m ests total,155,0
+k studies MA,16,0
+k studies MB,62,0
+median n MA,20,0
+median n MB,16,0
