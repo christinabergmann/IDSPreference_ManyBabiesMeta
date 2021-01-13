@@ -97,3 +97,51 @@ Corr MA est,0.4,2
 Corr MA lo,0.13,2
 Corr MA hi,0.68,2
 Corr MA pval,0.0099117,2
+*mod1 tau,0.33,1
+*mod1 k,155,1
+*mod1 est X.Intercept.,0.13,1
+*mod1 est isMetaTRUE,0.48,1
+*mod1 est mean_agec,0.02,1
+*mod1 est test_langb.nonnative,-0.09,1
+*mod1 est test_langc.artificial,-0.5,1
+*mod1 est methodb.hpp,0.11,1
+*mod1 est methodc.other,0.67,1
+*mod1 lo X.Intercept.,-0.08,1
+*mod1 lo isMetaTRUE,-0.02,1
+*mod1 lo mean_agec,0.01,1
+*mod1 lo test_langb.nonnative,-0.2,1
+*mod1 lo test_langc.artificial,-2.49,1
+*mod1 lo methodb.hpp,-0.23,1
+*mod1 lo methodc.other,-1.17,1
+*mod1 hi X.Intercept.,0.35,1
+*mod1 hi isMetaTRUE,0.97,1
+*mod1 hi mean_agec,0.03,1
+*mod1 hi test_langb.nonnative,0.02,1
+*mod1 hi test_langc.artificial,1.48,1
+*mod1 hi methodb.hpp,0.46,1
+*mod1 hi methodc.other,2.52,1
+*mod1 pval X.Intercept.,0.2174876,1
+*mod1 pval isMetaTRUE,0.0593261,1
+*mod1 pval mean_agec,0.0005402,1
+*mod1 pval test_langb.nonnative,0.1026598,1
+*mod1 pval test_langc.artificial,0.3881219,1
+*mod1 pval methodb.hpp,0.5047620,1
+*mod1 pval methodc.other,0.2844915,1
+*mod1 avg for meta,0.61,1
+*mod1 avg lo for meta,0.26,1
+*mod1 avg hi for meta,0.96,1
+*mod1 avg pval for meta,2e-03,1
+*naive tau,0.35,1
+*naive k,155,1
+*naive est X.Intercept.,0.35,1
+*naive est isMetaTRUE,0.32,1
+*naive lo X.Intercept.,0.28,1
+*naive lo isMetaTRUE,0,1
+*naive hi X.Intercept.,0.43,1
+*naive hi isMetaTRUE,0.64,1
+*naive pval X.Intercept.,< 0.0001,1
+*naive pval isMetaTRUE,0.047835,1
+*naive avg for meta,0.68,1
+*naive avg lo for meta,0.35,1
+*naive avg hi for meta,1,1
+*naive avg pval for meta,8e-04,1

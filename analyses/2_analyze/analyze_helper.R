@@ -291,7 +291,7 @@ fit_mr = function( .dat,
 
 
 fit_subset_meta = function( .dat,
-                            .label = NA,  # name of the analysis
+                            .label = NA,  # name of the analysis for the results csv
                             .mods ) {
   
   # # TEST ONLY
@@ -329,24 +329,26 @@ fit_subset_meta = function( .dat,
   pvals2 = format.pval(pval, eps = pval.cutoff)
   
   # save results to csv file
-  
-  update_result_csv( name = paste(.label, "tau"),
-                     value = round( sqrt(t2), 2 ) )
-  
-  update_result_csv( name = paste(.label, "k"),
-                     value = nrow(meta$data.full) )
-  
-  update_result_csv( name = paste( .label, "est", meta$labels ),
-                     value = ests )
-  
-  update_result_csv( name = paste( .label, "lo", meta$labels ),
-                     value = round(mu.lo, digits) )
-  
-  update_result_csv( name = paste( .label, "hi", meta$labels ),
-                     value = round(mu.hi, digits) )
-  
-  update_result_csv( name = paste( .label, "pval", meta$labels ),
-                     value = pvals2 )
+  if ( !is.na(.label) ) {
+    update_result_csv( name = paste(.label, "tau"),
+                       value = round( sqrt(t2), 2 ) )
+    
+    update_result_csv( name = paste(.label, "k"),
+                       value = nrow(meta$data.full) )
+    
+    update_result_csv( name = paste( .label, "est", meta$labels ),
+                       value = ests )
+    
+    update_result_csv( name = paste( .label, "lo", meta$labels ),
+                       value = round(mu.lo, digits) )
+    
+    update_result_csv( name = paste( .label, "hi", meta$labels ),
+                       value = round(mu.hi, digits) )
+    
+    update_result_csv( name = paste( .label, "pval", meta$labels ),
+                       value = pvals2 )
+  }
+
   
 
   return(meta)

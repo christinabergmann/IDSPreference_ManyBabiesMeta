@@ -181,12 +181,11 @@ labels = c("naive",
 # fit the naive model
 # fit_mr automatically writes results to the results csv file and table
 naiveRes = fit_mr( .dat = d,
-                   .label = "naive",
+                   .label = "*naive",
                    .mods = mod.sets[[1]],
                    .write.to.csv = TRUE,
                    .write.table = TRUE,
                    .simple.return = FALSE )
-
 
 
 # fit the meta-regression with all covariates 
@@ -201,7 +200,7 @@ while ( gotError == TRUE ) {
   
   tryCatch({
     mod1Res = fit_mr( .dat = d,
-                      .label = "mod1",
+                      .label = "*mod1",
                       .mods = mod.sets[[2]],
                       .write.to.csv = TRUE,
                       .write.table = TRUE,
@@ -226,7 +225,6 @@ while ( gotError == TRUE ) {
 mod.sets[[2]]
 
 # sanity check: refit the naive and pruned models manually
-
 robu( yi ~ isMeta, 
       data = d, 
       studynum = as.factor(study_id),
@@ -240,6 +238,23 @@ robu( yi ~ isMeta + mean_agec + test_lang + method,
       var.eff.size = vi,
       modelweights = "HIER",
       small = TRUE)
+
+# # sanity check: fit pruned model within MA and MLR separately
+# #  to look at interactions
+# # neither is estimable :(
+# fit_mr( .dat = dma,
+#         .label = "*mod1_mlr_only",
+#         .mods = mod.sets[[2]],
+#         .write.to.csv = TRUE,
+#         .write.table = TRUE,
+#         .simple.return = FALSE )
+# 
+# fit_mr( .dat = dr,
+#         .label = "*mod1_mlr_only",
+#         .mods = mod.sets[[2]],
+#         .write.to.csv = TRUE,
+#         .write.table = TRUE,
+#         .simple.return = FALSE )
 
 
 
@@ -257,6 +272,50 @@ robu( yi ~ isMeta + mean_agec + test_lang + method,
                                  .label = "Reps subset naive" ) )
 
 
+
+##### Sanity check: subsets that resemble each other #####
+
+# Could you do something like a "modal subsample" where you pull native language HPP (or CF?) results and plot those across MA/MB1, possibly with age included?
+fit_subset_meta( .dat = dma %>% filter( method == "b.hpp" & test_lang == "a.native" ),
+                 .mods = "1",
+                 .label = NA )
+
+fit_subset_meta( .dat = dr %>% filter( method == "b.hpp" & test_lang == "a.native" ),
+                 .mods = "1",
+                 .label = NA )
+# interesting!!! these agree pretty well (replications actually a little bigger, 0.58 vs 0.51)
+# bm
+
+# **complement of the above - do not agree well at all (difference 0.43, more like in meta-regression below)
+# 0.29 replications vs. 0.72 MA
+fit_subset_meta( .dat = dma %>% filter( method != "b.hpp" | test_lang != "a.native" ),
+                 .mods = "1",
+                 .label = NA )
+
+fit_subset_meta( .dat = dr %>% filter( method != "b.hpp" | test_lang != "a.native" ),
+                 .mods = "1",
+                 .label = NA )
+
+
+# surviving mods were mean age, language, and method
+# compare to meta-regression
+
+# first one is estimated difference of 0.24 - SEEMS TO DISAGREE WITH ABOVE!
+fit_mr( .dat = d,
+        .mods = c("isMeta", "method", "test_lang"),
+        .simple.return = FALSE)
+
+# recode method and language as binary
+d$method.hpp = d$method == "b.hpp"
+d$test_lang.native = d$test_lang == "a.native"
+
+fit_mr( .dat = d,
+        .mods = c("isMeta", "method.hpp", "test_lang.native"),
+        .simple.return = FALSE)
+
+#bm: look into this strange situation! 
+
+# also fit MR within only reps and within only MA
 
 ############################## PROPORTION MEANINGFULLY STRONG EFFECTS ##############################
 
