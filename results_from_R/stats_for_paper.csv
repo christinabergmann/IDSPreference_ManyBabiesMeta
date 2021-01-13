@@ -61,18 +61,18 @@ Phat0R hi,100,1
 Phat0.2R est,90,1
 Phat0.2R lo,66,1
 Phat0.2R hi,100,1
-Reps subset naive tau,0.11,1
-Reps subset naive k,104,1
-Reps subset naive est X.Intercept.,0.35,1
-Reps subset naive lo X.Intercept.,0.28,1
-Reps subset naive hi X.Intercept.,0.43,1
-Reps subset naive pval X.Intercept.,< 0.0001,1
-MA subset naive tau,0.45,1
-MA subset naive k,51,1
-MA subset naive est X.Intercept.,0.7,1
-MA subset naive lo X.Intercept.,0.37,1
-MA subset naive hi X.Intercept.,1.02,1
-MA subset naive pval X.Intercept.,0.00056364,1
+Reps subset naive tau,0.11,2
+Reps subset naive k,104,2
+Reps subset naive est X.Intercept.,0.35,2
+Reps subset naive lo X.Intercept.,0.28,2
+Reps subset naive hi X.Intercept.,0.43,2
+Reps subset naive pval X.Intercept.,< 0.0001,2
+MA subset naive tau,0.45,2
+MA subset naive k,51,2
+MA subset naive est X.Intercept.,0.7,2
+MA subset naive lo X.Intercept.,0.37,2
+MA subset naive hi X.Intercept.,1.02,2
+MA subset naive pval X.Intercept.,0.00056364,2
 moderator reduction avgDiff ,-0.15,1
 moderator reduction avgDiff lo,0.13,1
 moderator reduction avgDiff hi,0.47,1
@@ -93,3 +93,7 @@ sval est to reps,7.76,1
 sval CI to reps,1.09,1
 MA k nonaffirmative,29,1
 MA k affirmative,22,1
+Corr MA est,0.4,2
+Corr MA lo,0.13,2
+Corr MA hi,0.68,2
+Corr MA pval,0.0099117,2

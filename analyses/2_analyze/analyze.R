@@ -528,8 +528,7 @@ update_result_csv( name = "Worst mu pval",
                    value = round(pval.worst, 3) )
 
 
-# ##### S-values ######
-# omitted because not very informative given the worst-case results above
+##### S-values ######
 # s-values to reduce to null
 ( Sval0 = svalue( yi = dma$yi,
                 vi = dma$vi,
@@ -538,6 +537,40 @@ update_result_csv( name = "Worst mu pval",
                 favor.positive = TRUE,
                 model = "robust" ) )
 
+
+
+##### Meta-Analysis with Eta = 4.70 (Post Hoc) ######
+# code modified from PublicationBias::significance_funnel innards
+eta = 4.70
+pvals = dma$pval
+A = dma$affirm
+yi = dma$yi
+vi = dma$vi
+clustervar = dma$study_id
+dat = dma
+small = TRUE
+
+metaCorr = corrected_meta( yi = yi,
+                           vi = vi, 
+                           eta = eta,
+                           clustervar = clustervar,
+                           model = "robust",
+                           favor.positive = TRUE )
+
+# **wow! quite close to replication mean
+
+
+update_result_csv( name = "Corr MA est",
+                   value = round( metaCorr$est, 2) )
+
+update_result_csv( name = "Corr MA lo",
+                   value = round( metaCorr$lo, 2) )
+
+update_result_csv( name = "Corr MA hi",
+                   value = round( metaCorr$hi, 2) )
+
+update_result_csv( name = "Corr MA pval",
+                   value = format.pval( metaCorr$pval, eps = pval.cutoff) )
 
 
 # # N.P. for both point estimate and CI
@@ -572,21 +605,164 @@ update_result_csv( name = "sval CI to reps",
 
 
 ##### Significance Funnel ######
-significance_funnel(yi = dma$yi,
-                    vi = dma$vi,
-                    est.N = mu.worst,
-                    est.all = as.numeric(naive.MA.only$b.r),
-                    favor.positive = TRUE)
+# significance_funnel(yi = dma$yi,
+#                     vi = dma$vi,
+#                     est.N = mu.worst,
+#                     est.all = as.numeric(naive.MA.only$b.r),
+#                     favor.positive = TRUE)
+# 
+# setwd(results.dir)
+# ggsave( "funnel.pdf",
+#         width = 8,
+#         height = 6 )
+# 
+# setwd(overleaf.dir)
+# ggsave( "funnel.pdf",
+#         width = 8,
+#         height = 6 )
 
-setwd(results.dir)
-ggsave( "funnel.pdf",
-        width = 8,
-        height = 6 )
+
+# modified version
+yi = d$yi
+vi = d$vi
+xmin = min(yi)
+xmax = max(yi)
+ymin = 0  # so that pooled points are shown
+ymax = max( sqrt(vi) )
+xlab = "Point estimate"
+ylab = "Estimated standard error"
+favor.positive = TRUE
+alpha.select = 0.05
+plot.pooled = TRUE
+
+# pooled points to plot
+est.MA = naive.MA.only$b.r  # naive est in MA
+est.R = naive.reps.only$b.r  # naive est in reps
+est.SAPBE = metaCorr$est  # not actually worst-case, but rather SAPB-E estimate
+est.W = mu.worst
+
+
+d$sei = sqrt(vi)
+
+# calculate p-values
+d$pval = 2 * ( 1 - pnorm( abs(yi) / sqrt(vi) ) )
+
+# which direction of effects are favored?
+# if we have the pooled point estimate, but not the favored direction,
+#  assume favored direction matches sign of pooled estimate (but issue warning)
+if ( !is.na(est.all) & is.na(favor.positive) ) {
+  favor.positive = (est.all > 0)
+  warning("favor.positive not provided, so assuming publication bias favors estimates whose sign matches est.all")
+}
+if ( is.na(est.all) & is.na(favor.positive) ) {
+  stop("Need to specify favor.positive")
+}
+
+# affirmative vs. nonaffirmative indicator
+d$affirm = rep(NA, nrow(d))
+
+if ( favor.positive == TRUE ) {
+  d$affirm[ (d$yi > 0) & (d$pval < alpha.select) ] = "Affirmative"
+  d$affirm[ (d$yi < 0) | (d$pval >= alpha.select) ] = "Non-affirmative"
+}
+if ( favor.positive == FALSE ) {
+  d$affirm[ (d$yi < 0) & (d$pval < alpha.select) ] = "Affirmative"
+  d$affirm[ (d$yi > 0) | (d$pval >= alpha.select) ] = "Non-affirmative"
+}
+
+# reorder levels for plotting joy
+d$affirm = factor( d$affirm, c("Non-affirmative", "Affirmative") )
+
+# stop if no studies in either group
+if ( sum( d$affirm == "Non-affirmative" ) == 0 ) {
+  stop("There are no non-affirmative studies. The plot would look silly.")
+}
+
+if ( sum( d$affirm == "Affirmative" ) == 0 ) {
+  stop("There are no affirmative studies. The plot would look silly.")
+}
+
+
+# set up pooled estimates for plotting
+pooled.pts = data.frame( yi = c(est.MA, est.R, est.SAPBE, est.W),
+                         sei = c(0,0,0,0) )
+
+# for a given SE (y-value), return the "just significant" point estimate value (x-value)
+just_signif_est = function( .sei ) .sei * qnorm(1 - alpha.select/2)
+
+# calculate slope and intercept of the "just affirmative" line
+# i.e., 1.96 = (just affirmative estimate) / se
+if (favor.positive == TRUE) sl = 1/qnorm(1 - alpha.select/2)
+if (favor.positive == FALSE) sl = -1/qnorm(1 - alpha.select/2)
+int = 0
+# # sanity check: should be exactly alpha.select
+# 2 * ( 1 - pnorm( abs(1) / sl ) )
+
+
+##### Make the Plot #####
+# replications, originals
+colors = c("darkgray", "red")
+
+p.funnel = ggplot( data = d, aes( x = d$yi,
+                                  y = d$sei,
+                                  color = d$isMeta,
+                                  shape = d$affirm ) )
+
+if ( plot.pooled == TRUE ) {
+  
+  # plot the pooled points
+  p.funnel = p.funnel + geom_point(
+    data = pooled.pts,
+    aes( x = yi, y = sei ),
+    size = 4,
+    shape = 5,
+    fill = NA,
+    color = c("red", "black", "orange", "darkgray")
+  ) +
+    
+    geom_point(
+      data = pooled.pts,
+      aes( x = yi, y = sei ),
+      size = 4,
+      shape = 18,
+      color =  c("red", "black", "orange", "darkgray"),
+      alpha = 1
+    ) +
+    
+    # just for visual separation of pooled ests
+    geom_hline( yintercept = 0 ) +
+    
+    # diagonal "just significant" line
+    geom_abline(slope=sl,intercept = int, color = "gray")
+}
+
+p.funnel = p.funnel +
+  
+  # semi-transparent points with solid circles around them
+  geom_point( size = 3, alpha=.4) +
+  geom_point( size = 3, shape = 1) +
+  
+  scale_color_manual(values = colors) +
+  scale_shape_manual(values = c(1,19)) +
+  
+  xlab(xlab) +
+  ylab(ylab) +
+  
+  scale_x_continuous( limits = c(xmin, xmax), breaks = seq(-0.5, 3, .5) ) +
+  scale_y_continuous( limits = c(ymin, ymax), breaks = seq(0, .6, .1) ) +
+  
+  theme_classic() +
+  #theme(legend.title=element_blank())
+  theme(legend.position = "none")
+
+plot(p.funnel)
 
 setwd(overleaf.dir)
-ggsave( "funnel.pdf",
-        width = 8,
-        height = 6 )
+ggsave(plot = p.funnel,
+       filename = "mb_signif_funnel.png",
+       width = 5,
+       height = 4)
+
 
 
 
