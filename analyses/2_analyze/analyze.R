@@ -1,6 +1,4 @@
 
-
-
 ############################## PRELIMINARIES ############################## 
 
 library(tidyverse) 
@@ -17,6 +15,7 @@ library(boot)
 library(testthat)
 library(ggplot2)
 library(metafor)
+library(MatchIt)
 
 data.dir = here("data")
 # where to save results
@@ -244,223 +243,6 @@ robu( yi ~ isMeta + mean_agec + test_lang + method,
       modelweights = "HIER",
       small = TRUE)
 
-
-
-# 
-robu( yi ~ mean_agec + test_lang + method,
-      data = dma,
-      studynum = as.factor(study_id),
-      var.eff.size = vi,
-      modelweights = "HIER",
-      small = TRUE)
-
-robu( yi ~ mean_agec + test_lang + method,
-      data = dr,
-      studynum = as.factor(study_id),
-      var.eff.size = vi,
-      modelweights = "HIER",
-      small = TRUE)
-
-
-
-# *a key difference: HPP (vs. CF) is associated with LARGER ES in replications, but SMALLER ES in meta-analysis
-
-# sanity check: fit pruned model within MA and MLR separately
-#  to look heuristically at interactions
-fit_mr( .dat = dma,
-        .label = "mod1_MA_only",
-        .mods = c("mean_agec", "test_lang", "method"),
-        #.write.to.csv = TRUE,
-        .write.table = TRUE )
-
-fit_mr( .dat = dr,
-        .label = "mod1_MLR_only",
-        .mods = c("mean_agec", "test_lang", "method"),
-        #.write.to.csv = TRUE,
-        .write.table = TRUE )
-
-
-
-#bm
-
-
-
-robu( yi ~ isMeta + mean_agec + test_lang + (method=="b.hpp"), 
-      data = d, 
-      studynum = as.factor(study_id),
-      var.eff.size = vi,
-      modelweights = "HIER",
-      small = TRUE)
-
-# adding interactions doesn't improve fit
-robu( yi ~ isMeta*mean_agec + test_lang + isMeta*(method=="b.hpp"), 
-      data = d, 
-      studynum = as.factor(study_id),
-      var.eff.size = vi,
-      modelweights = "HIER",
-      small = TRUE)
-
-
-############################## SUBSET MODELS ##############################
-
-##### MA subset and MLR subset #####
-( naive.MA.only = fit_subset_meta( .dat = dma,
-                                   .mods = "1",
-                                   .label = "MA subset naive" ) )
-
-( naive.reps.only = fit_subset_meta( .dat = dr,
-                                     .mods = "1",
-                                     .label = "Reps subset naive" ) )
-
-
-##### Sanity check: Subsets that resemble each other #####
-
-# MCF: "Could you do something like a "modal subsample" where you pull native language HPP (or CF?) results and plot those across MA/MB1, possibly with age included?"
-fit_subset_meta( .dat = dma %>% filter( method == "b.hpp" & test_lang == "a.native" ),
-                 .mods = "1",
-                 .label = NA )
-
-fit_subset_meta( .dat = dr %>% filter( method == "b.hpp" & test_lang == "a.native" ),
-                 .mods = "1",
-                 .label = NA )
-
-# interesting!!! these agree pretty well (replications actually a little bigger, 0.58 vs 0.51)
-# bm
-
-
-# **complements of above - do not agree well at all (difference 0.43, more like in meta-regression below)
-# 0.29 replications vs. 0.72 MA
-fit_subset_meta( .dat = dma %>% filter( method != "b.hpp" | test_lang != "a.native" ),
-                 .mods = "1",
-                 .label = NA )
-
-fit_subset_meta( .dat = dr %>% filter( method != "b.hpp" | test_lang != "a.native" ),
-                 .mods = "1",
-                 .label = NA )
-
-
-# continues to agree very well if we look just at HPP subset
-fit_subset_meta( .dat = dma %>% filter( method == "b.hpp" ),
-                 .mods = "1",
-                 .label = NA )
-
-fit_subset_meta( .dat = dr %>% filter( method == "b.hpp" ),
-                 .mods = "1",
-                 .label = NA )
-
-
-# surviving mods were mean age, language, and method
-# compare to meta-regression
-
-# first one is estimated difference of 0.24 - SEEMS TO DISAGREE WITH ABOVE!
-fit_mr( .dat = d,
-        .mods = c("isMeta", "method", "test_lang"),
-        .simple.return = FALSE)
-
-# recode method and language as binary
-d$method.hpp = d$method == "b.hpp"
-d$test_lang.native = d$test_lang == "a.native"
-
-fit_mr( .dat = d,
-        .mods = c("isMeta", "method.hpp", "test_lang.native"),
-        .simple.return = FALSE)
-
-
-
-############################## FOREST PLOT OF SUBSET ESTIMATES ##############################
-
-
-#bm
-# for each categorical moderator, fit subset meta-analysis
-
-
-##### Fit subset model to each level of each categorical model ##### 
-modsCat = mods2[ !mods2 %in% c("isMeta", "mean_agec" ) ]
-
-for ( i in 1:length(modsCat) ) {
-  
-  .mod = modsCat[[i]] 
-  .levels = unique( d[[.mod]] )
-  
-  for ( l in .levels ) {
-    
-    .metaMA = fit_subset_meta( .dat = dma[ dma[,.mod] == l, ],
-                               .mods = "1",
-                               .label = NA,
-                               .simple.return = TRUE )
-    
-    .metaR = fit_subset_meta( .dat = dr[ dr[,.mod] == l, ],
-                              .mods = "1",
-                              .label = NA,
-                              .simple.return = TRUE ) 
-    
-    new.rows = data.frame( mod = .mod, 
-                           level = l,
-                           source = c( "Meta-analysis", "Replications"),
-                           k = c( .metaMA$k, .metaR$k ),
-                           est = c( .metaMA$intercept, .metaR$intercept ),
-                           lo = c( .metaMA$intercept.lo, .metaR$intercept.lo ),
-                           hi = c( .metaMA$intercept.hi, .metaR$intercept.hi ) )
-    
-    
-    if ( i == 1 & l == .levels[1] ) res = new.rows else res = rbind( res, new.rows )
-    
-  }
-  
-}
-
-setwd( results.dir )
-setwd( "tables_to_prettify" )
-write.csv( res, "subsets_by_moderator.csv")
-
-
-
-##### Plot it like it's hot ##### 
-
-# choose reasonable axis limits
-summary(res$est, na.rm = TRUE)
-min(res$lo, na.rm = TRUE)
-max(res$hi, na.rm = TRUE)
-breaks = seq(0, 1.6, 0.2)
-
-
-prettyLabels = c( main_question_ids_preference = "Primary analysis")
-
-
-# @to do in prep code: should make pretty versions of moderator variables (var names and levels) in prep code
-
-ggplot( data = res, 
-        aes( x = est,
-             y = level,
-             color = source ) ) + 
-  geom_vline( xintercept = naive.MA.only$b.r,
-              lty = 2,
-              color = colors[2]) + 
-  geom_vline( xintercept = naive.reps.only$b.r,
-              lty = 2,
-              color = colors[1]) + 
-  
-  geom_point( size = 3,
-              position=ggstance::position_dodgev(height=-0.4) ) + 
-  geom_errorbar( aes(xmin = lo,
-                     xmax = hi),
-                 width = 0,
-                 position=ggstance::position_dodgev(height=-0.4) ) +
-  xlab( "Subset estimate (SMD)") +
-  ylab( "Moderator subset") + 
-  scale_x_continuous( breaks = breaks ) +
-  scale_color_manual( name = "Source", values = rev(colors) ) + 
-  theme_classic() +
-  facet_grid( rows = vars(mod),
-                           scales = "free_y",
-                           switch = "both") +
-# https://michaelbach.de/2012/07/22/R-ggplot2-and-axis-limits-unexpected-behaviour-solution.html
-  coord_cartesian( xlim = c(breaks[1], breaks[length(breaks)] ) ) 
-
-
-my_ggsave( name = "subset_forest.pdf",
-           width = 10,
-           height = 7 )
 
 
 ############################## PROPORTION MEANINGFULLY STRONG EFFECTS ##############################
@@ -964,15 +746,241 @@ p.funnel = p.funnel +
 plot(p.funnel)
 
 
-
-
-
-
 setwd(overleaf.dir)
 ggsave(plot = p.funnel,
        filename = "mb_signif_funnel.png",
        width = 5,
        height = 4)
+
+
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+#                       SUBSET MODELS AND PLOTS           
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+
+
+
+robu( yi ~ mean_agec + test_lang + method,
+      data = dma,
+      studynum = as.factor(study_id),
+      var.eff.size = vi,
+      modelweights = "HIER",
+      small = TRUE)
+
+robu( yi ~ mean_agec + test_lang + method,
+      data = dr,
+      studynum = as.factor(study_id),
+      var.eff.size = vi,
+      modelweights = "HIER",
+      small = TRUE)
+
+
+
+# *a key difference: HPP (vs. CF) is associated with LARGER ES in replications, but SMALLER ES in meta-analysis
+
+# sanity check: fit pruned model within MA and MLR separately
+#  to look heuristically at interactions
+fit_mr( .dat = dma,
+        .label = "mod1_MA_only",
+        .mods = c("mean_agec", "test_lang", "method"),
+        #.write.to.csv = TRUE,
+        .write.table = TRUE )
+
+fit_mr( .dat = dr,
+        .label = "mod1_MLR_only",
+        .mods = c("mean_agec", "test_lang", "method"),
+        #.write.to.csv = TRUE,
+        .write.table = TRUE )
+
+
+
+
+robu( yi ~ isMeta + mean_agec + test_lang + (method=="b.hpp"), 
+      data = d, 
+      studynum = as.factor(study_id),
+      var.eff.size = vi,
+      modelweights = "HIER",
+      small = TRUE)
+
+# adding interactions doesn't improve fit
+robu( yi ~ isMeta*mean_agec + test_lang + isMeta*(method=="b.hpp"), 
+      data = d, 
+      studynum = as.factor(study_id),
+      var.eff.size = vi,
+      modelweights = "HIER",
+      small = TRUE)
+
+
+############################## SUBSET MODELS ##############################
+
+##### MA subset and MLR subset #####
+( naive.MA.only = fit_subset_meta( .dat = dma,
+                                   .mods = "1",
+                                   .label = "MA subset naive" ) )
+
+( naive.reps.only = fit_subset_meta( .dat = dr,
+                                     .mods = "1",
+                                     .label = "Reps subset naive" ) )
+
+
+##### Sanity check: Subsets that resemble each other #####
+
+# MCF: "Could you do something like a "modal subsample" where you pull native language HPP (or CF?) results and plot those across MA/MB1, possibly with age included?"
+fit_subset_meta( .dat = dma %>% filter( method == "b.hpp" & test_lang == "a.native" ),
+                 .mods = "1",
+                 .label = NA )
+
+fit_subset_meta( .dat = dr %>% filter( method == "b.hpp" & test_lang == "a.native" ),
+                 .mods = "1",
+                 .label = NA )
+
+# interesting!!! these agree pretty well (replications actually a little bigger, 0.58 vs 0.51)
+# bm
+
+
+# **complements of above - do not agree well at all (difference 0.43, more like in meta-regression below)
+# 0.29 replications vs. 0.72 MA
+fit_subset_meta( .dat = dma %>% filter( method != "b.hpp" | test_lang != "a.native" ),
+                 .mods = "1",
+                 .label = NA )
+
+fit_subset_meta( .dat = dr %>% filter( method != "b.hpp" | test_lang != "a.native" ),
+                 .mods = "1",
+                 .label = NA )
+
+
+# continues to agree very well if we look just at HPP subset
+fit_subset_meta( .dat = dma %>% filter( method == "b.hpp" ),
+                 .mods = "1",
+                 .label = NA )
+
+fit_subset_meta( .dat = dr %>% filter( method == "b.hpp" ),
+                 .mods = "1",
+                 .label = NA )
+
+
+# surviving mods were mean age, language, and method
+# compare to meta-regression
+
+# first one is estimated difference of 0.24 
+fit_mr( .dat = d,
+        .mods = c("isMeta", "method", "test_lang"),
+        .simple.return = FALSE)
+
+# recode method and language as binary
+d$method.hpp = d$method == "b.hpp"
+d$test_lang.native = d$test_lang == "a.native"
+
+fit_mr( .dat = d,
+        .mods = c("isMeta", "method.hpp", "test_lang.native"),
+        .simple.return = FALSE)
+
+
+
+############################## FOREST PLOT OF SUBSET ESTIMATES ##############################
+
+# for each categorical moderator, fit subset meta-analysis
+
+
+##### Fit subset model to each level of each categorical model ##### 
+modsCat = mods2[ !mods2 %in% c("isMeta", "mean_agec" ) ]
+
+for ( i in 1:length(modsCat) ) {
+  
+  .mod = modsCat[[i]] 
+  .levels = unique( d[[.mod]] )
+  
+  for ( l in .levels ) {
+    
+    .metaMA = fit_subset_meta( .dat = dma[ dma[,.mod] == l, ],
+                               .mods = "1",
+                               .label = NA,
+                               .simple.return = TRUE )
+    
+    .metaR = fit_subset_meta( .dat = dr[ dr[,.mod] == l, ],
+                              .mods = "1",
+                              .label = NA,
+                              .simple.return = TRUE ) 
+    
+    new.rows = data.frame( mod = .mod, 
+                           level = l,
+                           source = c( "Meta-analysis", "Replications"),
+                           k = c( .metaMA$k, .metaR$k ),
+                           est = c( .metaMA$intercept, .metaR$intercept ),
+                           lo = c( .metaMA$intercept.lo, .metaR$intercept.lo ),
+                           hi = c( .metaMA$intercept.hi, .metaR$intercept.hi ) )
+    
+    
+    if ( i == 1 & l == .levels[1] ) res = new.rows else res = rbind( res, new.rows )
+    
+  }
+  
+}
+
+setwd( results.dir )
+setwd( "tables_to_prettify" )
+write.csv( res, "subsets_by_moderator.csv")
+
+
+
+##### Plot it like it's hot ##### 
+
+# choose reasonable axis limits
+summary(res$est, na.rm = TRUE)
+min(res$lo, na.rm = TRUE)
+max(res$hi, na.rm = TRUE)
+breaks = seq(0, 1.6, 0.2)
+
+
+prettyLabels = c( main_question_ids_preference = "Primary analysis")
+
+
+# @to do in prep code: should make pretty versions of moderator variables (var names and levels) in prep code
+
+ggplot( data = res, 
+        aes( x = est,
+             y = level,
+             color = source ) ) + 
+  geom_vline( xintercept = naive.MA.only$b.r,
+              lty = 2,
+              color = colors[2]) + 
+  geom_vline( xintercept = naive.reps.only$b.r,
+              lty = 2,
+              color = colors[1]) + 
+  
+  geom_point( size = 3,
+              position=ggstance::position_dodgev(height=-0.4) ) + 
+  geom_errorbar( aes(xmin = lo,
+                     xmax = hi),
+                 width = 0,
+                 position=ggstance::position_dodgev(height=-0.4) ) +
+  xlab( "Subset estimate (SMD)") +
+  ylab( "Moderator subset") + 
+  scale_x_continuous( breaks = breaks ) +
+  scale_color_manual( name = "Source", values = rev(colors) ) + 
+  theme_classic() +
+  facet_grid( rows = vars(mod),
+              scales = "free_y",
+              switch = "both") +
+  # https://michaelbach.de/2012/07/22/R-ggplot2-and-axis-limits-unexpected-behaviour-solution.html
+  coord_cartesian( xlim = c(breaks[1], breaks[length(breaks)] ) ) 
+
+
+my_ggsave( name = "subset_forest.pdf",
+           width = 10,
+           height = 7 )
+
+
+
+############################## MATCHING ##############################
+
+# another approach: match MLR and MA studies to one another
+
+# fit PS model
+
+#bm
+
 
 
 
