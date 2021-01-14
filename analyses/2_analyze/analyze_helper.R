@@ -220,8 +220,7 @@ fit_mr = function( .dat,
     # could use linear combo of coefficients and vars, but df are complicated
     #  for robumeta
     # so easiest way is to just refit the model, reversing coding of study type variable
-    
-    
+
     .mods2 = .mods
     .mods2[ .mods == "isMeta" ] = "isRep"  # now intercept will be for meta-analysis
     linpred.string2 = paste( .mods2, collapse=" + ")
@@ -252,6 +251,8 @@ fit_mr = function( .dat,
       
       update_result_csv( name = paste( .label, "avg pval for meta" ),
                          value = pval2 )
+
+
     }
     
     # also save selected results to a df to be returned
@@ -279,8 +280,8 @@ fit_mr = function( .dat,
     
     if ( .simple.return == FALSE ) {
       .res$avgDiff = meta$b.r[ meta$labels == "isMetaTRUE"]
-      # .res$avgDiffLo = meta$reg_table$CI.L[ meta$labels == "isMetaTRUE"]
-      # .res$avgDiffHi = meta$reg_table$CI.U[ meta$labels == "isMetaTRUE"]
+      .res$avgDiffLo = meta$reg_table$CI.L[ meta$labels == "isMetaTRUE"]
+      .res$avgDiffHi = meta$reg_table$CI.U[ meta$labels == "isMetaTRUE"]
       # .res$avgDiff
       
       .res$Phat0Diff = runif(n=1, -1,1) # ***obviously fake
@@ -288,6 +289,7 @@ fit_mr = function( .dat,
       # .res$Phat0DiffHi = runif(n=1, -1,1) # ***obviously fake
       
       .res$Phat0.2Diff = runif(n=1, -1,1) # ***obviously fake
+
     }
     
     

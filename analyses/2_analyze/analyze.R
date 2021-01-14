@@ -151,6 +151,16 @@ write.csv(corrs, "moderator_cormat.csv")
 
 section = 1
 
+
+
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+#                       1. PRIMARY MODERATOR ANALYSES (PREREG'D)           
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+
+section = 1
+
 ############################## FIT NAIVE AND MODERATED META-REGRESSIONS ############################## 
 # order of importance given in prereg:
 # age, test_lang, method, speaker, speech_type, own_mother, presentation, DV, main question
@@ -428,7 +438,7 @@ statCI_result_csv( "moderator increase avgDiff", c(mod1Res$avgDiff - naiveRes$av
 # ***p-values would require resampling under H0...
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-#                           2. PUBLICATION BIAS           
+#                           2. PUBLICATION BIAS (PREREG'D AND POST HOC)           
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 section = 2
@@ -753,13 +763,11 @@ ggsave(plot = p.funnel,
        height = 4)
 
 
-
-
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-#                       SUBSET MODELS AND PLOTS           
+#                       3. SUBSET MODELS AND PLOTS (POST HOC)            
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
-
+section = 3
 
 robu( yi ~ mean_agec + test_lang + method,
       data = dma,
@@ -972,16 +980,200 @@ my_ggsave( name = "subset_forest.pdf",
            height = 7 )
 
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+#                           4. MATCHING (POST HOC)           
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+
+section = 4
 
 ############################## MATCHING ##############################
 
 # another approach: match MLR and MA studies to one another
 
-# fit PS model
 
-#bm
+##### Look at age distribution in each source ######
+# this is the only continuous covariate to be matched
 
 
+age_densities = function(.dat) {
+  # choose axis scaling
+  #summary(.dat$mean_agec)
+  xmin = -24
+  xmax = 30
+  tickJump = 6  # space between tick marks
+  
+  ggplot( data = .dat,
+          aes( x = mean_agec,
+               fill = studyTypePretty,
+               color = studyTypePretty ) ) +
+    
+    # ensemble estimates shifted to Z=0
+    geom_density(alpha = 0.3) +
+    
+    theme_bw() +
+    
+    xlab("Mean age (centered; months)") +
+    scale_x_continuous( limits = c(xmin, xmax),
+                        breaks = seq(xmin, xmax, tickJump)) +
+    
+    ylab("Density") +
+    
+    scale_color_manual( values = rev(colors), name = "Source" ) +
+    scale_fill_manual( values = rev(colors), name = "Source" ) +
+    
+    theme(axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank())
+  
+}
+
+age_densities(d)
+
+
+
+##### Make Matches - CEM #####
+# PS model string
+# string = paste( "isMeta ~ ",
+#                 paste( mods2[ !mods2 %in% c("isMeta", "mean_agec") ], collapse=" + "),
+#                 collapse = "")
+
+mods3 = mods2[ !mods2 %in% c("isMeta") ]
+
+string = paste( "isMeta ~ ",
+                paste( mods3, collapse=" + ")
+                collapse = "")
+
+
+# # quintiles
+# ageCuts = quantile( d$mean_agec,
+#                     probs = seq(0, 1, 1/4) )
+# # how big are the differences between bins (months)?
+# diff(ageCuts)
+
+# 12-month bins
+# @DISCUSS WITH SUBJECT EXPERTS
+( ageCuts = seq( min(d$mean_agec), max(d$mean_agec), 12 ) )
+
+# exact matching on all categorical variables and coarsened exact matching, based on ageCuts above,
+# for age
+# MatchIt::matchit docs: "if a categorical variable does not appear in grouping, it will not be coarsened, so exact matching will take place on it"
+# regarding subclasses: "setting method = "cem" performs coarsened exact matching. With coarsened exact matching, covariates are coarsened into bins, and a complete cross of the coarsened covariates is used to form subclasses defined by each combination of the coarsened covariate levels. Any subclass that doesn't contain both treated and control units is discarded, leaving only subclasses containing treatment and control units that are exactly equal on the coarsened covariates."
+x = matchit( formula = eval( parse( text = string ) ),
+             data = d,
+             method = "cem",
+             cutpoints = list( mean_agec =  ageCuts) )
+x
+
+# 49 matches if not including mean_agec (but still only 3 from MA)
+# 14 if using mean_agec with exact quintile matching
+# 19 if using age tertiles
+# 4 if using 6-8 month bins
+# 17 if using 12-month bins
+summary(x)
+
+
+
+# # nearest neighbor based on PS score: 102 matches
+# x = matchit( formula = eval( parse( text = string ) ),
+#              data = d,
+#              method = "nearest" )
+# x
+# 
+# # optimal pair matching based on PS score: also 102 matches
+# library(optmatch)
+# x = matchit( formula = eval( parse( text = string ) ),
+#              data = d,
+#              method = "optimal" )
+# x
+
+# how close are the matches on age?
+# obviously the other variables are exactly matched
+
+
+# look at match diagnostics (only interesting for age)
+#  and number of matches in MA and MLR
+summary(x)
+
+
+# matched pairs only
+dmt = match.data(x)
+age_densities(dmt)  # definitely looks better
+
+
+# how many subclasses?
+summary(x$subclass)
+
+# look at characteristics of each subclass
+CreateTableOne(vars = mods2, 
+                   strata = "study_type",
+                   data = dmt[ dmt$subclass == 1, ] ) 
+
+CreateTableOne(vars = mods2, 
+               strata = "study_type",
+               data = dmt[ dmt$subclass == 2, ] ) 
+# subclass 1 is younger and method = a.cf
+# subclass 2 is older and method = b.hpp
+# otherwise the other covariates are the same between strata
+
+
+
+
+##### Analyze the CEM Matched Dataset! #####
+
+# simple
+t1 = dmt %>% group_by(isMeta) %>%
+  summarise( k = n(),
+             mean(yi),
+             mAgec = mean(mean_agec) )
+# wow - really exacerbates the difference
+
+# look within subclasses
+t2 = dmt %>% group_by(subclass, isMeta) %>%
+  summarise( k = n(),
+             mean(yi),
+             mAgec = mean(mean_agec) )
+
+
+
+matchRes = fit_mr( .dat = dmt,
+                   .label = "matched",
+                   .mods = "isMeta",
+                   .write.to.csv = TRUE,
+                   .write.table = FALSE,
+                   .simple.return = FALSE )
+
+
+update_result_csv( name = "matched k total",
+                   value = nrow(dmt) )
+
+update_result_csv( name = "matched k from MA",
+                   value = sum( t2$k[ t2$isMeta == TRUE ] ) )
+
+update_result_csv( name = "matched k from R",
+                   value = sum( t2$k[ t2$isMeta == FALSE ] ) )
+
+update_result_csv( name = "matched age diff",
+                   value = diff( t1$mAgec ) )
+
+update_result_csv( name = "pre-matching age diff",
+                   value = mean( dr$mean_agec ) - mean( dma$mean_agec ) )
+
+
+update_result_csv( name = paste( "matched subclass", t2$subclass, "isMeta", t2$isMeta, "k", sep = " " ),
+                   value = t2$k )
+
+update_result_csv( name = "pre-matching mean_age",
+                   value = mean( d$mean_age ) )
+
+update_result_csv( name = "matched mean_age subclass 1",
+                   value = mean( dmt$mean_age[ dmt$subclass == 1 ] ) )
+
+update_result_csv( name = "matched mean_age subclass 2",
+                   value = mean( dmt$mean_age[ dmt$subclass == 2 ] ) )
+
+
+# @TO DO: should have forest plot overall and also with subclass studies highlighted in 2 different colors
 
 
 
