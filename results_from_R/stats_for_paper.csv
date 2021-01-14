@@ -1,33 +1,4 @@
 name,value,section
-matched k from MA,3,4
-matched k from R,46,4
-matched age diff,-12.7092608439287,4
-pre-matching age diff,11.7836963585192,4
-matched tau,0.04,4
-matched k,49,4
-matched est X.Intercept.,0.42,4
-matched est isMetaTRUE,1.26,4
-matched lo X.Intercept.,0.31,4
-matched lo isMetaTRUE,-5.2,4
-matched hi X.Intercept.,0.52,4
-matched hi isMetaTRUE,7.72,4
-matched pval X.Intercept.,< 0.0001,4
-matched pval isMetaTRUE,0.30246,4
-matched avg for meta,1.68,4
-matched avg lo for meta,-7.51,4
-matched avg hi for meta,10.86,4
-matched avg pval for meta,0.26,4
-matched avgDiff,1.26,1
-matched avgDiff lo,-5.2,1
-matched avgDiff hi,7.72,1
-matched subclass 1 isMeta FALSE k,28,4
-matched subclass 1 isMeta TRUE k,1,4
-matched subclass 2 isMeta FALSE k,18,4
-matched subclass 2 isMeta TRUE k,2,4
-matched mean_age subclass 2,289.105448709763,4
-matched mean_age subclass 1,268.381713045519,4
-pre-matching mean_age,239.132663608733,4
-matched k total,49,4
 m ests MA,51,0
 m ests MB,104,0
 m ests total,155,0
@@ -84,16 +55,16 @@ median n MB,16,0
 *mod1 avg hi for meta,0.96,1
 *mod1 avg pval for meta,2e-03,1
 Phat0MA est,90,1
-Phat0MA lo,74,1
+Phat0MA lo,72,1
 Phat0MA hi,98,1
 Phat0.2MA est,86,1
 Phat0.2MA lo,70,1
-Phat0.2MA hi,98,1
+Phat0.2MA hi,97,1
 Phat0R est,100,1
-Phat0R lo,89,1
+Phat0R lo,90,1
 Phat0R hi,100,1
 Phat0.2R est,90,1
-Phat0.2R lo,67,1
+Phat0.2R lo,65,1
 Phat0.2R hi,100,1
 moderator increase avgDiff ,0.15,1
 moderator increase avgDiff lo,0.13,1
@@ -112,25 +83,51 @@ Corr MA est,0.4,2
 Corr MA lo,0.13,2
 Corr MA hi,0.68,2
 Corr MA pval,0.0099117,2
+MA subset naive tau,0.45,2
+MA subset naive k,51,2
+MA subset naive est X.Intercept.,0.7,2
+MA subset naive lo X.Intercept.,0.37,2
+MA subset naive hi X.Intercept.,1.02,2
+MA subset naive pval X.Intercept.,0.00056364,2
+Reps subset naive tau,0.11,2
+Reps subset naive k,104,2
+Reps subset naive est X.Intercept.,0.35,2
+Reps subset naive lo X.Intercept.,0.28,2
+Reps subset naive hi X.Intercept.,0.43,2
+Reps subset naive pval X.Intercept.,< 0.0001,2
 sval est to reps,7.76,2
 sval CI to reps,1.09,2
-MA subset naive tau,0.45,3
-MA subset naive k,51,3
-MA subset naive est X.Intercept.,0.7,3
-MA subset naive lo X.Intercept.,0.37,3
-MA subset naive hi X.Intercept.,1.02,3
-MA subset naive pval X.Intercept.,0.00056364,3
-Reps subset naive tau,0.11,3
-Reps subset naive k,104,3
-Reps subset naive est X.Intercept.,0.35,3
-Reps subset naive lo X.Intercept.,0.28,3
-Reps subset naive hi X.Intercept.,0.43,3
-Reps subset naive pval X.Intercept.,< 0.0001,3
-IPW robu est X.Intercept.,0.394685966254886,4
-IPW robu est isMetaTRUE,0.394685966254886,4
-IPW robu lo X.Intercept.,-0.11,4
-IPW robu lo isMetaTRUE,-0.11,4
-IPW robu hi X.Intercept.,0.9,4
-IPW robu hi isMetaTRUE,0.9,4
-IPW robu pval X.Intercept.,0.119952345892366,4
-IPW robu pval isMetaTRUE,0.119952345892366,4
+pre-matching age diff,11.7836963585192,3
+pre-matching mean_age,239.132663608733,3
+matched tau,0.32,3
+matched k,17,3
+matched est X.Intercept.,0.31,3
+matched est isMetaTRUE,1.33,3
+matched lo X.Intercept.,0.14,3
+matched lo isMetaTRUE,-2.98,3
+matched hi X.Intercept.,0.48,3
+matched hi isMetaTRUE,5.65,3
+matched pval X.Intercept.,0.0018409,3
+matched pval isMetaTRUE,0.2515552,3
+matched avg for meta,1.64,3
+matched avg lo for meta,-7.78,3
+matched avg hi for meta,11.07,3
+matched avg pval for meta,0.27,3
+matched k total,17,3
+matched k from MA,3,3
+matched k from R,14,3
+matched age diff,-3.95407733386985,3
+matched subclass 1 isMeta FALSE k,6,3
+matched subclass 1 isMeta TRUE k,1,3
+matched subclass 2 isMeta FALSE k,8,3
+matched subclass 2 isMeta TRUE k,2,3
+matched mean_age subclass 1,124.721455824763,3
+matched mean_age subclass 2,206.356813465012,3
+IPW robu est X.Intercept.,0.394685966254886,3
+IPW robu est isMetaTRUE,0.394685966254886,3
+IPW robu lo X.Intercept.,-0.11,3
+IPW robu lo isMetaTRUE,-0.11,3
+IPW robu hi X.Intercept.,0.9,3
+IPW robu hi isMetaTRUE,0.9,3
+IPW robu pval X.Intercept.,0.119952345892366,3
+IPW robu pval isMetaTRUE,0.119952345892366,3

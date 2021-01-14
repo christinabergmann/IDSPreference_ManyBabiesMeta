@@ -38,6 +38,8 @@ start.res.from.scratch = FALSE
 cite.packages.anew = FALSE
 # should we bootstrap from scratch or read in old resamples?
 boot.from.scratch = FALSE
+# make plots from scratch?
+redo.plots = TRUE
 
 # wipe results csvs if needed
 if ( start.res.from.scratch == TRUE ) wr()
@@ -61,6 +63,20 @@ dma = d %>% filter(isMeta == TRUE)
 
 # dataset with just the replications
 dr = d %>% filter(isMeta == FALSE)
+
+
+###@move to prep script:
+# @someone should recode Study ID to look better in plot
+# short_cite variable also doesn't work well because it doesn't distinguish among the replications
+d$lo = d$yi - qnorm(0.975) * sqrt(d$vi)
+d$hi = d$yi + qnorm(0.975) * sqrt(d$vi)
+# unique ID
+d = d %>% group_by(study_id) %>% 
+  mutate( unique = paste( study_id, row_number(), sep = ", #" ) )
+
+d$sourcePretty = "Meta-analysis"
+d$sourcePretty[ d$isMeta == FALSE ] = "Replications"
+### end of stuff to move
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 #                       0. CHARACTERISTICS OF INCLUDED STUDIES            
@@ -146,20 +162,21 @@ write.csv(corrs, "moderator_cormat.csv")
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-#                       1. NAIVE AND MODERATED META-REGRESSIONS           
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-
-section = 1
-
-
-
-
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 #                       1. PRIMARY MODERATOR ANALYSES (PREREG'D)           
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 section = 1
+
+
+##### MA subset and MLR subset #####
+( naive.MA.only = fit_subset_meta( .dat = dma,
+                                   .mods = "1",
+                                   .label = "MA subset naive" ) )
+
+( naive.reps.only = fit_subset_meta( .dat = dr,
+                                     .mods = "1",
+                                     .label = "Reps subset naive" ) )
+
 
 ############################## FIT NAIVE AND MODERATED META-REGRESSIONS ############################## 
 # order of importance given in prereg:
@@ -292,60 +309,64 @@ d$calib[ d$isMeta == TRUE ] = calibMA
 ############################## DENSITY PLOT OF META-ANALYSIS VS. REPLICATION CALIBRATED ESTIMATES ##############################
 
 
-#@move to prep
-d$studyTypePretty = NA
-d$studyTypePretty[ d$isMeta == TRUE ] = "Meta-analysis"
-d$studyTypePretty[ d$isMeta == FALSE ] = "Replications"
-
-# choose axis scaling
-summary(d$yi)
-xmin = -1
-xmax = 3.5
-tickJump = 0.5  # space between tick marks
-
-ggplot( data = d,
-        aes( x = calib,
-             fill = studyTypePretty,
-             color = studyTypePretty ) ) +
+if ( redo.plots == TRUE ) {
   
-  # mean estimates from subset models
-  geom_vline( xintercept = naive.MA.only$b.r,
-              color = colors[2],
-              lty = 2 ) +
   
-  geom_vline( xintercept = naive.reps.only$b.r,
-              color = colors[1],
-              lty = 2) +
   
-  # shifted threshold for Z=z
-  geom_vline(xintercept = 0,
-             color = "gray",
-             lty = 1) +
+  #@move to prep
+  d$studyTypePretty = NA
+  d$studyTypePretty[ d$isMeta == TRUE ] = "Meta-analysis"
+  d$studyTypePretty[ d$isMeta == FALSE ] = "Replications"
   
-  # ensemble estimates shifted to Z=0
-  geom_density(alpha = 0.3) +
+  # choose axis scaling
+  summary(d$yi)
+  xmin = -1
+  xmax = 3.5
+  tickJump = 0.5  # space between tick marks
   
-  theme_bw() +
+  ggplot( data = d,
+          aes( x = calib,
+               fill = studyTypePretty,
+               color = studyTypePretty ) ) +
+    
+    # mean estimates from subset models
+    geom_vline( xintercept = naive.MA.only$b.r,
+                color = colors[2],
+                lty = 2 ) +
+    
+    geom_vline( xintercept = naive.reps.only$b.r,
+                color = colors[1],
+                lty = 2) +
+    
+    # shifted threshold for Z=z
+    geom_vline(xintercept = 0,
+               color = "gray",
+               lty = 1) +
+    
+    # ensemble estimates shifted to Z=0
+    geom_density(alpha = 0.3) +
+    
+    theme_bw() +
+    
+    xlab("Calibrated study estimate (SMD)") +
+    scale_x_continuous( limits = c(xmin, xmax), breaks = seq(xmin, xmax, tickJump)) +
+    
+    ylab("Density") +
+    
+    scale_color_manual( values = rev(colors), name = "Source" ) +
+    scale_fill_manual( values = rev(colors), name = "Source" ) +
+    
+    theme(axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank())
   
-  xlab("Calibrated study estimate (SMD)") +
-  scale_x_continuous( limits = c(xmin, xmax), breaks = seq(xmin, xmax, tickJump)) +
   
-  ylab("Density") +
+  my_ggsave( name = "calibrated_plot.pdf",
+             width = 8,
+             height = 5 )
   
-  scale_color_manual( values = rev(colors), name = "Source" ) +
-  scale_fill_manual( values = rev(colors), name = "Source" ) +
-  
-  theme(axis.text.y = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
-
-
-my_ggsave( name = "calibrated_plot.pdf",
-           width = 8,
-           height = 5 )
-
-
+}
 
 ############################## CROSS-MODEL INFERENCE ##############################
 
@@ -438,7 +459,7 @@ statCI_result_csv( "moderator increase avgDiff", c(mod1Res$avgDiff - naiveRes$av
 # ***p-values would require resampling under H0...
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-#                           2. PUBLICATION BIAS (PREREG'D AND POST HOC)           
+#               2. PUBLICATION BIAS (SOME PREREG'D AND SOME POST HOC)           
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 section = 2
@@ -582,7 +603,6 @@ update_result_csv( name = "Corr MA pval",
 #@not possible even though worst-case estimate has CI crossing null
 # must be the weight thing again
 
-
 # s-values to reduce effect size to match replications
 ( SvalR = svalue( yi = dma$yi,
                   vi = dma$vi,
@@ -601,167 +621,150 @@ update_result_csv( name = "sval CI to reps",
 
 
 ##### Significance Funnel ######
-# significance_funnel(yi = dma$yi,
-#                     vi = dma$vi,
-#                     est.N = mu.worst,
-#                     est.all = as.numeric(naive.MA.only$b.r),
-#                     favor.positive = TRUE)
-# 
-# setwd(results.dir)
-# ggsave( "funnel.pdf",
-#         width = 8,
-#         height = 6 )
-# 
-# setwd(overleaf.dir)
-# ggsave( "funnel.pdf",
-#         width = 8,
-#         height = 6 )
 
-
-# modified version
-yi = d$yi
-vi = d$vi
-xmin = min(yi)
-xmax = max(yi)
-ymin = 0  # so that pooled points are shown
-ymax = max( sqrt(vi) )
-xlab = "Point estimate (SMD)"
-ylab = "Estimated standard error"
-favor.positive = TRUE
-alpha.select = 0.05
-plot.pooled = TRUE
-
-# pooled points to plot
-est.MA = naive.MA.only$b.r  # naive est in MA
-est.R = naive.reps.only$b.r  # naive est in reps
-est.SAPBE = metaCorr$est  # not actually worst-case, but rather SAPB-E estimate
-est.W = mu.worst
-
-
-d$sei = sqrt(vi)
-
-# calculate p-values
-d$pval = 2 * ( 1 - pnorm( abs(yi) / sqrt(vi) ) )
-
-# which direction of effects are favored?
-# if we have the pooled point estimate, but not the favored direction,
-#  assume favored direction matches sign of pooled estimate (but issue warning)
-if ( !is.na(est.all) & is.na(favor.positive) ) {
-  favor.positive = (est.all > 0)
-  warning("favor.positive not provided, so assuming publication bias favors estimates whose sign matches est.all")
-}
-if ( is.na(est.all) & is.na(favor.positive) ) {
-  stop("Need to specify favor.positive")
-}
-
-# affirmative vs. nonaffirmative indicator
-d$affirm = rep(NA, nrow(d))
-
-if ( favor.positive == TRUE ) {
-  d$affirm[ (d$yi > 0) & (d$pval < alpha.select) ] = "Affirmative"
-  d$affirm[ (d$yi < 0) | (d$pval >= alpha.select) ] = "Non-affirmative"
-}
-if ( favor.positive == FALSE ) {
-  d$affirm[ (d$yi < 0) & (d$pval < alpha.select) ] = "Affirmative"
-  d$affirm[ (d$yi > 0) | (d$pval >= alpha.select) ] = "Non-affirmative"
-}
-
-# reorder levels for plotting joy
-d$affirm = factor( d$affirm, c("Non-affirmative", "Affirmative") )
-
-# stop if no studies in either group
-if ( sum( d$affirm == "Non-affirmative" ) == 0 ) {
-  stop("There are no non-affirmative studies. The plot would look silly.")
-}
-
-if ( sum( d$affirm == "Affirmative" ) == 0 ) {
-  stop("There are no affirmative studies. The plot would look silly.")
-}
-
-
-# set up pooled estimates for plotting
-pooled.pts = data.frame( yi = c(est.MA, est.R, est.SAPBE, est.W),
-                         sei = c(0,0,0,0) )
-
-# for a given SE (y-value), return the "just significant" point estimate value (x-value)
-just_signif_est = function( .sei ) .sei * qnorm(1 - alpha.select/2)
-
-# calculate slope and intercept of the "just affirmative" line
-# i.e., 1.96 = (just affirmative estimate) / se
-if (favor.positive == TRUE) sl = 1/qnorm(1 - alpha.select/2)
-if (favor.positive == FALSE) sl = -1/qnorm(1 - alpha.select/2)
-int = 0
-# # sanity check: should be exactly alpha.select
-# 2 * ( 1 - pnorm( abs(1) / sl ) )
-
-
-##### Make the Plot #####
-
-
-p.funnel = ggplot( data = d, aes( x = yi,
-                                  y = sei,
-                                  color = isMeta ) )
-
-if ( plot.pooled == TRUE ) {
+if ( redo.plots == TRUE ) {
+  # modified from package
+  yi = d$yi
+  vi = d$vi
+  xmin = min(yi)
+  xmax = max(yi)
+  ymin = 0  # so that pooled points are shown
+  ymax = max( sqrt(vi) )
+  xlab = "Point estimate (SMD)"
+  ylab = "Estimated standard error"
+  favor.positive = TRUE
+  alpha.select = 0.05
+  plot.pooled = TRUE
   
-  # plot the pooled points
-  # outer part of diamonds
-  p.funnel = p.funnel + geom_point(
-    data = pooled.pts,
-    aes( x = yi, y = sei ),
-    size = 4,
-    shape = 5,
-    fill = NA,
-    color = c("red", "darkgray", NA, NA)
-  ) +
+  # pooled points to plot
+  est.MA = naive.MA.only$b.r  # naive est in MA
+  est.R = naive.reps.only$b.r  # naive est in reps
+  est.SAPBE = metaCorr$est  # not actually worst-case, but rather SAPB-E estimate
+  est.W = mu.worst
+  
+  
+  d$sei = sqrt(vi)
+  
+  # calculate p-values
+  d$pval = 2 * ( 1 - pnorm( abs(yi) / sqrt(vi) ) )
+  
+  # which direction of effects are favored?
+  # if we have the pooled point estimate, but not the favored direction,
+  #  assume favored direction matches sign of pooled estimate (but issue warning)
+  if ( !is.na(est.all) & is.na(favor.positive) ) {
+    favor.positive = (est.all > 0)
+    warning("favor.positive not provided, so assuming publication bias favors estimates whose sign matches est.all")
+  }
+  if ( is.na(est.all) & is.na(favor.positive) ) {
+    stop("Need to specify favor.positive")
+  }
+  
+  # affirmative vs. nonaffirmative indicator
+  d$affirm = rep(NA, nrow(d))
+  
+  if ( favor.positive == TRUE ) {
+    d$affirm[ (d$yi > 0) & (d$pval < alpha.select) ] = "Affirmative"
+    d$affirm[ (d$yi < 0) | (d$pval >= alpha.select) ] = "Non-affirmative"
+  }
+  if ( favor.positive == FALSE ) {
+    d$affirm[ (d$yi < 0) & (d$pval < alpha.select) ] = "Affirmative"
+    d$affirm[ (d$yi > 0) | (d$pval >= alpha.select) ] = "Non-affirmative"
+  }
+  
+  # reorder levels for plotting joy
+  d$affirm = factor( d$affirm, c("Non-affirmative", "Affirmative") )
+  
+  # stop if no studies in either group
+  if ( sum( d$affirm == "Non-affirmative" ) == 0 ) {
+    stop("There are no non-affirmative studies. The plot would look silly.")
+  }
+  
+  if ( sum( d$affirm == "Affirmative" ) == 0 ) {
+    stop("There are no affirmative studies. The plot would look silly.")
+  }
+  
+  
+  # set up pooled estimates for plotting
+  pooled.pts = data.frame( yi = c(est.MA, est.R, est.SAPBE, est.W),
+                           sei = c(0,0,0,0) )
+  
+  # for a given SE (y-value), return the "just significant" point estimate value (x-value)
+  just_signif_est = function( .sei ) .sei * qnorm(1 - alpha.select/2)
+  
+  # calculate slope and intercept of the "just affirmative" line
+  # i.e., 1.96 = (just affirmative estimate) / se
+  if (favor.positive == TRUE) sl = 1/qnorm(1 - alpha.select/2)
+  if (favor.positive == FALSE) sl = -1/qnorm(1 - alpha.select/2)
+  int = 0
+  # # sanity check: should be exactly alpha.select
+  # 2 * ( 1 - pnorm( abs(1) / sl ) )
+  
+  
+  # make the plot
+  p.funnel = ggplot( data = d, aes( x = yi,
+                                    y = sei,
+                                    color = isMeta ) )
+  
+  if ( plot.pooled == TRUE ) {
     
-    # inner part of diamonds
-    geom_point(
+    # plot the pooled points
+    # outer part of diamonds
+    p.funnel = p.funnel + geom_point(
       data = pooled.pts,
       aes( x = yi, y = sei ),
       size = 4,
-      shape = 18,
-      color =  c("red", "darkgray", "red", "orange"),
-      alpha = 1
+      shape = 5,
+      fill = NA,
+      color = c("red", "darkgray", NA, NA)
     ) +
+      
+      # inner part of diamonds
+      geom_point(
+        data = pooled.pts,
+        aes( x = yi, y = sei ),
+        size = 4,
+        shape = 18,
+        color =  c("red", "darkgray", "red", "orange"),
+        alpha = 1
+      ) +
+      
+      # just for visual separation of pooled ests
+      geom_hline( yintercept = 0 ) +
+      
+      # diagonal "just significant" line
+      geom_abline(slope=sl,intercept = int, color = "gray")
+  }
+  
+  p.funnel = p.funnel +
     
-    # just for visual separation of pooled ests
-    geom_hline( yintercept = 0 ) +
+    # # semi-transparent points with solid circles around them
+    # geom_point( size = 3, alpha=.4) +
+    # geom_point( size = 3, shape = 1) +
     
-    # diagonal "just significant" line
-    geom_abline(slope=sl,intercept = int, color = "gray")
+    geom_point(size = 3, shape = 1) +
+    
+    scale_color_manual(values = colors) +
+    #scale_shape_manual(values = c(1,2)) +
+    
+    xlab(xlab) +
+    ylab(ylab) +
+    
+    scale_x_continuous( limits = c(xmin, xmax), breaks = seq(-0.5, 3, .5) ) +
+    scale_y_continuous( limits = c(ymin, ymax), breaks = seq(0, .6, .1) ) +
+    
+    theme_classic() +
+    #theme(legend.title=element_blank())
+    theme(legend.position = "none")
+  
+  plot(p.funnel)
+  
+  
+  setwd(overleaf.dir)
+  ggsave(plot = p.funnel,
+         filename = "mb_signif_funnel.png",
+         width = 5,
+         height = 4)
 }
-
-p.funnel = p.funnel +
-  
-  # # semi-transparent points with solid circles around them
-  # geom_point( size = 3, alpha=.4) +
-  # geom_point( size = 3, shape = 1) +
-  
-  geom_point(size = 3, shape = 1) +
-  
-  scale_color_manual(values = colors) +
-  #scale_shape_manual(values = c(1,2)) +
-  
-  xlab(xlab) +
-  ylab(ylab) +
-  
-  scale_x_continuous( limits = c(xmin, xmax), breaks = seq(-0.5, 3, .5) ) +
-  scale_y_continuous( limits = c(ymin, ymax), breaks = seq(0, .6, .1) ) +
-  
-  theme_classic() +
-  #theme(legend.title=element_blank())
-  theme(legend.position = "none")
-
-plot(p.funnel)
-
-
-setwd(overleaf.dir)
-ggsave(plot = p.funnel,
-       filename = "mb_signif_funnel.png",
-       width = 5,
-       height = 4)
-
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 #                       3. SUBSET MODELS AND PLOTS (POST HOC)            
@@ -819,74 +822,64 @@ robu( yi ~ isMeta*mean_agec + test_lang + isMeta*(method=="b.hpp"),
       modelweights = "HIER",
       small = TRUE)
 
-
-############################## SUBSET MODELS ##############################
-
-##### MA subset and MLR subset #####
-( naive.MA.only = fit_subset_meta( .dat = dma,
-                                   .mods = "1",
-                                   .label = "MA subset naive" ) )
-
-( naive.reps.only = fit_subset_meta( .dat = dr,
-                                     .mods = "1",
-                                     .label = "Reps subset naive" ) )
-
-
-##### Sanity check: Subsets that resemble each other #####
-
-# MCF: "Could you do something like a "modal subsample" where you pull native language HPP (or CF?) results and plot those across MA/MB1, possibly with age included?"
-fit_subset_meta( .dat = dma %>% filter( method == "b.hpp" & test_lang == "a.native" ),
-                 .mods = "1",
-                 .label = NA )
-
-fit_subset_meta( .dat = dr %>% filter( method == "b.hpp" & test_lang == "a.native" ),
-                 .mods = "1",
-                 .label = NA )
-
-# interesting!!! these agree pretty well (replications actually a little bigger, 0.58 vs 0.51)
-# bm
-
-
-# **complements of above - do not agree well at all (difference 0.43, more like in meta-regression below)
-# 0.29 replications vs. 0.72 MA
-fit_subset_meta( .dat = dma %>% filter( method != "b.hpp" | test_lang != "a.native" ),
-                 .mods = "1",
-                 .label = NA )
-
-fit_subset_meta( .dat = dr %>% filter( method != "b.hpp" | test_lang != "a.native" ),
-                 .mods = "1",
-                 .label = NA )
-
-
-# continues to agree very well if we look just at HPP subset
-fit_subset_meta( .dat = dma %>% filter( method == "b.hpp" ),
-                 .mods = "1",
-                 .label = NA )
-
-fit_subset_meta( .dat = dr %>% filter( method == "b.hpp" ),
-                 .mods = "1",
-                 .label = NA )
-
-
-# surviving mods were mean age, language, and method
-# compare to meta-regression
-
-# first one is estimated difference of 0.24 
-fit_mr( .dat = d,
-        .mods = c("isMeta", "method", "test_lang"),
-        .simple.return = FALSE)
-
-# recode method and language as binary
-d$method.hpp = d$method == "b.hpp"
-d$test_lang.native = d$test_lang == "a.native"
-
-fit_mr( .dat = d,
-        .mods = c("isMeta", "method.hpp", "test_lang.native"),
-        .simple.return = FALSE)
+# # save:
+# ############################## SUBSET MODELS ##############################
+# 
+# ##### Sanity check: Subsets that resemble each other #####
+# 
+# # MCF: "Could you do something like a "modal subsample" where you pull native language HPP (or CF?) results and plot those across MA/MB1, possibly with age included?"
+# fit_subset_meta( .dat = dma %>% filter( method == "b.hpp" & test_lang == "a.native" ),
+#                  .mods = "1",
+#                  .label = NA )
+# 
+# fit_subset_meta( .dat = dr %>% filter( method == "b.hpp" & test_lang == "a.native" ),
+#                  .mods = "1",
+#                  .label = NA )
+# 
+# # interesting!!! these agree pretty well (replications actually a little bigger, 0.58 vs 0.51)
+# # bm
+# 
+# 
+# # **complements of above - do not agree well at all (difference 0.43, more like in meta-regression below)
+# # 0.29 replications vs. 0.72 MA
+# fit_subset_meta( .dat = dma %>% filter( method != "b.hpp" | test_lang != "a.native" ),
+#                  .mods = "1",
+#                  .label = NA )
+# 
+# fit_subset_meta( .dat = dr %>% filter( method != "b.hpp" | test_lang != "a.native" ),
+#                  .mods = "1",
+#                  .label = NA )
+# 
+# 
+# # continues to agree very well if we look just at HPP subset
+# fit_subset_meta( .dat = dma %>% filter( method == "b.hpp" ),
+#                  .mods = "1",
+#                  .label = NA )
+# 
+# fit_subset_meta( .dat = dr %>% filter( method == "b.hpp" ),
+#                  .mods = "1",
+#                  .label = NA )
+# 
+# 
+# # surviving mods were mean age, language, and method
+# # compare to meta-regression
+# 
+# # first one is estimated difference of 0.24 
+# fit_mr( .dat = d,
+#         .mods = c("isMeta", "method", "test_lang"),
+#         .simple.return = FALSE)
+# 
+# # recode method and language as binary
+# d$method.hpp = d$method == "b.hpp"
+# d$test_lang.native = d$test_lang == "a.native"
+# 
+# fit_mr( .dat = d,
+#         .mods = c("isMeta", "method.hpp", "test_lang.native"),
+#         .simple.return = FALSE)
+# 
 
 
-
-############################## FOREST PLOT OF SUBSET ESTIMATES ##############################
+############################## TABLE AND FOREST PLOT OF SUBSET ESTIMATES ##############################
 
 # for each categorical moderator, fit subset meta-analysis
 
@@ -934,6 +927,7 @@ write.csv( res, "subsets_by_moderator.csv")
 
 ##### Plot it like it's hot ##### 
 
+if ( redo.plots == TRUE ) {
 # choose reasonable axis limits
 summary(res$est, na.rm = TRUE)
 min(res$lo, na.rm = TRUE)
@@ -979,6 +973,7 @@ my_ggsave( name = "subset_forest.pdf",
            width = 10,
            height = 7 )
 
+}
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 #                           4. MATCHING AND IPW (POST HOC)           
@@ -1037,7 +1032,7 @@ age_densities(d)
 mods3 = mods2[ !mods2 %in% c("isMeta") ]
 
 string = paste( "isMeta ~ ",
-                paste( mods3, collapse=" + ")
+                paste( mods3, collapse=" + "),
                 collapse = "")
 
 
@@ -1102,8 +1097,8 @@ summary(x$subclass)
 
 # look at characteristics of each subclass
 CreateTableOne(vars = mods2, 
-                   strata = "study_type",
-                   data = dmt[ dmt$subclass == 1, ] ) 
+               strata = "study_type",
+               data = dmt[ dmt$subclass == 1, ] ) 
 
 CreateTableOne(vars = mods2, 
                strata = "study_type",
@@ -1169,7 +1164,6 @@ update_result_csv( name = "matched mean_age subclass 2",
                    value = mean( dmt$mean_age[ dmt$subclass == 2 ] ) )
 
 
-# @TO DO: should have forest plot overall and also with subclass studies highlighted in 2 different colors
 
 ############################## IPW ##############################
 
@@ -1197,7 +1191,7 @@ ggplot( data = d[ d$isMeta == TRUE, ],
         aes(x = propScore,
             fill = isMeta ) ) +
   geom_histogram(aes(y = - ..density..)) + # negative sign for mirroring
-    
+  
   geom_histogram(data = d[ d$isMeta == FALSE, ],
                  aes(x = propScore,
                      y = ..density..,
@@ -1220,12 +1214,12 @@ summary(d$PSweight)
 # just like SAPB, theoretically
 # use the naive t2 from MA as the naive estimate
 IPW.robu = robu( yi ~ isMeta,
-                  studynum = as.factor(study_id),
-                  data = d,
-                  userweights = PSweight / (vi + c(naive.MA.only$mod_info$tau.sq) ),
-                  var.eff.size = vi,
-                  modelweights = "HIER",
-                  small = small )
+                 studynum = as.factor(study_id),
+                 data = d,
+                 userweights = PSweight / (vi + c(naive.MA.only$mod_info$tau.sq) ),
+                 var.eff.size = vi,
+                 modelweights = "HIER",
+                 small = small )
 
 est = as.numeric(IPW.robu$b.r)[2]  # isMeta coeff only
 lo = IPW.robu$reg_table$CI.L[2]
@@ -1249,28 +1243,20 @@ update_result_csv( name = paste( "IPW robu pval", IPW.robu$labels ),
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-#                           XX. FOREST PLOT           
+#                           5. FOREST PLOT           
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 
-# **pub bias: using studies' reported p-values?
+# don't move this section to be earlier! 
+# relies on having the matched dataset for coloring those points
+
+if ( redo.plots == TRUE ) {
 
 # relative weight of each study in meta-analysis (within group)
 d = d %>% group_by(isMeta) %>%
   mutate( rel.wt = 100 * (1/vi) / sum(1/vi) )
 
-###@move to prep script:
-# @someone should recode Study ID to look better in plot
-# short_cite variable also doesn't work well because it doesn't distinguish among the replications
-d$lo = d$yi - qnorm(0.975) * sqrt(d$vi)
-d$hi = d$yi + qnorm(0.975) * sqrt(d$vi)
-# unique ID
-d = d %>% group_by(study_id) %>% 
-  mutate( unique = paste( study_id, row_number(), sep = ", #" ) )
 
-d$sourcePretty = "Meta-analysis"
-d$sourcePretty[ d$isMeta == FALSE ] = "Replications"
-### end of stuff to move
 
 # plotting df
 dp = d
@@ -1278,9 +1264,9 @@ dp = d
 
 # strings with information about each meta-analysis
 dp$info.strings = paste( "n = ", d$n,
-                            ", ", round( d$yi, 2 ), " ",
-                            format_CI( d$lo, d$hi, 2 ),
-                            sep = "" )
+                         ", ", round( d$yi, 2 ), " ",
+                         format_CI( d$lo, d$hi, 2 ),
+                         sep = "" )
 
 
 # labels for each meta-analysis, including stats
@@ -1303,25 +1289,26 @@ for ( l in unique(dp$sourcePretty) ) {
   pooled.label = paste( "POOLED - ", toupper(l), sep = "" )
   
   dp = add_row( as.data.frame(dp),
-                   .after = this.group.rows[ length(this.group.rows) ],
-                   yi = ifelse( l == "Meta-analysis", naive.MA.only$b.r, naive.reps.only$b.r ),
-                   lo = ifelse( l == "Meta-analysis", naive.MA.only$reg_table$CI.L, naive.reps.only$reg_table$CI.L ),
-                   hi = ifelse( l == "Meta-analysis", naive.MA.only$reg_table$CI.U, naive.reps.only$reg_table$CI.U ),
-                   label = pooled.label,
-                   sourcePretty = l,
-                   rel.wt = 5 )
+                .after = this.group.rows[ length(this.group.rows) ],
+                yi = ifelse( l == "Meta-analysis", naive.MA.only$b.r, naive.reps.only$b.r ),
+                lo = ifelse( l == "Meta-analysis", naive.MA.only$reg_table$CI.L, naive.reps.only$reg_table$CI.L ),
+                hi = ifelse( l == "Meta-analysis", naive.MA.only$reg_table$CI.U, naive.reps.only$reg_table$CI.U ),
+                label = pooled.label,
+                sourcePretty = l,
+                rel.wt = 5 )
 }
 
 
 # for aes on plot
+#bm
 dp$is.pooled = grepl("POOL", dp$label)
-
+if ( color.subclasses == TRUE ) dp$is.pooled[ dp$unique %in% dmt$unique ] = 2
 
 # for pooled estimates, don't include number of studies in string
 ind = grepl("POOL", dp$label)
 dp$info.strings[ind] = paste( round( dp$yi[ind], 2 ), " ",
-                                 format_CI( dp$lo[ind], dp$hi[ind], 2 ),
-                                 sep = "" )
+                              format_CI( dp$lo[ind], dp$hi[ind], 2 ),
+                              sep = "" )
 
 # to force y-axis ordering, turn into a factor whose levels match the 
 #  actual order in the dataset
@@ -1332,6 +1319,7 @@ levels(dp$label)
 # regular circle: 19
 # 2 is open triangle
 shapes = c(19,17)
+if ( color.subclasses == TRUE ) shapes = c(19,17,19)
 # have breaks approximately evenly spaced on log scale
 #  but round for prettiness
 #breaks = unique( round( 10^seq(-3, 3, .2), 1 ) )
@@ -1351,6 +1339,7 @@ shapes = c(19,17)
 
 # now color-coding by whether it's the pooled estimate or not
 colors2 = c("black", "red")
+if( color.subclasses == TRUE ) colors2 = c("black", "red", "green" )
 
 # choose good axis breaks
 min(d$lo)
@@ -1358,16 +1347,15 @@ max(d$hi)
 xBreaks = seq( -1.5, 4.5, 0.5)
 
 p = ggplot( data = dp, aes( x = yi, 
-                               y = label, 
-                               size = rel.wt,
-                               shape = as.factor(is.pooled),
-                               color = as.factor(is.pooled) ) ) +
+                            y = label, 
+                            size = rel.wt,
+                            shape = as.factor(is.pooled),
+                            color = as.factor(is.pooled) ) ) +
   
   geom_errorbarh( aes(xmin = lo,
                       xmax = hi),
                   lwd = .5,
-                  height = .001,
-                  color = "black" ) +
+                  height = .001 ) +
   
   geom_point() +
   
@@ -1395,7 +1383,7 @@ p = ggplot( data = dp, aes( x = yi,
   scale_x_continuous(limits = c(min(xBreaks), max(xBreaks)),
                      breaks = xBreaks) +
   
-
+  
   facet_grid(sourcePretty ~ .,
              scales = "free",
              space = "free_y") +  # allows y-axes to drop levels from other groups
@@ -1415,4 +1403,4 @@ my_ggsave( name = "basic_forest.pdf",
            height = 28 )
 
 
-
+}
