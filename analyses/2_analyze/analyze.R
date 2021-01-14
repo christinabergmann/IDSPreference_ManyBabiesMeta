@@ -1189,6 +1189,9 @@ PSmod = glm( eval( parse( text = string ) ),
 d$propScore = predict(PSmod, type = "response")
 d$PSweight = 1/d$propScore
 
+
+
+# look at overlap
 # very poor overlap, which is why we get so few matches
 ggplot( data = d[ d$isMeta == TRUE, ],
         aes(x = propScore,
@@ -1201,9 +1204,17 @@ ggplot( data = d[ d$isMeta == TRUE, ],
                      fill = factor(isMeta)))
 
 
+# look at weights
+summary(d$PSweight)
+# very extreme weights, as expected given lack of overlap
 
-
-
+# # trimming weights doesn't really work because so many weights are equal to the max:
+# table(d$PSweight == max(d$PSweight))
+# q5 = quantile(d$PSweight, 0.1)
+# q95 = quantile(d$PSweight, 0.9)
+# d$PSweightTrim = pmin( d$PSweight, q95 )
+# d$PSweightTrim = pmax( d$PSweightTrim, q5 )
+# summary(d$PSweightTrim)
 
 # fit weighted robust model
 # just like SAPB, theoretically
@@ -1237,6 +1248,171 @@ update_result_csv( name = paste( "IPW robu pval", IPW.robu$labels ),
 
 
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+#                           XX. FOREST PLOT           
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+
+
+# **pub bias: using studies' reported p-values?
+
+# relative weight of each study in meta-analysis (within group)
+d = d %>% group_by(isMeta) %>%
+  mutate( rel.wt = 100 * (1/vi) / sum(1/vi) )
+
+###@move to prep script:
+# @someone should recode Study ID to look better in plot
+# short_cite variable also doesn't work well because it doesn't distinguish among the replications
+d$lo = d$yi - qnorm(0.975) * sqrt(d$vi)
+d$hi = d$yi + qnorm(0.975) * sqrt(d$vi)
+# unique ID
+d = d %>% group_by(study_id) %>% 
+  mutate( unique = paste( study_id, row_number(), sep = ", #" ) )
+
+d$sourcePretty = "Meta-analysis"
+d$sourcePretty[ d$isMeta == FALSE ] = "Replications"
+### end of stuff to move
+
+# plotting df
+dp = d
+
+
+# strings with information about each meta-analysis
+dp$info.strings = paste( "n = ", d$n,
+                            ", ", round( d$yi, 2 ), " ",
+                            format_CI( d$lo, d$hi, 2 ),
+                            sep = "" )
+
+
+# labels for each meta-analysis, including stats
+dp$label = paste(dp$unique, " (", dp$info.strings, ")", sep = "")
+
+
+# sort by point estimate
+dp = dp[ order( dp$sourcePretty,
+                dp$yi,
+                decreasing = FALSE), ]
+
+
+# add pooled point estimates after each group
+# these have arbitrary relative weights
+
+for ( l in unique(dp$sourcePretty) ) {
+  # row ID after which to insert the pooled row
+  this.group.rows = which(dp$sourcePretty == l)
+  
+  pooled.label = paste( "POOLED - ", toupper(l), sep = "" )
+  
+  dp = add_row( as.data.frame(dp),
+                   .after = this.group.rows[ length(this.group.rows) ],
+                   yi = ifelse( l == "Meta-analysis", naive.MA.only$b.r, naive.reps.only$b.r ),
+                   lo = ifelse( l == "Meta-analysis", naive.MA.only$reg_table$CI.L, naive.reps.only$reg_table$CI.L ),
+                   hi = ifelse( l == "Meta-analysis", naive.MA.only$reg_table$CI.U, naive.reps.only$reg_table$CI.U ),
+                   label = pooled.label,
+                   sourcePretty = l,
+                   rel.wt = 5 )
+}
+
+
+# for aes on plot
+dp$is.pooled = grepl("POOL", dp$label)
+
+
+# for pooled estimates, don't include number of studies in string
+ind = grepl("POOL", dp$label)
+dp$info.strings[ind] = paste( round( dp$yi[ind], 2 ), " ",
+                                 format_CI( dp$lo[ind], dp$hi[ind], 2 ),
+                                 sep = "" )
+
+# to force y-axis ordering, turn into a factor whose levels match the 
+#  actual order in the dataset
+dp$label = factor( dp$label, levels = rev(dp$label) )
+levels(dp$label)
+
+
+# regular circle: 19
+# 2 is open triangle
+shapes = c(19,17)
+# have breaks approximately evenly spaced on log scale
+#  but round for prettiness
+#breaks = unique( round( 10^seq(-3, 3, .2), 1 ) )
+
+
+# 
+# # re-level group.pretty so legend order matches display order
+# #  (i.e., from high to low pooled estimate)
+# agg2p$group.pretty = factor( agg2p$group.pretty,
+#                              levels =  rev(c( "Metalab",
+#                                               "Top psychology",
+#                                               "Top medical",
+#                                               "PLOS One" )  ))
+
+
+##### Make the Plot #####
+
+# now color-coding by whether it's the pooled estimate or not
+colors2 = c("black", "red")
+
+# choose good axis breaks
+min(d$lo)
+max(d$hi)
+xBreaks = seq( -1.5, 4.5, 0.5)
+
+p = ggplot( data = dp, aes( x = yi, 
+                               y = label, 
+                               size = rel.wt,
+                               shape = as.factor(is.pooled),
+                               color = as.factor(is.pooled) ) ) +
+  
+  geom_errorbarh( aes(xmin = lo,
+                      xmax = hi),
+                  lwd = .5,
+                  height = .001,
+                  color = "black" ) +
+  
+  geom_point() +
+  
+  # geom_point( data = dp, aes( x = yi,
+  #                                y = label ),
+  #             size = 3,
+  #             shape = 124,
+  #             color = "black") +  # "4" for X
+  
+  xlab( "Point estimate (SMD)" ) +
+  ylab("") +
+  
+  geom_vline(xintercept = 1, lty = 2) +
+  
+  guides(size = FALSE ) +
+  
+  scale_shape_manual(values = shapes,
+                     name = "",
+                     guide=FALSE) +
+  
+  scale_color_manual(values = colors2,
+                     name = "",
+                     guide=FALSE) +
+  
+  scale_x_continuous(limits = c(min(xBreaks), max(xBreaks)),
+                     breaks = xBreaks) +
+  
+
+  facet_grid(sourcePretty ~ .,
+             scales = "free",
+             space = "free_y") +  # allows y-axes to drop levels from other groups
+  
+  theme_classic() + 
+  theme(axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 14),
+        axis.title.x = element_text(size = 20),
+        strip.text.y = element_text(size = 20))
+
+p
+
+
+
+my_ggsave( name = "basic_forest.pdf",
+           width = 14,
+           height = 28 )
 
 
 

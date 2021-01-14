@@ -137,6 +137,7 @@ d$vi = d$d_var_calc
 d$sei = sqrt(d$vi)
 
 # p-values and affirmative status for publication bias analyses
+#@return to this; maybe use t-dist with n
 d$pval = 2 * ( 1 - pnorm( abs(d$yi/d$sei) ) )
 d$affirm = ( d$yi > 0 ) & ( d$pval < 0.05 )
 
