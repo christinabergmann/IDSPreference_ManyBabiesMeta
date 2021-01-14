@@ -981,7 +981,7 @@ my_ggsave( name = "subset_forest.pdf",
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-#                           4. MATCHING (POST HOC)           
+#                           4. MATCHING AND IPW (POST HOC)           
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 section = 4
@@ -1033,10 +1033,6 @@ age_densities(d)
 
 
 ##### Make Matches - CEM #####
-# PS model string
-# string = paste( "isMeta ~ ",
-#                 paste( mods2[ !mods2 %in% c("isMeta", "mean_agec") ], collapse=" + "),
-#                 collapse = "")
 
 mods3 = mods2[ !mods2 %in% c("isMeta") ]
 
@@ -1174,6 +1170,73 @@ update_result_csv( name = "matched mean_age subclass 2",
 
 
 # @TO DO: should have forest plot overall and also with subclass studies highlighted in 2 different colors
+
+############################## IPW ##############################
+
+
+# fit PS model
+# logit{ P(isMeta = 1) } = Xb + eps
+
+string = paste( "isMeta ~ ",
+                paste( mods3, collapse=" + "),
+                collapse = "")
+
+PSmod = glm( eval( parse( text = string ) ),
+             family = binomial(link = "logit"),
+             data = d )
+
+# add propensity scores to dataset
+d$propScore = predict(PSmod, type = "response")
+d$PSweight = 1/d$propScore
+
+# very poor overlap, which is why we get so few matches
+ggplot( data = d[ d$isMeta == TRUE, ],
+        aes(x = propScore,
+            fill = isMeta ) ) +
+  geom_histogram(aes(y = - ..density..)) + # negative sign for mirroring
+    
+  geom_histogram(data = d[ d$isMeta == FALSE, ],
+                 aes(x = propScore,
+                     y = ..density..,
+                     fill = factor(isMeta)))
+
+
+
+
+
+
+# fit weighted robust model
+# just like SAPB, theoretically
+# use the naive t2 from MA as the naive estimate
+IPW.robu = robu( yi ~ isMeta,
+                  studynum = as.factor(study_id),
+                  data = d,
+                  userweights = PSweight / (vi + c(naive.MA.only$mod_info$tau.sq) ),
+                  var.eff.size = vi,
+                  modelweights = "HIER",
+                  small = small )
+
+est = as.numeric(IPW.robu$b.r)[2]  # isMeta coeff only
+lo = IPW.robu$reg_table$CI.L[2]
+hi = IPW.robu$reg_table$CI.U[2]
+pval.est = IPW.robu$reg_table$prob[2]
+
+
+update_result_csv( name = paste( "IPW robu est", IPW.robu$labels ),
+                   value = est )
+
+update_result_csv( name = paste( "IPW robu lo", IPW.robu$labels ),
+                   value = round(lo, digits) )
+
+update_result_csv( name = paste( "IPW robu hi", IPW.robu$labels ),
+                   value = round(hi, digits) )
+
+update_result_csv( name = paste( "IPW robu pval", IPW.robu$labels ),
+                   value = pval.est )
+
+
+
+
 
 
 

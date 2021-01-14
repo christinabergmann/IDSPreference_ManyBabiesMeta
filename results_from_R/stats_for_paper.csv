@@ -126,3 +126,11 @@ Reps subset naive est X.Intercept.,0.35,3
 Reps subset naive lo X.Intercept.,0.28,3
 Reps subset naive hi X.Intercept.,0.43,3
 Reps subset naive pval X.Intercept.,< 0.0001,3
+IPW robu est X.Intercept.,0.394685966254886,4
+IPW robu est isMetaTRUE,0.394685966254886,4
+IPW robu lo X.Intercept.,-0.11,4
+IPW robu lo isMetaTRUE,-0.11,4
+IPW robu hi X.Intercept.,0.9,4
+IPW robu hi isMetaTRUE,0.9,4
+IPW robu pval X.Intercept.,0.119952345892366,4
+IPW robu pval isMetaTRUE,0.119952345892366,4
