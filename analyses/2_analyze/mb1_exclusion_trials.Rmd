@@ -1,0 +1,82 @@
+---
+title: "MB1_trials_exclusion"
+author: "Angeline Tsui"
+date: "2/3/2021"
+output: html_document
+---
+
+```{r library}
+library("papaja")
+library(metafor)
+library(tidyverse)
+library(here)
+
+
+source(here("helper/ma_helper.R"))
+```
+
+## Read MB1 file
+```{r data loading}
+mb1_diffs <- read.csv(text=RCurl::getURI("https://raw.githubusercontent.com/manybabies/mb1-analysis-public/master/processed_data/03_data_diff_main.csv"),  na = c("NA", "N/A")) %>% 
+    mutate(method = case_when(
+    method == "singlescreen" ~ "Central fixation",
+    method == "eyetracking" ~ "Eye tracking",
+    method == "hpp" ~ "HPP",
+    TRUE ~ method)) 
+
+ordered_ages <- c("3-6 mo", "6-9 mo", "9-12 mo", "12-15 mo")
+mb1_diffs$age_group <- fct_relevel(mb1_diffs$age_group, ordered_ages)
+mb1_diffs$age_group <- fct_relevel(mb1_diffs$age_group, ordered_ages)
+```
+
+## Exclusion criteria (copied from mb1-paper_result.Rmd from Mb1 public folder)
+
+```{r}
+#note that excl8 = 50% trials excluded, and excl12 = 75% trials excluded
+ds_excl <- mb1_diffs %>% 
+  group_by(lab, age_group, method, nae, subid) %>%
+  summarise(excl2 = mean(diff, na.rm = TRUE),
+            excl4 = ifelse(sum(!is.na(diff)) > 2,
+                            mean(diff, na.rm = TRUE), NA),
+             excl8 = ifelse(sum(!is.na(diff)) > 4,
+                            mean(diff, na.rm = TRUE), NA),
+             excl12 = ifelse(sum(!is.na(diff)) > 6,
+                            mean(diff, na.rm = TRUE), NA)) %>% 
+   gather(exclusion, mean_diff, excl2, excl4, excl8, excl12) %>% 
+   mutate(exclusion = as.numeric(str_replace(exclusion, "excl","")))
+```
+
+
+```{r}
+
+ds_excl <- ds_excl %>%
+  group_by(exclusion,lab, age_group, method, nae, subid) %>%
+  summarise(valid_cases=sum(!is.na(mean_diff)),all_cases=n()
+            ,percentage=valid_cases/all_cases,d = mean(mean_diff, na.rm = TRUE))
+
+ds_excl_agg<-ds_excl%>%
+  group_by(exclusion,lab, age_group, method, nae) %>%
+  summarise(d_z = mean(d, na.rm = TRUE) / sd(d, na.rm = TRUE), 
+            n = length(unique(subid)), 
+            d_z_var = d_var_calc(n, d_z)) %>%
+  filter(n >= 10) %>%
+  filter(!is.na(d_z)) 
+
+
+ds_excl_2 = ds_excl_agg %>% filter(exclusion==2 & !is.na(d_z)) 
+intercept_mod_2 <- metafor::rma(d_z ~ 1, vi = d_z_var, slab = lab, data = ds_excl_2, method = "REML")
+
+ds_excl_4 = ds_excl_agg %>% filter(exclusion==4 & !is.na(d_z)) 
+intercept_mod_4 <- metafor::rma(d_z ~ 1, vi = d_z_var, slab = lab, data = ds_excl_4, method = "REML")
+
+ds_excl_8 = ds_excl_agg %>% filter(exclusion==8 & !is.na(d_z)) 
+intercept_mod_8 <- metafor::rma(d_z ~ 1, vi = d_z_var, slab = lab, data = ds_excl_8, method = "REML")
+
+ds_excl_12 = ds_excl_agg %>% filter(exclusion==12 & !is.na(d_z)) 
+intercept_mod_12 <- metafor::rma(d_z ~ 1, vi = d_z_var, slab = lab, data = ds_excl_12, method = "REML")
+
+tibble(intercept_mod_2$b, intercept_mod_4$b, intercept_mod_8$b, intercept_mod_12$b)
+
+```
+
+
