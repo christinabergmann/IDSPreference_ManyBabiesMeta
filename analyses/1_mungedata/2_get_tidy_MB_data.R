@@ -2,8 +2,12 @@
 library(tidyverse)
 library(here)
 
+
+n_trial_pairs_criterion = 1
+# There are 8 pairs in total, so 4 pairs = 50%, 6 pairs = 75%
+
 MB1_PATH <- "https://raw.githubusercontent.com/manybabies/mb1-analysis-public/master/processed_data/03_data_diff_main.csv"
-MB_OUT_PATH <- here("data/mb_data_tidy.csv")
+MB_OUT_PATH <- here(paste("data/mb_data_tidy_", n_trial_pairs_criterion/8, ".csv", sep = ""))
 
 TARGET_VARS <- c("lab", "subid_unique", "trial_num", "method", "age_days", "age_group",
                  "lang_group", "lang1", "lang1_exposure",
@@ -53,9 +57,12 @@ d_var_calc <- function(n, d) {
   (2/n) + (d ^ 2 / (4 * n))
 }
 
-es_by_study <- mb_data_tidy_fct %>%
+es_by_participant <- mb_data_tidy_fct %>%
   group_by(lab, age_group, subid_unique) %>%
-  summarise(d = mean(diff, na.rm = TRUE)) %>%
+  summarise(d = mean(diff, na.rm = TRUE), n_trial_pairs = n()) %>%
+  filter(n_trial_pairs >= n_trial_pairs_criterion)
+
+es_by_study <- es_by_participant %>%
   group_by(lab, age_group) %>%
   summarise(d_z = mean(d)/ sd(d),
             n = n(),
@@ -87,4 +94,5 @@ mb_data <- full_join(mb_data, methodological_vars) %>%
   filter(n>9) # Match ManyBabies1 dataset by adding this inclusion criterion
 
 write_csv(mb_data, MB_OUT_PATH)
+
 
