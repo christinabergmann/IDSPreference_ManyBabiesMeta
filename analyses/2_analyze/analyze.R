@@ -1,4 +1,8 @@
 
+# To do: Put analysis that doesn't match on age but matches on the others into manuscript. 
+
+# E-value for moderators
+
 ############################## PRELIMINARIES ############################## 
 
 library(tidyverse) 
@@ -759,9 +763,7 @@ if ( redo.plots == TRUE ) {
   plot(p.funnel)
   
   
-  setwd(overleaf.dir)
-  ggsave(plot = p.funnel,
-         filename = "mb_signif_funnel.png",
+  my_ggsave("mb_signif_funnel.png",
          width = 5,
          height = 4)
 }
