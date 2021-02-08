@@ -3,6 +3,8 @@
 
 # E-value for moderators
 
+# stop using asterisks in file names bc they cause syncing trouble (for now, I just manually removed them)
+
 ############################## PRELIMINARIES ############################## 
 
 library(tidyverse) 
@@ -214,8 +216,9 @@ labels = c("naive",
 
 # fit the naive model
 # fit_mr automatically writes results to the results csv file and table
+# caps indicates it's a primary model
 naiveRes = fit_mr( .dat = d,
-                   .label = "*naive",
+                   .label = "NAIVE",
                    .mods = mod.sets[[1]],
                    .write.to.csv = TRUE,
                    .write.table = TRUE,
@@ -234,7 +237,7 @@ while ( gotError == TRUE ) {
   
   tryCatch({
     mod1Res = fit_mr( .dat = d,
-                      .label = "*mod1",
+                      .label = "MOD1",
                       .mods = mod.sets[[2]],
                       .write.to.csv = TRUE,
                       .write.table = TRUE,
