@@ -1,9 +1,13 @@
 
 # To do: Put analysis that doesn't match on age but matches on the others into manuscript. 
 
-# E-value for moderators
 
 # stop using asterisks in file names bc they cause syncing trouble (for now, I just manually removed them)
+
+# names of important model objects:
+# - naive.MA.only and naive.reps.only: meta-analyses within subsets; no moderators
+
+
 
 ############################## PRELIMINARIES ############################## 
 
@@ -37,7 +41,7 @@ source("analyze_helper.R")
 # package update not yet on CRAN, but we need the cluster-bootstrap functionality
 source("MetaUtility development functions.R")
 
-
+##### Code-Running Parameters #####
 # should we remove existing results file instead of overwriting individual entries? 
 start.res.from.scratch = FALSE
 # should we use the grateful package to scan and cite packages?
@@ -50,17 +54,31 @@ redo.plots = TRUE
 # wipe results csvs if needed
 if ( start.res.from.scratch == TRUE ) wr()
 
-# constants of universe
+##### Constants of Universe #####
 digits = 2
 pval.cutoff = 10^-4  # threshold for using "<"
-boot.reps = 2000 # for cross-model comparisons 
+boot.reps = 500 # for cross-model comparisons; @increase later 
 # plot colors
 colors = c("darkgray", "red")  # replications, originals
 
 # stop sci notation
 options(scipen=999)
 
-# read in dataset
+# moderator names
+mods = c( "study_type",
+          "mean_agec",
+          "test_lang",  # whether stimuli were in native language; almost constant in meta
+          "native_lang", #Won't be used in main analyses
+          "method",
+          
+          # constant in RRR:
+          "speech_type",
+          "own_mother",
+          "presentation",
+          "dependent_measure",
+          "main_question_ids_preference" )
+
+##### Read Datasets #####
 setwd(data.dir)
 d = suppressMessages( read_csv("mb_ma_combined_prepped.csv") )
 
@@ -71,18 +89,6 @@ dma = d %>% filter(isMeta == TRUE)
 dr = d %>% filter(isMeta == FALSE)
 
 
-###@move to prep script:
-# @someone should recode Study ID to look better in plot
-# short_cite variable also doesn't work well because it doesn't distinguish among the replications
-d$lo = d$yi - qnorm(0.975) * sqrt(d$vi)
-d$hi = d$yi + qnorm(0.975) * sqrt(d$vi)
-# unique ID
-d = d %>% group_by(study_id) %>% 
-  mutate( unique = paste( study_id, row_number(), sep = ", #" ) )
-
-d$sourcePretty = "Meta-analysis"
-d$sourcePretty[ d$isMeta == FALSE ] = "Replications"
-### end of stuff to move
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 #                       0. CHARACTERISTICS OF INCLUDED STUDIES            
@@ -115,22 +121,6 @@ update_result_csv( name = paste( "median n", t$study_type, sep = " "),
 
 
 ############################## MODERATORS ##############################
-
-# look at moderators
-mods = c( "study_type",
-          "mean_agec",
-          "test_lang",  # whether stimuli were in native language; almost constant in meta
-          "native_lang", #Won't be used in main analyses
-          "method",
-          
-          # constant in RRR:
-          "speech_type",
-          "own_mother",
-          "presentation",
-          "dependent_measure",
-          "main_question_ids_preference" )
-
-
 
 # distribution of moderators in RRR and MA
 t = CreateTableOne(vars = mods, 
@@ -279,7 +269,7 @@ robu( yi ~ isMeta + mean_agec + test_lang + method,
 
 
 
-############################## PROPORTION MEANINGFULLY STRONG EFFECTS ##############################
+############################## PROPORTION MEANINGFULLY STRONG EFFECTS - MARGINAL ##############################
 
 get_and_write_phat( .dat = dma,
                     .q = 0,
@@ -308,23 +298,43 @@ calibMA = calib_ests(yi = dma$yi, sei = sqrt(dma$vi) )
 mean(calibMA>0.2)
 mean(calibMA)
 
-d$calib = NA
-d$calib[ d$isMeta == FALSE ] = calibR
-d$calib[ d$isMeta == TRUE ] = calibMA
+d$calibNaive = NA
+d$calibNaive[ d$isMeta == FALSE ] = calibR
+d$calibNaive[ d$isMeta == TRUE ] = calibMA
+
 
 
 ############################## DENSITY PLOT OF META-ANALYSIS VS. REPLICATION CALIBRATED ESTIMATES ##############################
 
 
+# fit the final, moderated models to each subset
+# to see what the heterogeneity looks like in each case
+# @move this?
+( cond.MA.only = fit_subset_meta( .dat = dma,
+                                   .mods = mod.sets[[2]][ !mod.sets[[2]] == "isMeta" ],
+                                   .label = "MA subset mods" ) )
+
+( cond.reps.only = fit_subset_meta( .dat = dr,
+                                     .mods = mod.sets[[2]][ !mod.sets[[2]] == "isMeta" ],
+                                     .label = "Reps subset mods" ) )
+
+d$calibCond[ d$isMeta == FALSE ] = conditional_calib_ests(cond.reps.only)
+d$calibCond[ d$isMeta == TRUE ] = conditional_calib_ests(cond.MA.only)
+
+# ***important: MLR heterogeneity estimate is 0 after conditioning on mods
+#  but MA heterogeneity estimate actually slightly increases
+
+# get conditional calibrated estimates
+#bm
+
+
+
+
+
 if ( redo.plots == TRUE ) {
   
   
-  
-  #@move to prep
-  d$studyTypePretty = NA
-  d$studyTypePretty[ d$isMeta == TRUE ] = "Meta-analysis"
-  d$studyTypePretty[ d$isMeta == FALSE ] = "Replications"
-  
+  ##### Marginal Calibrated Estimates #####
   # choose axis scaling
   summary(d$yi)
   xmin = -1
@@ -332,7 +342,7 @@ if ( redo.plots == TRUE ) {
   tickJump = 0.5  # space between tick marks
   
   ggplot( data = d,
-          aes( x = calib,
+          aes( x = calibNaive,
                fill = studyTypePretty,
                color = studyTypePretty ) ) +
     
@@ -345,20 +355,19 @@ if ( redo.plots == TRUE ) {
                 color = colors[1],
                 lty = 2) +
     
-    # shifted threshold for Z=z
+    # null
     geom_vline(xintercept = 0,
                color = "gray",
                lty = 1) +
     
-    # ensemble estimates shifted to Z=0
     geom_density(alpha = 0.3) +
     
     theme_bw() +
     
-    xlab("Calibrated study estimate (SMD)") +
+    xlab("Marginal population SMDs") +
     scale_x_continuous( limits = c(xmin, xmax), breaks = seq(xmin, xmax, tickJump)) +
     
-    ylab("Density") +
+    ylab("Estimated density") +
     
     scale_color_manual( values = rev(colors), name = "Source" ) +
     scale_fill_manual( values = rev(colors), name = "Source" ) +
@@ -369,9 +378,54 @@ if ( redo.plots == TRUE ) {
           panel.grid.minor = element_blank())
   
   
-  my_ggsave( name = "calibrated_plot.pdf",
+  my_ggsave( name = "naive_calibrated_plot.pdf",
              width = 8,
              height = 5 )
+  
+  
+  ##### Conditional Calibrated Estimates #####
+  ggplot( data = d,
+          aes( x = calibCond,
+               fill = studyTypePretty,
+               color = studyTypePretty ) ) +
+    
+    # conditional mean estimates from subset models
+    geom_vline( xintercept = cond.MA.only$b.r[1],
+                color = colors[2],
+                lty = 2 ) +
+    
+    geom_vline( xintercept = cond.reps.only$b.r[1],
+                color = colors[1],
+                lty = 2) +
+    
+    # null
+    geom_vline(xintercept = 0,
+               color = "gray",
+               lty = 1) +
+    
+    # ensemble estimates shifted to Z=0
+    geom_density(alpha = 0.3) +
+    
+    theme_bw() +
+    
+    xlab("Conditional population SMDs") +
+    scale_x_continuous( limits = c(xmin, xmax), breaks = seq(xmin, xmax, tickJump)) +
+    
+    ylab("Estimated density") +
+    
+    scale_color_manual( values = rev(colors), name = "Source" ) +
+    scale_fill_manual( values = rev(colors), name = "Source" ) +
+    
+    theme(axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank())
+  
+  
+  my_ggsave( name = "cond_calibrated_plot.pdf",
+             width = 8,
+             height = 5 )
+  
   
 }
 
@@ -381,10 +435,6 @@ if ( redo.plots == TRUE ) {
 # refit mod1Res for each boot iterate, each time estimating avgDiff and two currently fake stats
 #  for Phat
 
-#bm
-# @temp only
-# @increase later
-boot.reps = 500
 
 if ( boot.from.scratch == TRUE ) {
   boot.res = boot( data = d, 
@@ -432,8 +482,8 @@ if ( boot.from.scratch == FALSE ){
 
 # order of statistics in the above: 
 # between-source difference in estimated means
-# between-source difference in Phat0 (**FAKE)
-# between-source difference in Phat0.2 (**FAKE)
+# between-source difference in Phat0 (@FAKE)
+# between-source difference in Phat0.2 (@FAKE)
 
 # # naive model metrics of source discrepancy
 # # CIS WRONG HERE
@@ -463,7 +513,7 @@ statCI_result_csv( "moderator increase avgDiff", c(mod1Res$avgDiff - naiveRes$av
 # statCI_result_csv( "moderator reduction Phat0.2Diff", c(naiveRes$Phat0.2Diff - mod1Res$Phat0.2Diff, bootCIs[[3]][1], bootCIs[[3]][2]) )
 
 
-# ***p-values would require resampling under H0...
+# @p-values would require resampling under H0...
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 #               2. PUBLICATION BIAS (SOME PREREG'D AND SOME POST HOC)           
@@ -1048,7 +1098,6 @@ string = paste( "isMeta ~ ",
 # diff(ageCuts)
 
 # 12-month bins
-# @DISCUSS WITH SUBJECT EXPERTS
 ( ageCuts = seq( min(d$mean_agec), max(d$mean_agec), 12 ) )
 
 # exact matching on all categorical variables and coarsened exact matching, based on ageCuts above,

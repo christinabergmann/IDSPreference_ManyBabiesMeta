@@ -216,6 +216,7 @@ fit_mr = function( .dat,
   
   
   if ( hasBoth == TRUE ) {
+    
     ##### 3. Get Estimated Mean for Meta-Analysis #####
     # could use linear combo of coefficients and vars, but df are complicated
     #  for robumeta
@@ -266,7 +267,7 @@ fit_mr = function( .dat,
     expect_equal( est.ma - est.rep, meta$b.r[ meta$labels == "isMetaTRUE"]
                   
                   
-                  ##### 4. Get Phat for Meta, Replications, and Differencee #####
+                  ##### 4. Get Phat for Meta, Replications, and Difference #####
                   # ***will fill later if tau^2 > 0
                   
                   
@@ -399,7 +400,7 @@ fit_subset_meta = function( .dat,
 
 
 
-
+# marginal Phat (no moderators)
 get_and_write_phat = function( .dat,
                                .q,
                                label ) {
@@ -422,6 +423,56 @@ get_and_write_phat = function( .dat,
                      value = round( 100 * Phat$hi ) )
   
 }
+
+
+# @AD HOC FOR THE MODERATORS ACTUALLY PRESENT IN EACH MODEL
+# @definitely needs unit tests 
+conditional_calib_ests = function(.model){
+  # get data from robu object
+  dat = .model$data
+  
+  bhat = .model$b.r  # vector of coefficient estimates 
+  t2 = .model$mod_info$tau.sq  # heterogeneity estimate
+  
+  # calculate the linear predictor (minus intercept) for each study
+  # would need to be modified for other datasets
+  otherBhat = bhat[-1]  # non-intercept terms
+  otherBhatVars = .model$labels[-1]
+  
+  # @specific to this set of moderators
+  
+  # MA has more levels of mods than reps
+  linpred = bhat[1] + dat$mean_agec * otherBhat[ otherBhatVars == "mean_agec" ] +
+    ( dat$test_lang == "b.nonnative" ) * otherBhat[ otherBhatVars == "test_langb.nonnative" ] +
+    ( dat$method == "b.hpp" ) * otherBhat[ otherBhatVars == "methodb.hpp" ]
+  
+  if ( length(bhat) > 4 ) {
+    linpred = linpred + ( dat$test_lang == "c.artificial" ) * otherBhat[ otherBhatVars == "test_langc.artificial" ] +
+      ( dat$method == "c.other" ) * otherBhat[ otherBhatVars == "methodc.other" ]
+  }
+  
+  ##### Calculate Calibrated Estimates #####
+  # point estimate, shifted to set effect modifiers to 0
+  dat$yi.shift = dat$yi - linpred  
+  
+  # calibrated estimate, shifted to set effect modifiers to 0
+  calib.shift = c(bhat[1]) + sqrt( c(t2) / ( c(t2) + dat$vi) ) * ( dat$yi.shift - c(bhat[1]) )
+  
+  # sanity check
+  var(calib.shift); t2
+  
+  return(calib.shift)
+  
+  # # threshold, shifted to set effect modifiers to 0
+  # # would need to be modified for other datasets
+  # q.shift = q - ( bhat[2]*z[1] + bhat[3]*z[2] )  
+  # # note: below assumes we are considering effects ABOVE the threshold
+  # Phat = mean( calib.shift > c(q.shift) )
+  
+}
+
+
+
 
 
 ################################ FNS FOR BOOTSTRAPPING ################################

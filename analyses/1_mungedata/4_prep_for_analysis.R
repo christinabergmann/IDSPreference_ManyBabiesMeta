@@ -30,7 +30,7 @@ setwd(data.dir)
 # codebook: https://github.com/langcog/metalab2/blob/master/metadata/spec.yaml
 
 
-# For preregistration, we use a scrambed dataset
+# For preregistration, we used a scrambled dataset
 if(prereg){
   
   COMBINED_DATASET <- here("data/mb_ma_combined.csv")
@@ -131,15 +131,32 @@ CreateTableOne(vars = mods,
 
 ############################## MAKE OTHER VARIABLES ############################## 
 
+# unique ID
+d = d %>% group_by(study_id) %>% 
+  mutate( unique = paste( study_id, row_number(), sep = ", #" ) )
+
+
 # rename for simplicity
 d$yi = d$d_calc
 d$vi = d$d_var_calc
 d$sei = sqrt(d$vi)
 
+# CI limits
+d$lo = d$yi - qnorm(0.975) * sqrt(d$vi)
+d$hi = d$yi + qnorm(0.975) * sqrt(d$vi)
+
 # p-values and affirmative status for publication bias analyses
 #@return to this; maybe use t-dist with n
 d$pval = 2 * ( 1 - pnorm( abs(d$yi/d$sei) ) )
 d$affirm = ( d$yi > 0 ) & ( d$pval < 0.05 )
+
+# recode for plotting joy
+d$studyTypePretty = NA
+d$studyTypePretty[ d$isMeta == TRUE ] = "Meta-analysis"
+d$studyTypePretty[ d$isMeta == FALSE ] = "Replications"
+
+d$sourcePretty = "Meta-analysis"
+d$sourcePretty[ d$isMeta == FALSE ] = "Replications"
 
 
 ############################## SAVE DATASET ############################## 
