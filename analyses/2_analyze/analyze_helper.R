@@ -427,6 +427,7 @@ get_and_write_phat = function( .dat,
 
 # @AD HOC FOR THE MODERATORS ACTUALLY PRESENT IN EACH MODEL
 # @definitely needs unit tests 
+# conditions on all moderators being set to modes in
 conditional_calib_ests = function(.model){
   # get data from robu object
   dat = .model$data
@@ -441,15 +442,18 @@ conditional_calib_ests = function(.model){
   
   # @specific to this set of moderators
   
-  # MA has more levels of mods than reps
-  linpred = bhat[1] + dat$mean_agec * otherBhat[ otherBhatVars == "mean_agec" ] +
-    ( dat$test_lang == "b.nonnative" ) * otherBhat[ otherBhatVars == "test_langb.nonnative" ] +
-    ( dat$method == "b.hpp" ) * otherBhat[ otherBhatVars == "methodb.hpp" ]
   
-  if ( length(bhat) > 4 ) {
-    linpred = linpred + ( dat$test_lang == "c.artificial" ) * otherBhat[ otherBhatVars == "test_langc.artificial" ] +
-      ( dat$method == "c.other" ) * otherBhat[ otherBhatVars == "methodc.other" ]
-  }
+  otherBhatVars %in% names(.model$data)
+  
+  # # MA has more levels of mods than reps
+  # linpred = bhat[1] + dat$mean_agec * otherBhat[ otherBhatVars == "mean_agec" ] +
+  #   ( dat$test_lang == "b.nonnative" ) * otherBhat[ otherBhatVars == "test_langb.nonnative" ] +
+  #   ( dat$method == "b.hpp" ) * otherBhat[ otherBhatVars == "methodb.hpp" ]
+  # 
+  # if ( length(bhat) > 4 ) {
+  #   linpred = linpred + ( dat$test_lang == "c.artificial" ) * otherBhat[ otherBhatVars == "test_langc.artificial" ] +
+  #     ( dat$method == "c.other" ) * otherBhat[ otherBhatVars == "methodc.other" ]
+  # }
   
   ##### Calculate Calibrated Estimates #####
   # point estimate, shifted to set effect modifiers to 0

@@ -318,13 +318,15 @@ d$calibNaive[ d$isMeta == TRUE ] = calibMA
                                      .mods = mod.sets[[2]][ !mod.sets[[2]] == "isMeta" ],
                                      .label = "Reps subset mods" ) )
 
+
+# get conditional calibrated estimates
 d$calibCond[ d$isMeta == FALSE ] = conditional_calib_ests(cond.reps.only)
 d$calibCond[ d$isMeta == TRUE ] = conditional_calib_ests(cond.MA.only)
 
 # ***important: MLR heterogeneity estimate is 0 after conditioning on mods
 #  but MA heterogeneity estimate actually slightly increases
 
-# get conditional calibrated estimates
+
 #bm
 
 

@@ -122,6 +122,10 @@ d = d %>% mutate_at( .vars = mods[ !mods == contMods ],
                                                            isMeta = d$isMeta) ) #Needed to hack this
 
 
+#@also recode as dummy variables for meta-regression joy
+d = cbind( d, d %>% select(mods) %>% dummy_cols() )
+
+
 # same table again, after recoding
 CreateTableOne(vars = mods, 
                strata = "study_type",
