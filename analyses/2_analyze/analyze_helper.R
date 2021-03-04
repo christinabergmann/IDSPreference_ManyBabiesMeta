@@ -442,30 +442,44 @@ conditional_calib_ests = function(.model){
   
   # @specific to this set of moderators
   
+  # for each bhat, check if it's actually in the model
+  # important because some subsets (e.g., boot resamples) could be 
+  #  homo on any given moderator
+  linpred = bhat[1]
   
-  otherBhatVars %in% names(.model$data)
+  for ( i in 1:length(otherBhatVars) ) {
+    
+    b = otherBhatVars[i]
+    if ( b == "mean_agec" ) {
+      linpred = linpred + dat$mean_agec * otherBhat[i]
+      
+    } else if (b == "test_langb.nonnative" ) {
+      linpred = linpred + ( dat$test_lang == "b.nonnative" ) * otherBhat[i]
+      
+    } else if (b == "test_langc.artificial" ) {
+      linpred = linpred + ( dat$test_lang == "c.artificial" ) * otherBhat[i]
+      
+    } else if (b == "methodb.hpp" ) {
+      linpred = linpred + ( dat$method == "b.hpp" ) * otherBhat[i]
+      
+    } else if (b == "methodc.other" ) {
+      linpred = linpred + ( dat$method == "c.other" ) * otherBhat[i]
+      
+    } else {
+      browser()
+      stop( "Variable name was not found in dataset" )
+    }
+  }
   
-  # # MA has more levels of mods than reps
-  # linpred = bhat[1] + dat$mean_agec * otherBhat[ otherBhatVars == "mean_agec" ] +
-  #   ( dat$test_lang == "b.nonnative" ) * otherBhat[ otherBhatVars == "test_langb.nonnative" ] +
-  #   ( dat$method == "b.hpp" ) * otherBhat[ otherBhatVars == "methodb.hpp" ]
-  # 
-  # if ( length(bhat) > 4 ) {
-  #   linpred = linpred + ( dat$test_lang == "c.artificial" ) * otherBhat[ otherBhatVars == "test_langc.artificial" ] +
-  #     ( dat$method == "c.other" ) * otherBhat[ otherBhatVars == "methodc.other" ]
-  # }
   
   ##### Calculate Calibrated Estimates #####
-  # point estimate, shifted to set effect modifiers to 0
-  dat$yi.shift = dat$yi - linpred  
-  
   # calibrated estimate, shifted to set effect modifiers to 0
-  calib.shift = c(bhat[1]) + sqrt( c(t2) / ( c(t2) + dat$vi) ) * ( dat$yi.shift - c(bhat[1]) )
+  calib.shift = c(bhat[1]) + sqrt( c(t2) / ( c(t2) + dat$vi) ) * ( dat$yi - linpred )
   
   # sanity check
-  var(calib.shift); t2
+  #var(calib.shift); t2
   
-  return(calib.shift)
+  return( data.frame( calib.shift, linpred ) )
   
   # # threshold, shifted to set effect modifiers to 0
   # # would need to be modified for other datasets
@@ -476,6 +490,44 @@ conditional_calib_ests = function(.model){
 }
 
 
+# ##### sanity check #1:
+# x = conditional_calib_ests(cond.reps.only)
+# mod = cond.reps.only  # see analyze.R
+# dat = dr
+# t2 = mod$mod_info$tau.sq
+# 
+# myLinpred = mod$b.r[1] + mod$b.r[2] * dat$mean_agec +
+#   mod$b.r[3] * ( dat$test_lang == "b.nonnative" ) +
+#   mod$b.r[4] * ( dat$method == "b.hpp" )
+# 
+# # check linear predictor calculation
+# expect_equal( myLinpred, x$linpred)
+# 
+# # calculate conditional calibrated estimates manually
+# myCalib = mod$b.r[1] + sqrt( c(t2) / ( c(t2) + dat$vi) ) * ( dat$yi - myLinpred ) 
+# expect_equal(myCalib, x$calib.shift)
+# # yesss
+# 
+# ##### sanity check #2: different dataset that is homo
+# #  on different covariates
+# x = conditional_calib_ests(cond.MA.only)
+# mod = cond.MA.only  # see analyze.R
+# dat = dma
+# t2 = mod$mod_info$tau.sq
+# 
+# myLinpred = mod$b.r[1] + mod$b.r[2] * dat$mean_agec +
+#   mod$b.r[3] * ( dat$test_lang == "b.nonnative" ) +
+#   mod$b.r[4] * ( dat$test_lang == "c.artificial" ) +
+#   mod$b.r[5] * ( dat$method == "b.hpp" ) + 
+#   mod$b.r[6] * ( dat$method == "c.other" )
+# 
+# # check linear predictor calculation
+# expect_equal( myLinpred, x$linpred)
+# 
+# # calculate conditional calibrated estimates manually
+# myCalib = mod$b.r[1] + sqrt( c(t2) / ( c(t2) + dat$vi) ) * ( dat$yi - myLinpred ) 
+# expect_equal(myCalib, x$calib.shift)
+# # yesss
 
 
 

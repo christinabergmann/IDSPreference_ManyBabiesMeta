@@ -320,16 +320,14 @@ d$calibNaive[ d$isMeta == TRUE ] = calibMA
 
 
 # get conditional calibrated estimates
-d$calibCond[ d$isMeta == FALSE ] = conditional_calib_ests(cond.reps.only)
-d$calibCond[ d$isMeta == TRUE ] = conditional_calib_ests(cond.MA.only)
+d$calibCond[ d$isMeta == FALSE ] = conditional_calib_ests(cond.reps.only)$calib.shift
+d$calibCond[ d$isMeta == TRUE ] = conditional_calib_ests(cond.MA.only)$calib.shift
 
 # ***important: MLR heterogeneity estimate is 0 after conditioning on mods
 #  but MA heterogeneity estimate actually slightly increases
 
 
 #bm
-
-
 
 
 
