@@ -50,6 +50,14 @@ cite.packages.anew = FALSE
 boot.from.scratch = FALSE
 # make plots from scratch?
 redo.plots = TRUE
+# redo iterative selection of moderators to get model to converge?
+redo.mod.selection = FALSE
+
+if (redo.mod.selection == FALSE) {
+  # read in the surviving moderators
+  setwd(results.dir)
+  modsS = read.csv("surviving_mods.csv")[,2]
+}
 
 # wipe results csvs if needed
 if ( start.res.from.scratch == TRUE ) wr()
@@ -175,99 +183,109 @@ section = 1
 
 
 ############################## FIT NAIVE AND MODERATED META-REGRESSIONS ############################## 
-# order of importance given in prereg:
-# age, test_lang, method, speaker, speech_type, own_mother, presentation, DV, main question
-
-# per prereg, if model isn't estimable, the moderators are to be removed in the opposite order
-#  of this importance list
-
-# try to fit meta-regression
-# same list as mods except has isMeta instead of study_type
-#  and does not have native_lang
-mods2 = c( "isMeta",  # code this way since we expect meta to have larger effect sizes
-           "mean_agec",
-           "test_lang",  # whether stimuli were in native language; almost constant in meta
-           "method",
-           
-           # constant in RRR:
-           "speech_type",
-           "own_mother",
-           "presentation",
-           "dependent_measure",  # causes singularity
-           "main_question_ids_preference" )
 
 
-
-mod.sets = list( c("isMeta"),  # naive model
-                 mods2 )
-
-labels = c("naive",
-           "moderated")
-
-# fit the naive model
-# fit_mr automatically writes results to the results csv file and table
-# caps indicates it's a primary model
-naiveRes = fit_mr( .dat = d,
-                   .label = "NAIVE",
-                   .mods = mod.sets[[1]],
-                   .write.to.csv = TRUE,
-                   .write.table = TRUE,
-                   .simple.return = FALSE )
-
-
-# fit the meta-regression with all covariates 
-#  and remove them in prespecified order if needed until 
-#  model becomes estimables
-
-gotError = TRUE  # initialize so the while-loop is entered
-
-
-# this will print an xtable with the moderator estimates for use in the paper
-while ( gotError == TRUE ) {
+if ( redo.mod.selection == TRUE ) {
   
-  tryCatch({
-    mod1Res = fit_mr( .dat = d,
-                      .label = "MOD1",
-                      .mods = mod.sets[[2]],
-                      .write.to.csv = TRUE,
-                      .write.table = TRUE,
-                      .simple.return = FALSE )
-    gotError = FALSE
-    
-  }, error = function(err){
-    gotError <<- TRUE
-    
-    # remove one moderator from the end of the list
-    message( paste( "\n Removing ", 
-                    mod.sets[[2]][ length(mod.sets[[2]]) ],
-                    " from moderators and trying again" ) )
-    mod.sets[[2]] <<- mod.sets[[2]][ 1 : ( length(mod.sets[[2]]) - 1 ) ]
-    
-    
-  })
+  # order of importance given in prereg:
+  # age, test_lang, method, speaker, speech_type, own_mother, presentation, DV, main question
   
-}
-
-# look at the surviving moderators
-mod.sets[[2]]
-
-##### Sanity checks #####
-# sanity check: refit the naive and pruned models manually
-robu( yi ~ isMeta, 
-      data = d, 
-      studynum = as.factor(study_id),
-      var.eff.size = vi,
-      modelweights = "HIER",
-      small = TRUE)
-
-robu( yi ~ isMeta + mean_agec + test_lang + method, 
-      data = d, 
-      studynum = as.factor(study_id),
-      var.eff.size = vi,
-      modelweights = "HIER",
-      small = TRUE)
-
-
+  # per prereg, if model isn't estimable, the moderators are to be removed in the opposite order
+  #  of this importance list
+  
+  # try to fit meta-regression
+  # same list as mods except has isMeta instead of study_type
+  #  and does not have native_lang
+  mods2 = c( "isMeta",  # code this way since we expect meta to have larger effect sizes
+             "mean_agec",
+             "test_lang",  # whether stimuli were in native language; almost constant in meta
+             "method",
+             
+             # constant in RRR:
+             "speech_type",
+             "own_mother",
+             "presentation",
+             "dependent_measure",  # causes singularity
+             "main_question_ids_preference" )
+  
+  
+  
+  mod.sets = list( c("isMeta"),  # naive model
+                   mods2 )
+  
+  labels = c("naive",
+             "moderated")
+  
+  # fit the naive model
+  # fit_mr automatically writes results to the results csv file and table
+  # caps indicates it's a primary model
+  naiveRes = fit_mr( .dat = d,
+                     .label = "NAIVE",
+                     .mods = mod.sets[[1]],
+                     .write.to.csv = TRUE,
+                     .write.table = TRUE,
+                     .simple.return = FALSE )
+  
+  
+  # fit the meta-regression with all covariates 
+  #  and remove them in prespecified order if needed until 
+  #  model becomes estimables
+  
+  section = 1  # loop will break otherwise
+  
+  gotError = TRUE  # initialize so the while-loop is entered
+  
+  
+  # this will print an xtable with the moderator estimates for use in the paper
+  while ( gotError == TRUE ) {
+    
+    tryCatch({
+      mod1Res = fit_mr( .dat = d,
+                        .label = "MOD1",
+                        .mods = mod.sets[[2]],
+                        .write.to.csv = TRUE,
+                        .write.table = TRUE,
+                        .simple.return = FALSE )
+      gotError = FALSE
+      
+    }, error = function(err){
+      gotError <<- TRUE
+      
+      # remove one moderator from the end of the list
+      message( paste( "\n Removing ", 
+                      mod.sets[[2]][ length(mod.sets[[2]]) ],
+                      " from moderators and trying again" ) )
+      mod.sets[[2]] <<- mod.sets[[2]][ 1 : ( length(mod.sets[[2]]) - 1 ) ]
+      
+      
+    })
+    
+  }
+  
+  # look at the surviving moderators
+  mod.sets[[2]]
+  
+  # write the list of moderators  so we don't have to do this again
+  setwd(results.dir)
+  write.csv(mod.sets[[2]], file = "surviving_mods.csv")
+  
+  ##### Sanity checks #####
+  # sanity check: refit the naive and pruned models manually
+  robu( yi ~ isMeta, 
+        data = d, 
+        studynum = as.factor(study_id),
+        var.eff.size = vi,
+        modelweights = "HIER",
+        small = TRUE)
+  
+  robu( yi ~ isMeta + mean_agec + test_lang + method, 
+        data = d, 
+        studynum = as.factor(study_id),
+        var.eff.size = vi,
+        modelweights = "HIER",
+        small = TRUE)
+  
+} # end if ( redo.mod.selection == TRUE )
 
 ############################## PROPORTION MEANINGFULLY STRONG EFFECTS - MARGINAL ##############################
 
@@ -307,16 +325,17 @@ d$calibNaive[ d$isMeta == TRUE ] = calibMA
 ############################## DENSITY PLOT OF META-ANALYSIS VS. REPLICATION CALIBRATED ESTIMATES ##############################
 
 
+
 # fit the final, moderated models to each subset
 # to see what the heterogeneity looks like in each case
 # @move this?
 ( cond.MA.only = fit_subset_meta( .dat = dma,
-                                   .mods = mod.sets[[2]][ !mod.sets[[2]] == "isMeta" ],
-                                   .label = "MA subset mods" ) )
+                                  .mods = modsS[ !modsS == "isMeta" ],
+                                  .label = "MA subset mods" ) )
 
 ( cond.reps.only = fit_subset_meta( .dat = dr,
-                                     .mods = mod.sets[[2]][ !mod.sets[[2]] == "isMeta" ],
-                                     .label = "Reps subset mods" ) )
+                                    .mods = modsS[ !modsS == "isMeta" ],
+                                    .label = "Reps subset mods" ) )
 
 
 # get conditional calibrated estimates
@@ -325,9 +344,6 @@ d$calibCond[ d$isMeta == TRUE ] = conditional_calib_ests(cond.MA.only)$calib.shi
 
 # ***important: MLR heterogeneity estimate is 0 after conditioning on mods
 #  but MA heterogeneity estimate actually slightly increases
-
-
-#bm
 
 
 
@@ -455,9 +471,10 @@ if ( boot.from.scratch == TRUE ) {
                      # multi-argument returns need to be via c(), not list or df or whatever
                      tryCatch({
                        fit_mr( .dat = b,
-                               .mods = mod.sets[[2]] )
+                               .mods = modsS )
                      }, error = function(err){
-                       return( c(NA, NA, NA) )
+                       # increase number of NA's if needed to match .simple.return = TRUE structure of fit_mr
+                       return( rep(NA, 7) )
                      })
                      
                    } )
@@ -817,8 +834,8 @@ if ( redo.plots == TRUE ) {
   
   
   my_ggsave("mb_signif_funnel.png",
-         width = 5,
-         height = 4)
+            width = 5,
+            height = 4)
 }
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
@@ -983,51 +1000,51 @@ write.csv( res, "subsets_by_moderator.csv")
 ##### Plot it like it's hot ##### 
 
 if ( redo.plots == TRUE ) {
-# choose reasonable axis limits
-summary(res$est, na.rm = TRUE)
-min(res$lo, na.rm = TRUE)
-max(res$hi, na.rm = TRUE)
-breaks = seq(0, 1.6, 0.2)
-
-
-prettyLabels = c( main_question_ids_preference = "Primary analysis")
-
-
-# @to do in prep code: should make pretty versions of moderator variables (var names and levels) in prep code
-
-ggplot( data = res, 
-        aes( x = est,
-             y = level,
-             color = source ) ) + 
-  geom_vline( xintercept = naive.MA.only$b.r,
-              lty = 2,
-              color = colors[2]) + 
-  geom_vline( xintercept = naive.reps.only$b.r,
-              lty = 2,
-              color = colors[1]) + 
+  # choose reasonable axis limits
+  summary(res$est, na.rm = TRUE)
+  min(res$lo, na.rm = TRUE)
+  max(res$hi, na.rm = TRUE)
+  breaks = seq(0, 1.6, 0.2)
   
-  geom_point( size = 3,
-              position=ggstance::position_dodgev(height=-0.4) ) + 
-  geom_errorbar( aes(xmin = lo,
-                     xmax = hi),
-                 width = 0,
-                 position=ggstance::position_dodgev(height=-0.4) ) +
-  xlab( "Subset estimate (SMD)") +
-  ylab( "Moderator subset") + 
-  scale_x_continuous( breaks = breaks ) +
-  scale_color_manual( name = "Source", values = rev(colors) ) + 
-  theme_classic() +
-  facet_grid( rows = vars(mod),
-              scales = "free_y",
-              switch = "both") +
-  # https://michaelbach.de/2012/07/22/R-ggplot2-and-axis-limits-unexpected-behaviour-solution.html
-  coord_cartesian( xlim = c(breaks[1], breaks[length(breaks)] ) ) 
-
-
-my_ggsave( name = "subset_forest.pdf",
-           width = 10,
-           height = 7 )
-
+  
+  prettyLabels = c( main_question_ids_preference = "Primary analysis")
+  
+  
+  # @to do in prep code: should make pretty versions of moderator variables (var names and levels) in prep code
+  
+  ggplot( data = res, 
+          aes( x = est,
+               y = level,
+               color = source ) ) + 
+    geom_vline( xintercept = naive.MA.only$b.r,
+                lty = 2,
+                color = colors[2]) + 
+    geom_vline( xintercept = naive.reps.only$b.r,
+                lty = 2,
+                color = colors[1]) + 
+    
+    geom_point( size = 3,
+                position=ggstance::position_dodgev(height=-0.4) ) + 
+    geom_errorbar( aes(xmin = lo,
+                       xmax = hi),
+                   width = 0,
+                   position=ggstance::position_dodgev(height=-0.4) ) +
+    xlab( "Subset estimate (SMD)") +
+    ylab( "Moderator subset") + 
+    scale_x_continuous( breaks = breaks ) +
+    scale_color_manual( name = "Source", values = rev(colors) ) + 
+    theme_classic() +
+    facet_grid( rows = vars(mod),
+                scales = "free_y",
+                switch = "both") +
+    # https://michaelbach.de/2012/07/22/R-ggplot2-and-axis-limits-unexpected-behaviour-solution.html
+    coord_cartesian( xlim = c(breaks[1], breaks[length(breaks)] ) ) 
+  
+  
+  my_ggsave( name = "subset_forest.pdf",
+             width = 10,
+             height = 7 )
+  
 }
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
@@ -1305,156 +1322,156 @@ update_result_csv( name = paste( "IPW robu pval", IPW.robu$labels ),
 # relies on having the matched dataset for coloring those points
 
 if ( redo.plots == TRUE ) {
-
-# relative weight of each study in meta-analysis (within group)
-d = d %>% group_by(isMeta) %>%
-  mutate( rel.wt = 100 * (1/vi) / sum(1/vi) )
-
-
-
-# plotting df
-dp = d
-
-
-# strings with information about each meta-analysis
-dp$info.strings = paste( "n = ", d$n,
-                         ", ", round( d$yi, 2 ), " ",
-                         format_CI( d$lo, d$hi, 2 ),
-                         sep = "" )
-
-
-# labels for each meta-analysis, including stats
-dp$label = paste(dp$unique, " (", dp$info.strings, ")", sep = "")
-
-
-# sort by point estimate
-dp = dp[ order( dp$sourcePretty,
-                dp$yi,
-                decreasing = FALSE), ]
-
-
-# add pooled point estimates after each group
-# these have arbitrary relative weights
-
-for ( l in unique(dp$sourcePretty) ) {
-  # row ID after which to insert the pooled row
-  this.group.rows = which(dp$sourcePretty == l)
   
-  pooled.label = paste( "POOLED - ", toupper(l), sep = "" )
-  
-  dp = add_row( as.data.frame(dp),
-                .after = this.group.rows[ length(this.group.rows) ],
-                yi = ifelse( l == "Meta-analysis", naive.MA.only$b.r, naive.reps.only$b.r ),
-                lo = ifelse( l == "Meta-analysis", naive.MA.only$reg_table$CI.L, naive.reps.only$reg_table$CI.L ),
-                hi = ifelse( l == "Meta-analysis", naive.MA.only$reg_table$CI.U, naive.reps.only$reg_table$CI.U ),
-                label = pooled.label,
-                sourcePretty = l,
-                rel.wt = 5 )
-}
-
-
-# for aes on plot
-#bm
-dp$is.pooled = grepl("POOL", dp$label)
-if ( color.subclasses == TRUE ) dp$is.pooled[ dp$unique %in% dmt$unique ] = 2
-
-# for pooled estimates, don't include number of studies in string
-ind = grepl("POOL", dp$label)
-dp$info.strings[ind] = paste( round( dp$yi[ind], 2 ), " ",
-                              format_CI( dp$lo[ind], dp$hi[ind], 2 ),
-                              sep = "" )
-
-# to force y-axis ordering, turn into a factor whose levels match the 
-#  actual order in the dataset
-dp$label = factor( dp$label, levels = rev(dp$label) )
-levels(dp$label)
-
-
-# regular circle: 19
-# 2 is open triangle
-shapes = c(19,17)
-if ( color.subclasses == TRUE ) shapes = c(19,17,19)
-# have breaks approximately evenly spaced on log scale
-#  but round for prettiness
-#breaks = unique( round( 10^seq(-3, 3, .2), 1 ) )
-
-
-# 
-# # re-level group.pretty so legend order matches display order
-# #  (i.e., from high to low pooled estimate)
-# agg2p$group.pretty = factor( agg2p$group.pretty,
-#                              levels =  rev(c( "Metalab",
-#                                               "Top psychology",
-#                                               "Top medical",
-#                                               "PLOS One" )  ))
-
-
-##### Make the Plot #####
-
-# now color-coding by whether it's the pooled estimate or not
-colors2 = c("black", "red")
-if( color.subclasses == TRUE ) colors2 = c("black", "red", "green" )
-
-# choose good axis breaks
-min(d$lo)
-max(d$hi)
-xBreaks = seq( -1.5, 4.5, 0.5)
-
-p = ggplot( data = dp, aes( x = yi, 
-                            y = label, 
-                            size = rel.wt,
-                            shape = as.factor(is.pooled),
-                            color = as.factor(is.pooled) ) ) +
-  
-  geom_errorbarh( aes(xmin = lo,
-                      xmax = hi),
-                  lwd = .5,
-                  height = .001 ) +
-  
-  geom_point() +
-  
-  # geom_point( data = dp, aes( x = yi,
-  #                                y = label ),
-  #             size = 3,
-  #             shape = 124,
-  #             color = "black") +  # "4" for X
-  
-  xlab( "Point estimate (SMD)" ) +
-  ylab("") +
-  
-  geom_vline(xintercept = 1, lty = 2) +
-  
-  guides(size = FALSE ) +
-  
-  scale_shape_manual(values = shapes,
-                     name = "",
-                     guide=FALSE) +
-  
-  scale_color_manual(values = colors2,
-                     name = "",
-                     guide=FALSE) +
-  
-  scale_x_continuous(limits = c(min(xBreaks), max(xBreaks)),
-                     breaks = xBreaks) +
+  # relative weight of each study in meta-analysis (within group)
+  d = d %>% group_by(isMeta) %>%
+    mutate( rel.wt = 100 * (1/vi) / sum(1/vi) )
   
   
-  facet_grid(sourcePretty ~ .,
-             scales = "free",
-             space = "free_y") +  # allows y-axes to drop levels from other groups
   
-  theme_classic() + 
-  theme(axis.text.x = element_text(size = 18),
-        axis.text.y = element_text(size = 14),
-        axis.title.x = element_text(size = 20),
-        strip.text.y = element_text(size = 20))
-
-p
-
-
-
-my_ggsave( name = "basic_forest.pdf",
-           width = 14,
-           height = 28 )
-
-
+  # plotting df
+  dp = d
+  
+  
+  # strings with information about each meta-analysis
+  dp$info.strings = paste( "n = ", d$n,
+                           ", ", round( d$yi, 2 ), " ",
+                           format_CI( d$lo, d$hi, 2 ),
+                           sep = "" )
+  
+  
+  # labels for each meta-analysis, including stats
+  dp$label = paste(dp$unique, " (", dp$info.strings, ")", sep = "")
+  
+  
+  # sort by point estimate
+  dp = dp[ order( dp$sourcePretty,
+                  dp$yi,
+                  decreasing = FALSE), ]
+  
+  
+  # add pooled point estimates after each group
+  # these have arbitrary relative weights
+  
+  for ( l in unique(dp$sourcePretty) ) {
+    # row ID after which to insert the pooled row
+    this.group.rows = which(dp$sourcePretty == l)
+    
+    pooled.label = paste( "POOLED - ", toupper(l), sep = "" )
+    
+    dp = add_row( as.data.frame(dp),
+                  .after = this.group.rows[ length(this.group.rows) ],
+                  yi = ifelse( l == "Meta-analysis", naive.MA.only$b.r, naive.reps.only$b.r ),
+                  lo = ifelse( l == "Meta-analysis", naive.MA.only$reg_table$CI.L, naive.reps.only$reg_table$CI.L ),
+                  hi = ifelse( l == "Meta-analysis", naive.MA.only$reg_table$CI.U, naive.reps.only$reg_table$CI.U ),
+                  label = pooled.label,
+                  sourcePretty = l,
+                  rel.wt = 5 )
+  }
+  
+  
+  # for aes on plot
+  #bm
+  dp$is.pooled = grepl("POOL", dp$label)
+  if ( color.subclasses == TRUE ) dp$is.pooled[ dp$unique %in% dmt$unique ] = 2
+  
+  # for pooled estimates, don't include number of studies in string
+  ind = grepl("POOL", dp$label)
+  dp$info.strings[ind] = paste( round( dp$yi[ind], 2 ), " ",
+                                format_CI( dp$lo[ind], dp$hi[ind], 2 ),
+                                sep = "" )
+  
+  # to force y-axis ordering, turn into a factor whose levels match the 
+  #  actual order in the dataset
+  dp$label = factor( dp$label, levels = rev(dp$label) )
+  levels(dp$label)
+  
+  
+  # regular circle: 19
+  # 2 is open triangle
+  shapes = c(19,17)
+  if ( color.subclasses == TRUE ) shapes = c(19,17,19)
+  # have breaks approximately evenly spaced on log scale
+  #  but round for prettiness
+  #breaks = unique( round( 10^seq(-3, 3, .2), 1 ) )
+  
+  
+  # 
+  # # re-level group.pretty so legend order matches display order
+  # #  (i.e., from high to low pooled estimate)
+  # agg2p$group.pretty = factor( agg2p$group.pretty,
+  #                              levels =  rev(c( "Metalab",
+  #                                               "Top psychology",
+  #                                               "Top medical",
+  #                                               "PLOS One" )  ))
+  
+  
+  ##### Make the Plot #####
+  
+  # now color-coding by whether it's the pooled estimate or not
+  colors2 = c("black", "red")
+  if( color.subclasses == TRUE ) colors2 = c("black", "red", "green" )
+  
+  # choose good axis breaks
+  min(d$lo)
+  max(d$hi)
+  xBreaks = seq( -1.5, 4.5, 0.5)
+  
+  p = ggplot( data = dp, aes( x = yi, 
+                              y = label, 
+                              size = rel.wt,
+                              shape = as.factor(is.pooled),
+                              color = as.factor(is.pooled) ) ) +
+    
+    geom_errorbarh( aes(xmin = lo,
+                        xmax = hi),
+                    lwd = .5,
+                    height = .001 ) +
+    
+    geom_point() +
+    
+    # geom_point( data = dp, aes( x = yi,
+    #                                y = label ),
+    #             size = 3,
+    #             shape = 124,
+    #             color = "black") +  # "4" for X
+    
+    xlab( "Point estimate (SMD)" ) +
+    ylab("") +
+    
+    geom_vline(xintercept = 1, lty = 2) +
+    
+    guides(size = FALSE ) +
+    
+    scale_shape_manual(values = shapes,
+                       name = "",
+                       guide=FALSE) +
+    
+    scale_color_manual(values = colors2,
+                       name = "",
+                       guide=FALSE) +
+    
+    scale_x_continuous(limits = c(min(xBreaks), max(xBreaks)),
+                       breaks = xBreaks) +
+    
+    
+    facet_grid(sourcePretty ~ .,
+               scales = "free",
+               space = "free_y") +  # allows y-axes to drop levels from other groups
+    
+    theme_classic() + 
+    theme(axis.text.x = element_text(size = 18),
+          axis.text.y = element_text(size = 14),
+          axis.title.x = element_text(size = 20),
+          strip.text.y = element_text(size = 20))
+  
+  p
+  
+  
+  
+  my_ggsave( name = "basic_forest.pdf",
+             width = 14,
+             height = 28 )
+  
+  
 }

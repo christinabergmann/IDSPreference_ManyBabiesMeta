@@ -112,8 +112,12 @@ vr = function(){
 #  - write a table with all the meta-regression estimates (optionally)
 #  - write certain desired stats directly to results csv (optionally)
 
-# .simple.return: should fn return only the 3 stats to be bootstrapped (as a numeric vector)
+# .simple.return: should fn return only the stats to be bootstrapped (as a numeric vector)
 #  or a more informative dataframe?
+
+# Phats for MA and reps are based on SUBSET models
+# .dat is an argument only to allow for bootstrapping
+# .mods SHOULD include isMeta
 fit_mr = function( .dat,
                    .label = NA,  # name of the analysis
                    .mods, 
@@ -121,9 +125,9 @@ fit_mr = function( .dat,
                    .write.to.csv = FALSE,
                    .simple.return = TRUE ) {
   
-  # # TEST ONLY
+  # #@TEST ONLY
   # .dat = d
-  # .mods = mod.sets[[1]]
+  # .mods = modsS
   # .label = "naive"
   # .write.table = FALSE
   # .write.to.csv = FALSE
@@ -137,7 +141,7 @@ fit_mr = function( .dat,
     hasBoth = TRUE
   }
 
-  ##### 1. Fit Meta-Regression #####
+  ##### 1. Fit Meta-Regression (All Data) #####
   linpred.string = paste( .mods, collapse=" + ")
   string = paste( "yi ~ ", linpred.string, collapse = "")
   
@@ -185,14 +189,17 @@ fit_mr = function( .dat,
                        value = pvals2 )
   }
   
-  # also save selected results to a df to be returned
-  if ( hasBoth == TRUE & .simple.return == FALSE ) .res = data.frame( est.rep = est.rep,
-                                                    est.rep.lo = mu.lo[ meta$labels == "X.Intercept." ], 
-                                                    est.rep.hi = mu.hi[ meta$labels == "X.Intercept." ] )
-  
 
   
-  ##### 2. Write Meta-Regression Table #####
+
+  # also save selected results to a df to be returned
+  if ( hasBoth == TRUE & .simple.return == FALSE ) .res = data.frame( est.rep = est.rep,
+                                                                      est.rep.lo = mu.lo[ meta$labels == "X.Intercept." ], 
+                                                                      est.rep.hi = mu.hi[ meta$labels == "X.Intercept." ])
+  
+  
+  
+  ##### 3. Write Meta-Regression Table #####
   if ( .write.table == TRUE ){
     CIs = format_CI( mu.lo,
                      mu.hi )
@@ -264,11 +271,44 @@ fit_mr = function( .dat,
     }
     
     # sanity check
-    expect_equal( est.ma - est.rep, meta$b.r[ meta$labels == "isMetaTRUE"]
+    expect_equal( est.ma - est.rep, meta$b.r[ meta$labels == "isMetaTRUE"] )
                   
                   
-                  ##### 4. Get Phat for Meta, Replications, and Difference #####
-                  # ***will fill later if tau^2 > 0
+    ##### 4. Get Phat for Meta, Replications, and Difference #####
+    # from subset models
+    
+    # remove "isMeta" from moderators
+    .mods3 = .mods[ !.mods == "isMeta" ]
+    linpred.string3 = paste( .mods3, collapse=" + ")
+    string3 = paste( "yi ~ ", linpred.string3, collapse = "")
+    # replications only
+    mR = robu( eval( parse( text = string3 ) ), 
+               data = .dat %>% filter(isMeta == FALSE), 
+               studynum = as.factor(study_id),
+               var.eff.size = vi,
+               modelweights = "HIER",
+               small = TRUE)
+    
+    calibR = conditional_calib_ests(mR)$calib.shift
+    Phat0.rep = mean( calibR > 0 )
+    Phat0.2.rep = mean( calibR > 0.2 )
+    
+    #bm
+    
+    # meta-analysis only
+    mM = robu( eval( parse( text = string3 ) ), 
+               data = .dat %>% filter(isMeta == TRUE), 
+               studynum = as.factor(study_id),
+               var.eff.size = vi,
+               modelweights = "HIER",
+               small = TRUE )
+    
+    calibM = conditional_calib_ests(mM)$calib.shift
+    Phat0.ma = mean( calibM > 0 )
+    Phat0.2.ma = mean( calibM > 0.2 )
+    
+    Phat0.diff = Phat0.ma - Phat0.rep
+    Phat0.2.diff = Phat0.2.ma - Phat0.2.rep
                   
                   
                   ##### 5. Write Results #####
@@ -277,19 +317,20 @@ fit_mr = function( .dat,
                   #                   Phat0.2Diff = runif(n=1, -1,1) ) # ***obviously fake
                   # return(row)
                   
-    )
+    
     
     if ( .simple.return == FALSE ) {
       .res$avgDiff = meta$b.r[ meta$labels == "isMetaTRUE"]
       .res$avgDiffLo = meta$reg_table$CI.L[ meta$labels == "isMetaTRUE"]
       .res$avgDiffHi = meta$reg_table$CI.U[ meta$labels == "isMetaTRUE"]
-      # .res$avgDiff
       
-      .res$Phat0Diff = runif(n=1, -1,1) # ***obviously fake
-      # .res$Phat0DiffLo = runif(n=1, -1,1) # ***obviously fake
-      # .res$Phat0DiffHi = runif(n=1, -1,1) # ***obviously fake
-      
-      .res$Phat0.2Diff = runif(n=1, -1,1) # ***obviously fake
+      #bm
+      .res$Phat0.rep = Phat0.rep
+      .res$Phat0.ma = Phat0.ma
+      .res$Phat0.2.rep = Phat0.2.rep
+      .res$Phat0.2.ma = Phat0.2.ma
+      .res$Phat0Diff = Phat0.diff
+      .res$Phat0.2Diff = Phat0.2.diff
 
     }
     
@@ -297,8 +338,15 @@ fit_mr = function( .dat,
     if ( .simple.return == TRUE ){
       # return as a numeric vector for compatibility with boot()
       return( c( est.ma - est.rep,
-                 runif(n=1, -1,1), # ***obviously fake
-                 runif(n=1, -1,1) ) ) # ***obviously fake
+                 
+                 Phat0.rep,
+                 Phat0.ma,
+                 
+                 Phat0.2.rep,
+                 Phat0.2.ma,
+                 
+                 Phat0.diff,
+                 Phat0.2.diff ) ) 
       
     } else return(.res)
   }
@@ -426,7 +474,6 @@ get_and_write_phat = function( .dat,
 
 
 # @AD HOC FOR THE MODERATORS ACTUALLY PRESENT IN EACH MODEL
-# @definitely needs unit tests 
 # conditions on all moderators being set to modes in
 conditional_calib_ests = function(.model){
   # get data from robu object
