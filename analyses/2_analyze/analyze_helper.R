@@ -118,6 +118,7 @@ vr = function(){
 # Phats for MA and reps are based on SUBSET models
 # .dat is an argument only to allow for bootstrapping
 # .mods SHOULD include isMeta
+# in returned stats, differences are always meta-analysis - replications
 fit_mr = function( .dat,
                    .label = NA,  # name of the analysis
                    .mods, 
@@ -132,7 +133,7 @@ fit_mr = function( .dat,
   # .write.table = FALSE
   # .write.to.csv = FALSE
   # .simple.return = FALSE
-
+  
   # find out if dataset has both MLR and MA
   if ( length( unique(.dat$isMeta) ) != 2 ) {
     message("FYI, dataset has only one source (MLR or MA), so not looking at isMeta discrepancy")
@@ -140,7 +141,7 @@ fit_mr = function( .dat,
   } else {
     hasBoth = TRUE
   }
-
+  
   ##### 1. Fit Meta-Regression (All Data) #####
   linpred.string = paste( .mods, collapse=" + ")
   string = paste( "yi ~ ", linpred.string, collapse = "")
@@ -189,9 +190,9 @@ fit_mr = function( .dat,
                        value = pvals2 )
   }
   
-
   
-
+  
+  
   # also save selected results to a df to be returned
   if ( hasBoth == TRUE & .simple.return == FALSE ) .res = data.frame( est.rep = est.rep,
                                                                       est.rep.lo = mu.lo[ meta$labels == "X.Intercept." ], 
@@ -228,7 +229,7 @@ fit_mr = function( .dat,
     # could use linear combo of coefficients and vars, but df are complicated
     #  for robumeta
     # so easiest way is to just refit the model, reversing coding of study type variable
-
+    
     .mods2 = .mods
     .mods2[ .mods == "isMeta" ] = "isRep"  # now intercept will be for meta-analysis
     linpred.string2 = paste( .mods2, collapse=" + ")
@@ -259,8 +260,8 @@ fit_mr = function( .dat,
       
       update_result_csv( name = paste( .label, "avg pval for meta" ),
                          value = pval2 )
-
-
+      
+      
     }
     
     # also save selected results to a df to be returned
@@ -272,8 +273,8 @@ fit_mr = function( .dat,
     
     # sanity check
     expect_equal( est.ma - est.rep, meta$b.r[ meta$labels == "isMetaTRUE"] )
-                  
-                  
+    
+    
     ##### 4. Get Phat for Meta, Replications, and Difference #####
     # from subset models
     
@@ -309,14 +310,14 @@ fit_mr = function( .dat,
     
     Phat0.diff = Phat0.ma - Phat0.rep
     Phat0.2.diff = Phat0.2.ma - Phat0.2.rep
-                  
-                  
-                  ##### 5. Write Results #####
-                  # row = data.frame( avgDiff = est.ma - est.rep,
-                  #                   Phat0Diff = runif(n=1, -1,1), # ***obviously fake
-                  #                   Phat0.2Diff = runif(n=1, -1,1) ) # ***obviously fake
-                  # return(row)
-                  
+    
+    
+    ##### 5. Write Results #####
+    # row = data.frame( avgDiff = est.ma - est.rep,
+    #                   Phat0Diff = runif(n=1, -1,1), # ***obviously fake
+    #                   Phat0.2Diff = runif(n=1, -1,1) ) # ***obviously fake
+    # return(row)
+    
     
     
     if ( .simple.return == FALSE ) {
@@ -331,7 +332,7 @@ fit_mr = function( .dat,
       .res$Phat0.2.ma = Phat0.2.ma
       .res$Phat0Diff = Phat0.diff
       .res$Phat0.2Diff = Phat0.2.diff
-
+      
     }
     
     
@@ -350,7 +351,7 @@ fit_mr = function( .dat,
       
     } else return(.res)
   }
-
+  
   
 }
 
@@ -430,7 +431,7 @@ fit_subset_meta = function( .dat,
     update_result_csv( name = paste( .label, "pval", meta$labels ),
                        value = pvals2 )
   }
-
+  
   if ( .simple.return == FALSE ) return(meta)
   
   if ( .simple.return == TRUE ) {
@@ -610,13 +611,23 @@ cluster_bt = function(.dat,
 get_boot_CIs = function(boot.res,
                         type = "bca",
                         n.ests) {
-  bootCIs = lapply( 1:n.ests, function(x) boot.ci(boot.res, type = type, index = x) )
+  bootCIs = lapply( 1:n.ests, function(x) {
+    tryCatch({
+      # get CIs for just this index (x)
+      CIs = boot.ci(boot.res, type = type, index = x)
+      # the middle index "4" on the bootCIs accesses the stats vector
+      # the final index chooses the CI lower (4) or upper (5) bound
+      c( CIs[[4]][4],
+         CIs[[4]][5] )
+      
+    }, error = function(err){
+      # in case CI isn't estimable
+      c(NA, NA)
+    })
+  }  # end fn used lapply
+  ) # end lapply
   
-  # list with one entry per estimate
-  # the middle index "4" on the bootCIs accesses the stats vector
-  # the final index chooses the CI lower (4) or upper (5) bound
-  bootCIs = lapply( 1:n.ests, function(x) c( bootCIs[[x]][[4]][4],
-                                             bootCIs[[x]][[4]][5] ) )
+  return(bootCIs)
 }
 
 

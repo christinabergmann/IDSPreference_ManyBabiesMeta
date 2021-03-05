@@ -451,7 +451,7 @@ if ( redo.plots == TRUE ) {
 # refit mod1Res for each boot iterate, each time estimating avgDiff and two currently fake stats
 #  for Phat
 
-
+# with boot.reps - 1,000, takes about 10 min
 if ( boot.from.scratch == TRUE ) {
   boot.res = boot( data = d, 
                    parallel = "multicore",
@@ -494,21 +494,62 @@ if ( boot.from.scratch == FALSE ){
 # number of non-failed bootstrap reps
 ( boot.reps.successful = sum( !is.na( boot.res$t[,1] ) ) )
 
+
+# get stats on original data
+( t0 = fit_mr( .dat = d, 
+        .mods = modsS ) )
+# this results in:
+# [1]  0.47624200  1.00000000  0.98039216  0.00000000
+# [5]  0.88235294 -0.01960784  0.88235294
+
+# NB: because of the way we hacked the "statistic" argument of boot()
+#  above st it actually creates a resample, the below will NOT match
+#  the actual estimates from original dataset
+# the bootstrap "bias" estimates will also be wrong for this reason
+# boot.res$t0
+
+# **critical step: replace boot()'s incorrect t0 with the correct one
+#  to allow boot.ci to work correctly
+boot.res$t0 = t0
+
 # get the bootstrapped CIs for all 3 statistics respectively using BCa method
-( bootCIs = get_boot_CIs(boot.res, n.ests = 3) )
+( bootCIs = get_boot_CIs(boot.res, n.ests = ncol(boot.res$t) ) )
 
-# order of statistics in the above: 
-# between-source difference in estimated means
-# between-source difference in Phat0 (@FAKE)
-# between-source difference in Phat0.2 (@FAKE)
+#bm: trying to fix infinite-w issue in the above
+# using boot.reps = 1000 doesn't help
 
-# # naive model metrics of source discrepancy
-# # CIS WRONG HERE
-# statCI_result_csv( "naive avgDiff", c(naiveRes$avgDiff, bootCIs[[1]][1], bootCIs[[1]][2]) )
-# 
-# statCI_result_csv( "naive Phat0Diff", c(naiveRes$Phat0Diff, bootCIs[[2]][1], bootCIs[[2]][2]) )
-# 
-# statCI_result_csv( "naive Phat0.2Diff", c(naiveRes$Phat0.2Diff, bootCIs[[3]][1], bootCIs[[3]][2]) )
+for ( i in 1:7 ) {
+  print( boot.ci(boot.res, type = "all", index = i) )
+}
+
+
+
+# sanity check: compare to bootstrap means
+colMeans(boot.res$t, na.rm = TRUE)
+t0
+
+
+# order of returned stats:
+# ( est.ma - est.rep,
+#   
+#   Phat0.rep,
+#   Phat0.ma,
+#   
+#   Phat0.2.rep,
+#   Phat0.2.ma,
+#   
+#   Phat0.diff,
+#   Phat0.2.diff )
+
+
+
+# naive model metrics of source discrepancy
+# CIS WRONG HERE
+statCI_result_csv( "naive avgDiff", c(naiveRes$avgDiff, bootCIs[[1]][1], bootCIs[[1]][2]) )
+
+statCI_result_csv( "naive Phat0Diff", c(naiveRes$Phat0Diff, bootCIs[[2]][1], bootCIs[[2]][2]) )
+
+statCI_result_csv( "naive Phat0.2Diff", c(naiveRes$Phat0.2Diff, bootCIs[[3]][1], bootCIs[[3]][2]) )
 # 
 # 
 # # moderated model metrics of metrics of source discrepancy
