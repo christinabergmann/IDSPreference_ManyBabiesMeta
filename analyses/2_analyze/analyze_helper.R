@@ -279,32 +279,49 @@ fit_mr = function( .dat,
     # from subset models
     
     # remove "isMeta" from moderators
-    .mods3 = .mods[ !.mods == "isMeta" ]
-    linpred.string3 = paste( .mods3, collapse=" + ")
-    string3 = paste( "yi ~ ", linpred.string3, collapse = "")
+    if ( length(.mods) > 1 ) {
+      .mods3 = .mods[ !.mods == "isMeta" ]
+      linpred.string3 = paste( .mods3, collapse=" + ")
+      string3 = paste( "yi ~ ", linpred.string3, collapse = "")
+    } else {
+      # handle naive model
+      string3 = "yi ~ 1"
+    }
+
     # replications only
-    mR = robu( eval( parse( text = string3 ) ), 
-               data = .dat %>% filter(isMeta == FALSE), 
-               studynum = as.factor(study_id),
-               var.eff.size = vi,
-               modelweights = "HIER",
-               small = TRUE)
-    
-    calibR = conditional_calib_ests(mR)$calib.shift
+    if ( length(.mods) > 1 ) {
+      mR = robu( eval( parse( text = string3 ) ), 
+                 data = .dat %>% filter(isMeta == FALSE), 
+                 studynum = as.factor(study_id),
+                 var.eff.size = vi,
+                 modelweights = "HIER",
+                 small = TRUE)
+      
+      calibR = conditional_calib_ests(mR)$calib.shift
+    } else {
+      calibR = calib_ests( yi = .dat$yi[ .dat$isMeta == FALSE ],
+                           sei = .dat$sei[ .dat$isMeta == FALSE ] ) 
+    }
+
     Phat0.rep = mean( calibR > 0 )
     Phat0.2.rep = mean( calibR > 0.2 )
     
-    #bm
-    
+
     # meta-analysis only
-    mM = robu( eval( parse( text = string3 ) ), 
-               data = .dat %>% filter(isMeta == TRUE), 
-               studynum = as.factor(study_id),
-               var.eff.size = vi,
-               modelweights = "HIER",
-               small = TRUE )
-    
-    calibM = conditional_calib_ests(mM)$calib.shift
+    if ( length(.mods) > 1 ) {
+      mM = robu( eval( parse( text = string3 ) ), 
+                 data = .dat %>% filter(isMeta == TRUE), 
+                 studynum = as.factor(study_id),
+                 var.eff.size = vi,
+                 modelweights = "HIER",
+                 small = TRUE )
+      
+      calibM = conditional_calib_ests(mM)$calib.shift
+    } else {
+      calibM = calib_ests( yi = .dat$yi[ .dat$isMeta == TRUE ],
+                           sei = .dat$sei[ .dat$isMeta == TRUE ] ) 
+    }
+   
     Phat0.ma = mean( calibM > 0 )
     Phat0.2.ma = mean( calibM > 0.2 )
     
@@ -611,24 +628,25 @@ cluster_bt = function(.dat,
 get_boot_CIs = function(boot.res,
                         type = "bca",
                         n.ests) {
-  bootCIs = lapply( 1:n.ests, function(x) {
-    tryCatch({
-      # get CIs for just this index (x)
-      CIs = boot.ci(boot.res, type = type, index = x)
-      # the middle index "4" on the bootCIs accesses the stats vector
-      # the final index chooses the CI lower (4) or upper (5) bound
-      c( CIs[[4]][4],
-         CIs[[4]][5] )
-      
-    }, error = function(err){
-      # in case CI isn't estimable
-      c(NA, NA)
-    })
-  }  # end fn used lapply
-  ) # end lapply
+  bootCIs = lapply( 1:n.ests, function(x) safe_boot_ci(x, boot.res, type) )
   
   return(bootCIs)
 }
 
-
+# for use by get_boot_CIs
+# x is an index
+safe_boot_ci = function(x, boot.res, type) {
+  tryCatch({
+    # get CIs for just this index (x)
+    CIs = boot.ci(boot.res, type = type, index = x)
+    # the middle index "4" on the bootCIs accesses the stats vector
+    # the final index chooses the CI lower (4) or upper (5) bound
+    c( CIs[[4]][4],
+       CIs[[4]][5] )
+    
+  }, error = function(err){
+    # in case CI isn't estimable
+    c(NA, NA)
+  })
+}  # end fn used lapply
 

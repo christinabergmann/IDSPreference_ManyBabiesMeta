@@ -289,6 +289,7 @@ if ( redo.mod.selection == TRUE ) {
 
 ############################## PROPORTION MEANINGFULLY STRONG EFFECTS - MARGINAL ##############################
 
+# this part might be obsolete because of fit_mr below?
 get_and_write_phat( .dat = dma,
                     .q = 0,
                     label = "Phat0MA")
@@ -307,7 +308,7 @@ get_and_write_phat( .dat = dr,
 
 
 
-
+# SAVE calibR, calibM because needed for plot
 calibR = calib_ests(yi = dr$yi, sei = sqrt(dr$vi) )
 mean(calibR>0.2)
 mean(calibR)
@@ -323,7 +324,6 @@ d$calibNaive[ d$isMeta == TRUE ] = calibMA
 
 
 ############################## DENSITY PLOT OF META-ANALYSIS VS. REPLICATION CALIBRATED ESTIMATES ##############################
-
 
 
 # fit the final, moderated models to each subset
@@ -445,11 +445,28 @@ if ( redo.plots == TRUE ) {
   
 }
 
-############################## CROSS-MODEL INFERENCE ##############################
+############################## NAIVE AND MODERATED MODEL INFERENCE ##############################
 
+# get inference for conditional Phats and their difference FOR the moderated model
+#@ also need this for naive model
 
-# refit mod1Res for each boot iterate, each time estimating avgDiff and two currently fake stats
-#  for Phat
+# for each resample, fits both naive model and moderated model
+# via fit_mr, gets 7 stats of interest for each model
+# returns results of naive model, moderated model, AND their difference
+# in a 21-length vector
+
+# order of fit_mr's 7 returned stats:
+# ( est.ma - est.rep,
+#   
+#   Phat0.rep,
+#   Phat0.ma,
+#   
+#   Phat0.2.rep,
+#   Phat0.2.ma,
+#   
+#   Phat0.diff,
+#   Phat0.2.diff )
+
 
 # with boot.reps - 1,000, takes about 10 min
 if ( boot.from.scratch == TRUE ) {
@@ -470,11 +487,18 @@ if ( boot.from.scratch == TRUE ) {
                      
                      # multi-argument returns need to be via c(), not list or df or whatever
                      tryCatch({
-                       fit_mr( .dat = b,
-                               .mods = modsS )
+                       # **key part: fit the two models
+                       # get their stats and also the cross-model differences
+                       .naiveRes = fit_mr( .dat = b, .mods = "isMeta" )
+                       .modRes = fit_mr( .dat = b, .mods = modsS )
+                       .diff = .naiveRes - .modRes
+                       
+                       c(.naiveRes, .modRes, .diff)
+                       
                      }, error = function(err){
                        # increase number of NA's if needed to match .simple.return = TRUE structure of fit_mr
-                       return( rep(NA, 7) )
+                       # x 3 separate calls to fit_mr
+                       return( rep(NA, 7 * 3) )
                      })
                      
                    } )
@@ -496,11 +520,10 @@ if ( boot.from.scratch == FALSE ){
 
 
 # get stats on original data
-( t0 = fit_mr( .dat = d, 
-        .mods = modsS ) )
-# this results in:
-# [1]  0.47624200  1.00000000  0.98039216  0.00000000
-# [5]  0.88235294 -0.01960784  0.88235294
+naiveRes = fit_mr( .dat = d, .mods = "isMeta" )
+modRes = fit_mr( .dat = d, .mods = modsS )
+diff = naiveRes - modRes
+( t0 = c(naiveRes, modRes, diff) )
 
 # NB: because of the way we hacked the "statistic" argument of boot()
 #  above st it actually creates a resample, the below will NOT match
@@ -512,21 +535,45 @@ if ( boot.from.scratch == FALSE ){
 #  to allow boot.ci to work correctly
 boot.res$t0 = t0
 
+
+# sanity check: bootstrap bias estimate
+# should be reasonably close to 0
+round( colMeans(boot.res$t, na.rm = TRUE) - t0, 2 )
+
 # get the bootstrapped CIs for all 3 statistics respectively using BCa method
-( bootCIs = get_boot_CIs(boot.res, n.ests = ncol(boot.res$t) ) )
+( CIs = get_boot_CIs(boot.res, n.ests = ncol(boot.res$t) ) )
+# convert to df
+res = as.data.frame( do.call( what = rbind, args = CIs ) )
+names(res) = c("lo", "hi")
 
-#bm: trying to fix infinite-w issue in the above
-# using boot.reps = 1000 doesn't help
+# add in sample point estimates and names of variables
+res = res %>% add_column( est = t0, .before = 1 )
+# from return structure of fit_mr:
+varNames = c( "AvgDiff",
+              
+              "Phat0R",
+              "Phat0M",
+              
+              "Phat0.2R",
+              "Phat0.2M",
+              
+              "Phat0Diff",
+              "Phat0.2Diff" )
 
-for ( i in 1:7 ) {
-  print( boot.ci(boot.res, type = "all", index = i) )
-}
+res = res %>% add_column( stat = varNames, .before = 1 )
 
 
+# sanity check: are point estimates always in the CIs?
+expect_equal( res$est <= res$hi, TRUE )
 
-# sanity check: compare to bootstrap means
-colMeans(boot.res$t, na.rm = TRUE)
-t0
+# # investigate the [0,0] CI for 2nd statistic
+# # wow...boot.ci really does return [0,0] for the 2nd interval
+# #  even though the estimates are almost always 1!
+# table(boot.res$t[,2])
+# boot.ci(boot.res, type = "all", index = 2)
+
+# to avoid this, require that all CIs contain the sample estimates, 
+#  o.w. set to NA
 
 
 # order of returned stats:
@@ -541,37 +588,116 @@ t0
 #   Phat0.diff,
 #   Phat0.2.diff )
 
+# GAME PLAN: get these stats for naive and corrected models
+# then, deal with cross-model inference: do a SEPARATE round of bootstrapping that fits BOTH models but returns only DIFFERENCES between models in est.ma - est.rep, Phat0.diff, and Phat0.2.diff
 
 
-# naive model metrics of source discrepancy
-# CIS WRONG HERE
-statCI_result_csv( "naive avgDiff", c(naiveRes$avgDiff, bootCIs[[1]][1], bootCIs[[1]][2]) )
+############################## ORGANIZE MODEL DISCREPANCY STATS INTO TABLE ##############################
 
-statCI_result_csv( "naive Phat0Diff", c(naiveRes$Phat0Diff, bootCIs[[2]][1], bootCIs[[2]][2]) )
+# naive model with inference
+# moderated model with inference
+# difference with inference
 
-statCI_result_csv( "naive Phat0.2Diff", c(naiveRes$Phat0.2Diff, bootCIs[[3]][1], bootCIs[[3]][2]) )
+#bm
+
+# 3 because again, we have naive model, moderated model, and their difference
+#@needs to match return structure of fit_mr
+varNames = c( "AvgDiff",
+              
+              "Phat0R",
+              "Phat0M",
+              
+              "Phat0.2R",
+              "Phat0.2M",
+              
+              "Phat0Diff",
+              "Phat0.2Diff" )
+
+names(t0) = paste( varNames )
+
+
+# also sanity-check the simple models using calls to quick_phat above
+
+
+
+# ############################## CROSS-MODEL INFERENCE ##############################
+# 
+# #bm: just ran these boot iterates and next should see if results make sense
+# #  then need to save stats from the part above (inference within a given model)
+# 
+# # this works
+# fit_mr( .dat = d,
+#         .mods = "isMeta" )
+# 
+# if ( boot.from.scratch == TRUE ) {
+#   boot.res = boot( data = d, 
+#                    parallel = "multicore",
+#                    R = boot.reps, 
+#                    statistic = function(original, indices) {
+#                      # draw resample with replacement
+#                      # ignore the indices passed by boot because we're
+#                      #  doing clustered bootstrapping, oh yeah
+#                      
+#                      # # this works fine
+#                      # b = original[indices,]
+#                      # mean(rnorm(20))
+#                      
+#                      b = cluster_bt(.dat = original,
+#                                     .clustervar = "study_id")
+#                      
+#                      # multi-argument returns need to be via c(), not list or df or whatever
+#                      tryCatch({
+#                        # DIFFERENCE between stats in naive model vs. moderated model
+#                        fit_mr( .dat = b,
+#                                .mods = "isMeta" ) - fit_mr( .dat = b,
+#                                                          .mods = modsS ) 
+#                      }, error = function(err){
+#                        # increase number of NA's if needed to match .simple.return = TRUE structure of fit_mr
+#                        return( rep(NA, 7) )
+#                      })
+#                      
+#                    } )
+#   
+#   # save bootstraps
+#   setwd(results.dir)
+#   save(boot.res, file = "saved_bootstraps_cross_models.RData")
+# }
+# 
+# if ( boot.from.scratch == FALSE ){
+#   # read in existing bootstraps
+#   setwd(results.dir)
+#   load("saved_bootstraps_cross_models.RData")
+# }
 # 
 # 
-# # moderated model metrics of metrics of source discrepancy
-# statCI_result_csv( "mod1 avgDiff", c(mod1Res$avgDiff, bootCIs[[1]][1], bootCIs[[1]][2]) )
+# # number of non-failed bootstrap reps
+# ( boot.reps.successful = sum( !is.na( boot.res$t[,1] ) ) )
 # 
-# statCI_result_csv( "mod1 Phat0Diff", c(mod1Res$Phat0Diff, bootCIs[[2]][1], bootCIs[[2]][2]) )
 # 
-# statCI_result_csv( "mod1 Phat0.2Diff", c(mod1Res$Phat0.2Diff, bootCIs[[3]][1], bootCIs[[3]][2]) )
-
-
-# between-model difference
-# framed as the INCREASED discrepancy after controlling for moderators
-statCI_result_csv( "moderator increase avgDiff", c(mod1Res$avgDiff - naiveRes$avgDiff, bootCIs[[1]][1], bootCIs[[1]][2]) )
-
-# SAVE
-# currently these are fake
-# statCI_result_csv( "moderator reduction Phat0Diff", c(naiveRes$Phat0Diff - mod1Res$Phat0Diff, bootCIs[[2]][1], bootCIs[[2]][2]) )
+# # get stats on original data
+# ( t0 = fit_mr( .dat = d,
+#                .mods = "isMeta" ) - fit_mr( .dat = d,
+#                                             .mods = modsS )  )
+# # this results in:
+# # [1] -0.15266756  0.00000000 -0.07843137
+# # [4]  0.90384615 -0.01960784 -0.07843137
+# # [7] -0.92345400
 # 
-# statCI_result_csv( "moderator reduction Phat0.2Diff", c(naiveRes$Phat0.2Diff - mod1Res$Phat0.2Diff, bootCIs[[3]][1], bootCIs[[3]][2]) )
+# # as above, replace boot()'s incorrect t0 with the correct one
+# #  to allow boot.ci to work correctly
+# boot.res$t0 = t0
+# 
+# # get the bootstrapped CIs for all 3 statistics respectively using BCa method
+# ( bootCIs = get_boot_CIs(boot.res, n.ests = ncol(boot.res$t) ) )
+# 
+# 
+# # sanity check: compare to bootstrap means
+# colMeans(boot.res$t, na.rm = TRUE)
+# t0
+# 
 
 
-# @p-values would require resampling under H0...
+
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 #               2. PUBLICATION BIAS (SOME PREREG'D AND SOME POST HOC)           
