@@ -355,15 +355,16 @@ fit_mr = function( .dat,
     
     if ( .simple.return == TRUE ){
       # return as a numeric vector for compatibility with boot()
-      return( c( est.ma - est.rep,
+      return( c( est.ma,
+                 est.rep,
+                 est.ma - est.rep,
                  
-                 Phat0.rep,
                  Phat0.ma,
-                 
-                 Phat0.2.rep,
-                 Phat0.2.ma,
-                 
+                 Phat0.rep,
                  Phat0.diff,
+                 
+                 Phat0.2.ma,
+                 Phat0.2.rep,
                  Phat0.2.diff ) ) 
       
     } else return(.res)

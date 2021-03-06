@@ -560,60 +560,49 @@ varNames = c( "AvgDiff",
               "Phat0Diff",
               "Phat0.2Diff" )
 
-res = res %>% add_column( stat = varNames, .before = 1 )
+res = res %>% add_column( stat = rep( varNames, 3 ), .before = 1 )
+res = res %>% add_column( model = rep( c("naive", "mod", "modelDiff" ), each = length(varNames) ),
+                          .before = 1 )
 
 
-# sanity check: are point estimates always in the CIs?
-expect_equal( res$est <= res$hi, TRUE )
+##### Clean Up CIs #####
+# sanity check: look for point estimates that aren't in their CIs
+res %>% filter( est > hi | est < lo )
+# this one makes sense b/c estimate was at ceiling
 
-# # investigate the [0,0] CI for 2nd statistic
-# # wow...boot.ci really does return [0,0] for the 2nd interval
-# #  even though the estimates are almost always 1!
-# table(boot.res$t[,2])
-# boot.ci(boot.res, type = "all", index = 2)
+# set such CIs to NA
+res$lo[ res$est < res$lo | res$est > res$hi ] = NA
+res$hi[ res$est < res$lo | res$est > res$hi ] = NA
 
-# to avoid this, require that all CIs contain the sample estimates, 
-#  o.w. set to NA
+# if only one CI limit was estimable, set both to NA
+res$lo[ is.na(res$hi) ] = NA
+res$hi[ is.na(res$lo) ] = NA
 
+##### Prettify and Save Results Tables #####
 
-# order of returned stats:
-# ( est.ma - est.rep,
-#   
-#   Phat0.rep,
-#   Phat0.ma,
-#   
-#   Phat0.2.rep,
-#   Phat0.2.ma,
-#   
-#   Phat0.diff,
-#   Phat0.2.diff )
+# unrounded numeric table (just for reproducibility)
+setwd(results.dir)
+setwd("table_model_diffs")
+library(data.table)
+fwrite( res, "table_model_diffs_unrounded.csv" )
 
-# GAME PLAN: get these stats for naive and corrected models
-# then, deal with cross-model inference: do a SEPARATE round of bootstrapping that fits BOTH models but returns only DIFFERENCES between models in est.ma - est.rep, Phat0.diff, and Phat0.2.diff
+# rounded numeric table (for piping numbers into manuscript)
+res2 = res
+numVars = c("est", "lo", "hi")
+res2[ , numVars ] = round( res2[ , numVars ], 2 )
+# also turn Phats into percentages
+inds = grepl( pattern = "Phat", x = res2$stat )
+res2[ inds, numVars ] = 100*res2[ inds, numVars ]
+res2$stat[ inds ] = str_replace( string = res2$stat[ inds ],
+                                 pattern = "Phat",
+                                 replacement = "Perc" )
 
+# rounded character table (for manuscript table)
+res3 = res2
+res3 = res3 %>% mutate_at( numVars, as.character )
 
-############################## ORGANIZE MODEL DISCREPANCY STATS INTO TABLE ##############################
-
-# naive model with inference
-# moderated model with inference
-# difference with inference
-
-#bm
-
-# 3 because again, we have naive model, moderated model, and their difference
-#@needs to match return structure of fit_mr
-varNames = c( "AvgDiff",
-              
-              "Phat0R",
-              "Phat0M",
-              
-              "Phat0.2R",
-              "Phat0.2M",
-              
-              "Phat0Diff",
-              "Phat0.2Diff" )
-
-names(t0) = paste( varNames )
+# also transposed for readabilty
+x = as_tibble(t(res3), rownames = "row_names")
 
 
 # also sanity-check the simple models using calls to quick_phat above
