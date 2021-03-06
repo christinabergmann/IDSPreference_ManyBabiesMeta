@@ -65,7 +65,7 @@ if ( start.res.from.scratch == TRUE ) wr()
 ##### Constants of Universe #####
 digits = 2
 pval.cutoff = 10^-4  # threshold for using "<"
-boot.reps = 500 # for cross-model comparisons; @increase later 
+boot.reps = 1000 # for all bootstrapped inference 
 # plot colors
 colors = c("darkgray", "red")  # replications, originals
 
@@ -455,17 +455,18 @@ if ( redo.plots == TRUE ) {
 # returns results of naive model, moderated model, AND their difference
 # in a 21-length vector
 
-# order of fit_mr's 7 returned stats:
-# ( est.ma - est.rep,
-#   
-#   Phat0.rep,
-#   Phat0.ma,
-#   
-#   Phat0.2.rep,
-#   Phat0.2.ma,
-#   
-#   Phat0.diff,
-#   Phat0.2.diff )
+# order of fit_mr's 9 returned stats:
+# c( est.ma,
+#    est.rep,
+#    est.ma - est.rep,
+#    
+#    Phat0.ma,
+#    Phat0.rep,
+#    Phat0.diff,
+#    
+#    Phat0.2.ma,
+#    Phat0.2.rep,
+#    Phat0.2.diff )
 
 
 # with boot.reps - 1,000, takes about 10 min
@@ -498,7 +499,7 @@ if ( boot.from.scratch == TRUE ) {
                      }, error = function(err){
                        # increase number of NA's if needed to match .simple.return = TRUE structure of fit_mr
                        # x 3 separate calls to fit_mr
-                       return( rep(NA, 7 * 3) )
+                       return( rep(NA, 9 * 3) )
                      })
                      
                    } )
@@ -549,17 +550,33 @@ names(res) = c("lo", "hi")
 # add in sample point estimates and names of variables
 res = res %>% add_column( est = t0, .before = 1 )
 # from return structure of fit_mr:
-varNames = c( "AvgDiff",
+# **must match return structure of fit_mr
+varNames = c( "AvgM",
+              "AvgR",
+              "AvgDiff",
               
-              "Phat0R",
               "Phat0M",
-              
-              "Phat0.2R",
-              "Phat0.2M",
-              
+              "Phat0R",
               "Phat0Diff",
+              
+              "Phat0.2M",
+              "Phat0.2R",
               "Phat0.2Diff" )
 
+# return structure of fit_mr:
+# c( est.ma,
+#    est.rep,
+#    est.ma - est.rep,
+#    
+#    Phat0.ma,
+#    Phat0.rep,
+#    Phat0.diff,
+#    
+#    Phat0.2.ma,
+#    Phat0.2.rep,
+#    Phat0.2.diff )
+
+# 3 for number of calls to fit_mr
 res = res %>% add_column( stat = rep( varNames, 3 ), .before = 1 )
 res = res %>% add_column( model = rep( c("naive", "mod", "modelDiff" ), each = length(varNames) ),
                           .before = 1 )
@@ -580,13 +597,13 @@ res$hi[ is.na(res$lo) ] = NA
 
 ##### Prettify and Save Results Tables #####
 
-# unrounded numeric table (just for reproducibility)
+### unrounded numeric table (just for reproducibility)
 setwd(results.dir)
 setwd("table_model_diffs")
 library(data.table)
 fwrite( res, "table_model_diffs_unrounded.csv" )
 
-# rounded numeric table (for piping numbers into manuscript)
+### rounded numeric table (for piping numbers into manuscript)
 res2 = res
 numVars = c("est", "lo", "hi")
 res2[ , numVars ] = round( res2[ , numVars ], 2 )
@@ -596,13 +613,37 @@ res2[ inds, numVars ] = 100*res2[ inds, numVars ]
 res2$stat[ inds ] = str_replace( string = res2$stat[ inds ],
                                  pattern = "Phat",
                                  replacement = "Perc" )
+fwrite( res2, "table_model_diffs_rounded.csv" )
 
-# rounded character table (for manuscript table)
+
+### rounded character table (for manuscript table)
 res3 = res2
 res3 = res3 %>% mutate_at( numVars, as.character )
 
-# also transposed for readabilty
-x = as_tibble(t(res3), rownames = "row_names")
+# combine estimates and CIs into single string
+res3$valueString = paste( res3$est,
+                          " [",
+                          res3$lo, 
+                          ", ", 
+                          res3$hi, 
+                          "]",
+                          sep = "" ) 
+# if CI is [NA, NA], delete it from string
+res3$valueString = str_replace( string = res3$valueString,
+                                pattern = " \\[NA, NA\\]",
+                                replacement = "" )
+
+res3 = res3 %>% select(-numVars)
+
+# reshape table for readability
+res3 = res3 %>% pivot_wider( names_from = model,
+                 values_from = valueString )
+
+
+fwrite( res3, "table_model_diffs_rounded_pretty.csv" )
+
+# TeX for paper
+print( xtable(res3), include.rownames = FALSE)
 
 
 # also sanity-check the simple models using calls to quick_phat above
