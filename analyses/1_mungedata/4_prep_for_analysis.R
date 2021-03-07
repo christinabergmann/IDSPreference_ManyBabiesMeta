@@ -12,7 +12,10 @@ prereg = FALSE
 
 # for replications, should we make the sensitivity-analysis dataset with more
 #  stringent inclusion (set to TRUE), or the main-analysis dataset?
-ic.dataset = TRUE
+ic.dataset = FALSE
+
+# for replications, should we look at the much smaller, age-matched dataset instead?
+age.matched = TRUE
 
 data.dir = here("data")
 # where to save results
@@ -52,8 +55,10 @@ if(prereg){
   d = full_dataset_shuffled
   
 } else {
-  if ( ic.dataset == FALSE ) d = read_csv("mb_ma_combined.csv") else d = read_csv("mb_ma_combined_0.75.csv")
-  
+  if ( ic.dataset == FALSE & age.matched == FALSE ) d = read_csv("mb_ma_combined.csv")
+  if ( ic.dataset == TRUE & age.matched == FALSE ) d = read_csv("mb_ma_combined_0.75.csv")
+  if ( ic.dataset == FALSE & age.matched == TRUE ) d = read_csv("mb_ma_combined_0.125_age_matched.csv")
+  if ( ic.dataset == TRUE & age.matched == TRUE ) stop("Case not handled")
 }
 
   
@@ -175,8 +180,14 @@ d$sourcePretty[ d$isMeta == FALSE ] = "Replications"
 setwd(data.dir)
 
 if ( prereg == TRUE ) write.csv(d, "mb_ma_combined_scrambled_prepped.csv")
-if ( prereg == FALSE & ic.dataset == FALSE ) write.csv(d, "mb_ma_combined_prepped.csv")
-if ( prereg == FALSE & ic.dataset == TRUE ) write.csv(d, "mb_ma_combined_prepped_0.75.csv")
+
+if ( prereg == FALSE ) {
+  if ( ic.dataset == FALSE & age.matched == FALSE ) write.csv(d, "mb_ma_combined_prepped.csv")
+  if ( ic.dataset == TRUE & age.matched == FALSE ) write.csv(d, "mb_ma_combined_prepped_0.75.csv")
+  if ( ic.dataset == FALSE & age.matched == TRUE ) write.csv(d, "mb_ma_combined_prepped_0.125_age_matched.csv")
+  
+}
+
 
 
 

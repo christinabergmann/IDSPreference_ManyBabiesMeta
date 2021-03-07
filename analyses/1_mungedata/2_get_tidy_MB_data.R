@@ -20,6 +20,30 @@ mb_data_tidy <- mb_data_raw %>%
   filter(!is.na(diff)) %>%
   select(all_of(TARGET_VARS))
 
+# ~ MM plays with age ----------------
+# in main analysis, MB subjects were on average 12 months older
+# MA mean age: 144 days
+setwd(here("data"))
+dma = read_csv("ma_data_tidy.csv")
+summary(dma$mean_age)
+
+summary(mb_data_tidy$age_days)
+
+# try to get the same mean age in the replications
+# by taking only the youngest subjects
+# this one matches almost exactly (mean 144)
+mean( mb_data_tidy$age_days[ mb_data_tidy$age_days <= 180 ] )
+
+temp = mb_data_tidy[ mb_data_tidy$age_days <= 180, ]
+
+# this retains only 11% of the data (2,314 subjects)
+nrow(temp)/nrow(mb_data_tidy)
+
+mb_data_tidy = temp
+
+MB_OUT_PATH <- here(paste("data/mb_data_tidy_", n_trial_pairs_criterion/8, "_age_matched.csv", sep = ""))
+# ~ end MM playing ----------------
+
 # tidy factors
 mb_data_tidy_fct <- mb_data_tidy %>%
   mutate_at(vars(lang1, 

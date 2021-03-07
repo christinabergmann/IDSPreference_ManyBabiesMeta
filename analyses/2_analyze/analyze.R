@@ -16,6 +16,8 @@
 
 # in the 0.75 dataset with the more stringent inclusion criterion, am I right in thinking that there are fewer effect sizes because some age groups are dropped completely? (but the mean age in MB doesn't change much at all)
 
+# the 0.125 dataset corresponds with main analysis, right?
+
 
 # ~ Other notes  ------------------------------------------------------------------
 

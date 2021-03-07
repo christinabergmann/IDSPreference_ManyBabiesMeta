@@ -5,13 +5,31 @@ library(here)
 
 # for replications, should we make the sensitivity-analysis dataset with more
 #  stringent inclusion (set to TRUE), or the main-analysis dataset?
-ic.dataset = TRUE
+ic.dataset = FALSE
 
-if ( ic.datasset == FALSE ) MB_DATA_PATH <- here("data/mb_data_tidy.csv") else MB_DATA_PATH <- here("data/mb_data_tidy_0.75.csv")
+# for replications, should we look at the much smaller, age-matched dataset instead?
+age.matched = TRUE
 
 MA_DATA_PATH <- here("data/ma_data_tidy.csv")
 
-if ( ic.dataset == FALSE ) OUTFILE <- here("data/mb_ma_combined.csv") else OUTFILE <- here("data/mb_ma_combined_0.75.csv")
+if ( ic.dataset == FALSE & age.matched == FALSE ) {
+  MB_DATA_PATH <- here("data/mb_data_tidy.csv")
+  OUTFILE <- here("data/mb_ma_combined.csv")
+}
+
+if ( ic.dataset == TRUE & age.matched == FALSE ) {
+  MB_DATA_PATH <- here("data/mb_data_tidy_0.75.csv")
+  OUTFILE <- here("data/mb_ma_combined_0.75.csv")
+}
+
+if ( ic.dataset == FALSE & age.matched == TRUE ) {
+  MB_DATA_PATH <- here("data/mb_data_tidy_0.125_age_matched.csv")
+  OUTFILE <- here("data/mb_ma_combined_0.125_age_matched.csv")
+}
+
+if ( ic.dataset == TRUE & age.matched == TRUE ) {
+  stop("Case not handled")
+}
 
 mb_data_raw <- read_csv(MB_DATA_PATH)
 ma_data_raw <- read_csv(MA_DATA_PATH)
