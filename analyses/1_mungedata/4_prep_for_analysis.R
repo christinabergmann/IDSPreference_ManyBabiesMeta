@@ -10,6 +10,10 @@ library(tableone)
 # If working on the preregistration, set this to T, otherwise F to use the veridical dataset without scrambling.
 prereg = FALSE
 
+# for replications, should we make the sensitivity-analysis dataset with more
+#  stringent inclusion (set to TRUE), or the main-analysis dataset?
+ic.dataset = TRUE
+
 data.dir = here("data")
 # where to save results
 results.dir = here("results_from_R")
@@ -47,8 +51,11 @@ if(prereg){
   
   d = full_dataset_shuffled
   
-}else
-  d = read_csv("mb_ma_combined.csv")
+} else {
+  if ( ic.dataset == FALSE ) d = read_csv("mb_ma_combined.csv") else d = read_csv("mb_ma_combined_0.75.csv")
+  
+}
+
   
 
 
@@ -168,7 +175,8 @@ d$sourcePretty[ d$isMeta == FALSE ] = "Replications"
 setwd(data.dir)
 
 if ( prereg == TRUE ) write.csv(d, "mb_ma_combined_scrambled_prepped.csv")
-if ( prereg == FALSE ) write.csv(d, "mb_ma_combined_prepped.csv")
+if ( prereg == FALSE & ic.dataset == FALSE ) write.csv(d, "mb_ma_combined_prepped.csv")
+if ( prereg == FALSE & ic.dataset == TRUE ) write.csv(d, "mb_ma_combined_prepped_0.75.csv")
 
 
 

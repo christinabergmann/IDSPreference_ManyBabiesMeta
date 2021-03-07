@@ -1,11 +1,23 @@
 
-# To do:
+# META-NOTES ------------------------------------------------------------------ 
+
+# ~ To do  ------------------------------------------------------------------
+
+
+# - Think about doing something IPD for age (look at raw data to see if this makes sense)
 
 # - Put analysis that doesn't match on age but matches on the others into manuscript. 
 
 # stop using asterisks in file names bc they cause syncing trouble (for now, I just manually removed them)
 
 # section variable needs updating after code structure is done
+
+# ~ Ask CB, et al ------------------------------------------------------------------
+
+# in the 0.75 dataset with the more stringent inclusion criterion, am I right in thinking that there are fewer effect sizes because some age groups are dropped completely? (but the mean age in MB doesn't change much at all)
+
+
+# ~ Other notes  ------------------------------------------------------------------
 
 # names of important model objects:
 # - naive.MA.only and naive.reps.only: meta-analyses within subsets; no moderators
@@ -45,7 +57,7 @@ source("MetaUtility development functions.R")
 
 # ~ Code-Running Parameters ------------------------------------------------------------------
 # should we remove existing results file instead of overwriting individual entries? 
-start.res.from.scratch = TRUE
+start.res.from.scratch = FALSE
 # should we use the grateful package to scan and cite packages?
 cite.packages.anew = FALSE
 # should we bootstrap from scratch or read in old resamples?
@@ -53,7 +65,7 @@ boot.from.scratch = FALSE
 # make plots from scratch?
 redo.plots = FALSE
 # redo iterative selection of moderators to get model to converge?
-redo.mod.selection = TRUE
+redo.mod.selection = FALSE
 
 if (redo.mod.selection == FALSE) {
   # read in the surviving moderators
@@ -98,6 +110,9 @@ dma = d %>% filter(isMeta == TRUE)
 # dataset with just the replications
 dr = d %>% filter(isMeta == FALSE)
 
+# dataset with more stringent inclusion criteria in replications
+dic = suppressMessages( suppressWarnings( read_csv("mb_ma_combined_prepped_0.75.csv") ) )
+dric = dic %>% filter(isMeta == FALSE)
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
@@ -107,7 +122,7 @@ dr = d %>% filter(isMeta == FALSE)
 # for updating result csv
 section = 0
 
-# ~ BASICS ------------------------------------------------------------------
+# ~ Basics ------------------------------------------------------------------
 
 t = d %>% group_by(study_type) %>%
   summarise( m = n(),
@@ -130,7 +145,7 @@ update_result_csv( name = paste( "median n", t$study_type, sep = " "),
                    value = t$nSubjMed )
 
 
-# ~ MODERATORS ------------------------------------------------------------------
+# ~ Moderators ------------------------------------------------------------------
 
 # distribution of moderators in RRR and MA
 t = CreateTableOne(vars = mods, 
@@ -184,7 +199,7 @@ section = 1
                                      .label = "Reps subset naive" ) )
 
 
-# ~ FIT NAIVE AND MODERATED META-REGRESSIONS ------------------------------------------------------------------ 
+# ~ Fit naive and moderated regressions ------------------------------------------------------------------ 
 
 
 if ( redo.mod.selection == TRUE ) {
@@ -1093,62 +1108,6 @@ robu( yi ~ isMeta*mean_agec + test_lang + isMeta*(method=="b.hpp"),
       small = TRUE)
 
 # # save:
-# ############################## SUBSET MODELS ##############################
-# 
-# ##### Sanity check: Subsets that resemble each other #####
-# 
-# # MCF: "Could you do something like a "modal subsample" where you pull native language HPP (or CF?) results and plot those across MA/MB1, possibly with age included?"
-# fit_subset_meta( .dat = dma %>% filter( method == "b.hpp" & test_lang == "a.native" ),
-#                  .mods = "1",
-#                  .label = NA )
-# 
-# fit_subset_meta( .dat = dr %>% filter( method == "b.hpp" & test_lang == "a.native" ),
-#                  .mods = "1",
-#                  .label = NA )
-# 
-# # interesting!!! these agree pretty well (replications actually a little bigger, 0.58 vs 0.51)
-# # bm
-# 
-# 
-# # **complements of above - do not agree well at all (difference 0.43, more like in meta-regression below)
-# # 0.29 replications vs. 0.72 MA
-# fit_subset_meta( .dat = dma %>% filter( method != "b.hpp" | test_lang != "a.native" ),
-#                  .mods = "1",
-#                  .label = NA )
-# 
-# fit_subset_meta( .dat = dr %>% filter( method != "b.hpp" | test_lang != "a.native" ),
-#                  .mods = "1",
-#                  .label = NA )
-# 
-# 
-# # continues to agree very well if we look just at HPP subset
-# fit_subset_meta( .dat = dma %>% filter( method == "b.hpp" ),
-#                  .mods = "1",
-#                  .label = NA )
-# 
-# fit_subset_meta( .dat = dr %>% filter( method == "b.hpp" ),
-#                  .mods = "1",
-#                  .label = NA )
-# 
-# 
-# # surviving mods were mean age, language, and method
-# # compare to meta-regression
-# 
-# # first one is estimated difference of 0.24 
-# fit_mr( .dat = d,
-#         .mods = c("isMeta", "method", "test_lang"),
-#         .simple.return = FALSE)
-# 
-# # recode method and language as binary
-# d$method.hpp = d$method == "b.hpp"
-# d$test_lang.native = d$test_lang == "a.native"
-# 
-# fit_mr( .dat = d,
-#         .mods = c("isMeta", "method.hpp", "test_lang.native"),
-#         .simple.return = FALSE)
-# 
-
-
 # 5. TABLE AND FOREST PLOT OF SUBSET ESTIMATES ------------------------------------------------------------------
 
 # for each categorical moderator, fit subset meta-analysis
@@ -1630,3 +1589,98 @@ if ( redo.plots == TRUE ) {
   
   
 }
+
+# 8. WITH MODIFIED SUBJECT INCLUSION CRITERIA ------------------------------------------------------------------
+
+section = 8
+setwd(data.dir)
+
+# replication dataset that excludes 
+# see n_trial_pairs_criterion variable in "2_get_tidy_MB_data.R" for how this is created
+
+# note that there are now fewer effect sizes, presumably because some age groups get lost completely upon excluding badly behaved subjects
+dim(dric)
+
+# ~ Subset model in MLR ------------------------------------------------------------------
+
+# with more stringent inclusion criteria, estimate in MLR increases from 0.35 to 0.43
+# still less than in meta-analysis
+# this fn also writes stats to results csv
+( naiveIC.reps.only = fit_subset_meta( .dat = dric,
+                                     .mods = "1",
+                                     .label = "Reps subset naiveIC" ) )
+
+# ~ Naive model with both sources ------------------------------------------------------------------
+naiveResIC = fit_mr( .dat = dic,
+                   .label = "naiveIC",
+                   .mods = "isMeta",
+                   .write.to.csv = TRUE,
+                   .write.table = TRUE,
+                   .simple.return = FALSE )
+
+# ~ Moderated model with both sources ------------------------------------------------------------------
+# again does not improve, and in fact somewhat worsens, the discrepancy
+modResIC = fit_mr( .dat = dic,
+                     .label = "modIC",
+                     .mods = modsS,
+                     .write.to.csv = TRUE,
+                     .write.table = TRUE,
+                     .simple.return = FALSE )
+
+#@
+
+# (Obsolete?) SUBSET MODELS ------------------------------------------------------------------ 
+# 
+# # ~ Sanity check: Subsets that resemble each other  ------------------------------------------------------------------
+# 
+# # MCF: "Could you do something like a "modal subsample" where you pull native language HPP (or CF?) results and plot those across MA/MB1, possibly with age included?"
+# fit_subset_meta( .dat = dma %>% filter( method == "b.hpp" & test_lang == "a.native" ),
+#                  .mods = "1",
+#                  .label = NA )
+# 
+# fit_subset_meta( .dat = dr %>% filter( method == "b.hpp" & test_lang == "a.native" ),
+#                  .mods = "1",
+#                  .label = NA )
+# 
+# # interesting!!! these agree pretty well (replications actually a little bigger, 0.58 vs 0.51)
+# # bm
+# 
+# 
+# # **complements of above - do not agree well at all (difference 0.43, more like in meta-regression below)
+# # 0.29 replications vs. 0.72 MA
+# fit_subset_meta( .dat = dma %>% filter( method != "b.hpp" | test_lang != "a.native" ),
+#                  .mods = "1",
+#                  .label = NA )
+# 
+# fit_subset_meta( .dat = dr %>% filter( method != "b.hpp" | test_lang != "a.native" ),
+#                  .mods = "1",
+#                  .label = NA )
+# 
+# 
+# # continues to agree very well if we look just at HPP subset
+# fit_subset_meta( .dat = dma %>% filter( method == "b.hpp" ),
+#                  .mods = "1",
+#                  .label = NA )
+# 
+# fit_subset_meta( .dat = dr %>% filter( method == "b.hpp" ),
+#                  .mods = "1",
+#                  .label = NA )
+# 
+# 
+# # surviving mods were mean age, language, and method
+# # compare to meta-regression
+# 
+# # first one is estimated difference of 0.24 
+# fit_mr( .dat = d,
+#         .mods = c("isMeta", "method", "test_lang"),
+#         .simple.return = FALSE)
+# 
+# # recode method and language as binary
+# d$method.hpp = d$method == "b.hpp"
+# d$test_lang.native = d$test_lang == "a.native"
+# 
+# fit_mr( .dat = d,
+#         .mods = c("isMeta", "method.hpp", "test_lang.native"),
+#         .simple.return = FALSE)
+# 
+

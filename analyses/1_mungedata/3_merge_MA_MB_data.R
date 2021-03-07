@@ -3,9 +3,15 @@
 library(tidyverse)
 library(here)
 
-MB_DATA_PATH <- here("data/mb_data_tidy.csv")
+# for replications, should we make the sensitivity-analysis dataset with more
+#  stringent inclusion (set to TRUE), or the main-analysis dataset?
+ic.dataset = TRUE
+
+if ( ic.datasset == FALSE ) MB_DATA_PATH <- here("data/mb_data_tidy.csv") else MB_DATA_PATH <- here("data/mb_data_tidy_0.75.csv")
+
 MA_DATA_PATH <- here("data/ma_data_tidy.csv")
-OUTFILE <- here("data/mb_ma_combined.csv")
+
+if ( ic.dataset == FALSE ) OUTFILE <- here("data/mb_ma_combined.csv") else OUTFILE <- here("data/mb_ma_combined_0.75.csv")
 
 mb_data_raw <- read_csv(MB_DATA_PATH)
 ma_data_raw <- read_csv(MA_DATA_PATH)
