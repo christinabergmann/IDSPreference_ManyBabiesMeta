@@ -634,7 +634,6 @@ res[ res$model == "naive" & res$stat == "AvgDiff", c("lo", "hi") ]; c( naiveRes$
 
 # why are boot CIs so different from model-based ones?
 boot.res
-#bm
 boot.ci(boot.res, index=1)  # all types of boot CIs are pretty similar
 c( naiveRes$est.ma.lo, naiveRes$est.ma.hi )  # model-based much wider
 # I went through the browser of fit_br and confirmed that above model-based ones
@@ -656,11 +655,17 @@ mean(x, na.rm = TRUE); t0[1]
 
 # **for coefficient estimates (i.e., not Phats), use the model-based CIs instead 
 # for consistency with earlier table showing meta-regression estimates
-res[ res$model == "naive" & res$stat == "AvgM", c("lo", "hi") ]; c( naiveRes$est.ma.lo, naiveRes$est.ma.hi )
+res[ res$model == "naive" & res$stat == "AvgM", c("lo", "hi") ] = c( naiveRes$est.ma.lo, naiveRes$est.ma.hi )
 
-res[ res$model == "naive" & res$stat == "AvgR", c("lo", "hi") ]; c( naiveRes$est.rep.lo, naiveRes$est.ma.hi )
+res[ res$model == "naive" & res$stat == "AvgR", c("lo", "hi") ] = c( naiveRes$est.rep.lo, naiveRes$est.ma.hi )
 
-res[ res$model == "naive" & res$stat == "AvgDiff", c("lo", "hi") ]; c( naiveRes$avgDiffLo, naiveRes$avgDiffHi )
+res[ res$model == "naive" & res$stat == "AvgDiff", c("lo", "hi") ] = c( naiveRes$avgDiffLo, naiveRes$avgDiffHi )
+
+res[ res$model == "mod" & res$stat == "AvgM", c("lo", "hi") ] = c( mod1Res$est.ma.lo, mod1Res$est.ma.hi )
+
+res[ res$model == "mod" & res$stat == "AvgR", c("lo", "hi") ] = c( mod1Res$est.rep.lo, mod1Res$est.ma.hi )
+
+res[ res$model == "mod" & res$stat == "AvgDiff", c("lo", "hi") ] = c( mod1Res$avgDiffLo, mod1Res$avgDiffHi )
 
 
 
@@ -1536,7 +1541,6 @@ if ( redo.plots == TRUE ) {
   
   
   # for aes on plot
-  #bm
   dp$is.pooled = grepl("POOL", dp$label)
   if ( color.subclasses == TRUE ) dp$is.pooled[ dp$unique %in% dmt$unique ] = 2
   
