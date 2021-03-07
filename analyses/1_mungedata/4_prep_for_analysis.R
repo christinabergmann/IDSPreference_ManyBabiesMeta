@@ -7,13 +7,16 @@ library(knitr)
 library(here)
 library(tableone)
 
+# to reproduce main analyses, set to FALSE
 # If working on the preregistration, set this to T, otherwise F to use the veridical dataset without scrambling.
 prereg = FALSE
 
+# to reproduce main analyses, set to FALSE
 # for replications, should we make the sensitivity-analysis dataset with more
 #  stringent inclusion (set to TRUE), or the main-analysis dataset?
 ic.dataset = FALSE
 
+# to reproduce main analyses, set to FALSE
 # for replications, should we look at the much smaller, age-matched dataset instead?
 age.matched = TRUE
 

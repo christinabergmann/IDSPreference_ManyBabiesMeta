@@ -2,9 +2,12 @@
 library(tidyverse)
 library(here)
 
-
+# for changing the inclusion criterion
 n_trial_pairs_criterion = 1
 # There are 8 pairs in total, so 4 pairs = 50%, 6 pairs = 75%
+
+# for replications, should we look at the much smaller, age-matched dataset instead?
+age.matched = TRUE
 
 MB1_PATH <- "https://raw.githubusercontent.com/manybabies/mb1-analysis-public/master/processed_data/03_data_diff_main.csv"
 MB_OUT_PATH <- here(paste("data/mb_data_tidy_", n_trial_pairs_criterion/8, ".csv", sep = ""))
@@ -20,29 +23,29 @@ mb_data_tidy <- mb_data_raw %>%
   filter(!is.na(diff)) %>%
   select(all_of(TARGET_VARS))
 
-# ~ MM plays with age ----------------
-# in main analysis, MB subjects were on average 12 months older
-# MA mean age: 144 days
-setwd(here("data"))
-dma = read_csv("ma_data_tidy.csv")
-summary(dma$mean_age)
+if (age.matched == TRUE) {
+  
+  # in main analysis, MB subjects were on average 12 months older than MA subjects
+  
+  # check mean age in MA: 144 days
+  setwd(here("data"))
+  dma = read_csv("ma_data_tidy.csv")
+  summary(dma$mean_age)
+  
+  # without further restriction, mean age in MB is 284 days
+  summary(mb_data_tidy$age_days)
+  
+  # try to subset the MB subjects to get a mean of 144 days 
+  # as in the MA
+  # to do this, take only the youngest MB subjects
+  # this one matches almost exactly (mean 144)
+  mb_data_tidy = mb_data_tidy[ mb_data_tidy$age_days <= 180, ]
+  mean( mb_data_tidy$age_days )
+  # this retains only 11% of the data (2,314 subjects)
+  
+  MB_OUT_PATH <- here(paste("data/mb_data_tidy_", n_trial_pairs_criterion/8, "_age_matched.csv", sep = ""))
+}
 
-summary(mb_data_tidy$age_days)
-
-# try to get the same mean age in the replications
-# by taking only the youngest subjects
-# this one matches almost exactly (mean 144)
-mean( mb_data_tidy$age_days[ mb_data_tidy$age_days <= 180 ] )
-
-temp = mb_data_tidy[ mb_data_tidy$age_days <= 180, ]
-
-# this retains only 11% of the data (2,314 subjects)
-nrow(temp)/nrow(mb_data_tidy)
-
-mb_data_tidy = temp
-
-MB_OUT_PATH <- here(paste("data/mb_data_tidy_", n_trial_pairs_criterion/8, "_age_matched.csv", sep = ""))
-# ~ end MM playing ----------------
 
 # tidy factors
 mb_data_tidy_fct <- mb_data_tidy %>%
