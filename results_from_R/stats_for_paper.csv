@@ -53,3 +53,57 @@ modIC avg for meta,0.66,8
 modIC avg lo for meta,0.36,8
 modIC avg hi for meta,0.96,8
 modIC avg pval for meta,6e-04,8
+Reps subset naiveAge tau,0.21,9
+Reps subset naiveAge k,14,9
+Reps subset naiveAge est X.Intercept.,0.16,9
+Reps subset naiveAge lo X.Intercept.,-0.07,9
+Reps subset naiveAge hi X.Intercept.,0.4,9
+Reps subset naiveAge pval X.Intercept.,0.15946,9
+naiveAge tau,0.45,9
+naiveAge k,65,9
+naiveAge est X.Intercept.,0.16,9
+naiveAge est isMetaTRUE,0.53,9
+naiveAge lo X.Intercept.,-0.07,9
+naiveAge lo isMetaTRUE,0.15,9
+naiveAge hi X.Intercept.,0.39,9
+naiveAge hi isMetaTRUE,0.91,9
+naiveAge pval X.Intercept.,0.1502128,9
+naiveAge pval isMetaTRUE,0.0084147,9
+naiveAge avg for meta,0.69,9
+naiveAge avg lo for meta,0.37,9
+naiveAge avg hi for meta,1.02,9
+naiveAge avg pval for meta,6e-04,9
+modAge tau,0.42,9
+modAge k,65,9
+modAge est X.Intercept.,0.34,9
+modAge est isMetaTRUE,0.41,9
+modAge est mean_agec,0.03,9
+modAge est test_langb.nonnative,-0.32,9
+modAge est test_langc.artificial,-0.5,9
+modAge est methodb.hpp,-0.29,9
+modAge est methodc.other,0.58,9
+modAge lo X.Intercept.,-0.05,9
+modAge lo isMetaTRUE,0.02,9
+modAge lo mean_agec,-0.01,9
+modAge lo test_langb.nonnative,-0.79,9
+modAge lo test_langc.artificial,-2.05,9
+modAge lo methodb.hpp,-1.67,9
+modAge lo methodc.other,-0.87,9
+modAge hi X.Intercept.,0.73,9
+modAge hi isMetaTRUE,0.79,9
+modAge hi mean_agec,0.08,9
+modAge hi test_langb.nonnative,0.14,9
+modAge hi test_langc.artificial,1.04,9
+modAge hi methodb.hpp,1.08,9
+modAge hi methodc.other,2.03,9
+modAge pval X.Intercept.,0.082568,9
+modAge pval isMetaTRUE,0.039419,9
+modAge pval mean_agec,0.082007,9
+modAge pval test_langb.nonnative,0.137579,9
+modAge pval test_langc.artificial,0.331398,9
+modAge pval methodb.hpp,0.611718,9
+modAge pval methodc.other,0.282937,9
+modAge avg for meta,0.75,9
+modAge avg lo for meta,0.42,9
+modAge avg hi for meta,1.08,9
+modAge avg pval for meta,2e-03,9

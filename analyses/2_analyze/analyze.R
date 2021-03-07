@@ -116,6 +116,10 @@ dr = d %>% filter(isMeta == FALSE)
 dic = suppressMessages( suppressWarnings( read_csv("mb_ma_combined_prepped_0.75.csv") ) )
 dric = dic %>% filter(isMeta == FALSE)
 
+# dataset with IPD age-matching in MLR
+dage = suppressMessages( suppressWarnings( read_csv("mb_ma_combined_prepped_0.125_age_matched.csv") ) )
+drage = dage %>% filter(isMeta == FALSE)
+
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 # 0. CHARACTERISTICS OF INCLUDED STUDIES ------------------------------------------------------------------           
@@ -1629,7 +1633,47 @@ modResIC = fit_mr( .dat = dic,
                      .write.table = TRUE,
                      .simple.return = FALSE )
 
-#@
+
+# 9. WITH IPD AGE-MATCHING IN MLR ------------------------------------------------------------------
+
+section = 9
+setwd(data.dir)
+
+# only 14 effect sizes now
+nrow(drage)
+
+# sanity check: should be very close to 0 now
+mean(drage$mean_agec)
+
+# ~ Subset model in MLR ------------------------------------------------------------------
+
+# estimate in MLR further DECREASES from 0.35 to 0.162
+# still less than in meta-analysis
+# this fn also writes stats to results csv
+( naiveAge.reps.only = fit_subset_meta( .dat = drage,
+                                       .mods = "1",
+                                       .label = "Reps subset naiveAge" ) )
+
+# ~ Naive model with both sources ------------------------------------------------------------------
+naiveResAge = fit_mr( .dat = dage,
+                     .label = "naiveAge",
+                     .mods = "isMeta",
+                     .write.to.csv = TRUE,
+                     .write.table = TRUE,
+                     .simple.return = FALSE )
+
+# ~ Moderated model with both sources ------------------------------------------------------------------
+# discrepancies might decrease a little bit this time, but still 0.41
+modResAge = fit_mr( .dat = dage,
+                   .label = "modAge",
+                   .mods = modsS,
+                   .write.to.csv = TRUE,
+                   .write.table = TRUE,
+                   .simple.return = FALSE )
+
+#bm: this analysis seems useful; should clean up the 2_XXX prep file
+#  and merge this branch into master
+
 
 # (Obsolete?) SUBSET MODELS ------------------------------------------------------------------ 
 # 
