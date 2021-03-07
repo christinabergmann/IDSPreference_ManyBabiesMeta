@@ -459,7 +459,6 @@ if ( redo.plots == TRUE ) {
 ############################## NAIVE AND MODERATED MODEL INFERENCE ##############################
 
 # get inference for conditional Phats and their difference FOR the moderated model
-#@ also need this for naive model
 
 # for each resample, fits both naive model and moderated model
 # via fit_mr, gets 7 stats of interest for each model
@@ -626,8 +625,6 @@ res$hi[ is.na(res$lo) ] = NA
 # **all of the CIs in this df are bootstrapped
 
 ### COMPARE BOOT VS. MODEL-BASED CIs FOR COEFF ESTIMATES:
-# **for coefficient estimates (i.e., not Phats), use the model-based CIs instead 
-# first just compare the 2 sets of CIs:
 # model-based ones are consistently a lot wider
 res[ res$model == "naive" & res$stat == "AvgM", c("lo", "hi") ]; c( naiveRes$est.ma.lo, naiveRes$est.ma.hi )
 
@@ -654,6 +651,16 @@ mean(x, na.rm = TRUE); t0[1]
 # *for this reason, perhaps it actually makes more sense to use the boot CIs here
 # also for comparability within the table
 ### END CI COMPARISON
+
+
+
+# **for coefficient estimates (i.e., not Phats), use the model-based CIs instead 
+# for consistency with earlier table showing meta-regression estimates
+res[ res$model == "naive" & res$stat == "AvgM", c("lo", "hi") ]; c( naiveRes$est.ma.lo, naiveRes$est.ma.hi )
+
+res[ res$model == "naive" & res$stat == "AvgR", c("lo", "hi") ]; c( naiveRes$est.rep.lo, naiveRes$est.ma.hi )
+
+res[ res$model == "naive" & res$stat == "AvgDiff", c("lo", "hi") ]; c( naiveRes$avgDiffLo, naiveRes$avgDiffHi )
 
 
 
