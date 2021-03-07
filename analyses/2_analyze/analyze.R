@@ -721,86 +721,7 @@ print( xtable(res3), include.rownames = FALSE)
 
 
 
-# also sanity-check the simple models using calls to quick_phat above
-
-
-
-# ############################## CROSS-MODEL INFERENCE ##############################
-# 
-# #bm: just ran these boot iterates and next should see if results make sense
-# #  then need to save stats from the part above (inference within a given model)
-# 
-# # this works
-# fit_mr( .dat = d,
-#         .mods = "isMeta" )
-# 
-# if ( boot.from.scratch == TRUE ) {
-#   boot.res = boot( data = d, 
-#                    parallel = "multicore",
-#                    R = boot.reps, 
-#                    statistic = function(original, indices) {
-#                      # draw resample with replacement
-#                      # ignore the indices passed by boot because we're
-#                      #  doing clustered bootstrapping, oh yeah
-#                      
-#                      # # this works fine
-#                      # b = original[indices,]
-#                      # mean(rnorm(20))
-#                      
-#                      b = cluster_bt(.dat = original,
-#                                     .clustervar = "study_id")
-#                      
-#                      # multi-argument returns need to be via c(), not list or df or whatever
-#                      tryCatch({
-#                        # DIFFERENCE between stats in naive model vs. moderated model
-#                        fit_mr( .dat = b,
-#                                .mods = "isMeta" ) - fit_mr( .dat = b,
-#                                                          .mods = modsS ) 
-#                      }, error = function(err){
-#                        # increase number of NA's if needed to match .simple.return = TRUE structure of fit_mr
-#                        return( rep(NA, 7) )
-#                      })
-#                      
-#                    } )
-#   
-#   # save bootstraps
-#   setwd(results.dir)
-#   save(boot.res, file = "saved_bootstraps_cross_models.RData")
-# }
-# 
-# if ( boot.from.scratch == FALSE ){
-#   # read in existing bootstraps
-#   setwd(results.dir)
-#   load("saved_bootstraps_cross_models.RData")
-# }
-# 
-# 
-# # number of non-failed bootstrap reps
-# ( boot.reps.successful = sum( !is.na( boot.res$t[,1] ) ) )
-# 
-# 
-# # get stats on original data
-# ( t0 = fit_mr( .dat = d,
-#                .mods = "isMeta" ) - fit_mr( .dat = d,
-#                                             .mods = modsS )  )
-# # this results in:
-# # [1] -0.15266756  0.00000000 -0.07843137
-# # [4]  0.90384615 -0.01960784 -0.07843137
-# # [7] -0.92345400
-# 
-# # as above, replace boot()'s incorrect t0 with the correct one
-# #  to allow boot.ci to work correctly
-# boot.res$t0 = t0
-# 
-# # get the bootstrapped CIs for all 3 statistics respectively using BCa method
-# ( bootCIs = get_boot_CIs(boot.res, n.ests = ncol(boot.res$t) ) )
-# 
-# 
-# # sanity check: compare to bootstrap means
-# colMeans(boot.res$t, na.rm = TRUE)
-# t0
-# 
-
+#@also sanity-check the simple models using calls to quick_phat above
 
 
 
@@ -1332,47 +1253,12 @@ section = 4
 
 ##### Look at age distribution in each source ######
 # this is the only continuous covariate to be matched
-
-
-age_densities = function(.dat) {
-  # choose axis scaling
-  #summary(.dat$mean_agec)
-  xmin = -24
-  xmax = 30
-  tickJump = 6  # space between tick marks
-  
-  ggplot( data = .dat,
-          aes( x = mean_agec,
-               fill = studyTypePretty,
-               color = studyTypePretty ) ) +
-    
-    # ensemble estimates shifted to Z=0
-    geom_density(alpha = 0.3) +
-    
-    theme_bw() +
-    
-    xlab("Mean age (centered; months)") +
-    scale_x_continuous( limits = c(xmin, xmax),
-                        breaks = seq(xmin, xmax, tickJump)) +
-    
-    ylab("Density") +
-    
-    scale_color_manual( values = rev(colors), name = "Source" ) +
-    scale_fill_manual( values = rev(colors), name = "Source" ) +
-    
-    theme(axis.text.y = element_blank(),
-          axis.ticks = element_blank(),
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank())
-  
-}
-
+# and it's one with little overlap
 age_densities(d)
 
 
 
 ##### Make Matches - CEM #####
-
 mods3 = mods2[ !mods2 %in% c("isMeta") ]
 
 string = paste( "isMeta ~ ",

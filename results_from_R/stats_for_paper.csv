@@ -66,3 +66,53 @@ MOD1 avg for meta,0.61,1
 MOD1 avg lo for meta,0.26,1
 MOD1 avg hi for meta,0.96,1
 MOD1 avg pval for meta,2e-03,1
+MA k nonaffirmative,29,2
+MA k affirmative,22,2
+weightr mu ,0.92,2
+weightr mu lo,0.6,2
+weightr mu hi,1.23,2
+weightr mu pval,< 0.0001,2
+Worst mu ,0.21,2
+Worst mu lo,-0.06,2
+Worst mu hi,0.48,2
+Worst mu pval,0.11,2
+Corr MA est,0.4,2
+Corr MA lo,0.13,2
+Corr MA hi,0.68,2
+Corr MA pval,0.0099117,2
+sval est to reps,7.76,2
+sval CI to reps,1.09,2
+matched tau,0.32,2
+matched k,17,2
+matched est X.Intercept.,0.31,2
+matched est isMetaTRUE,1.33,2
+matched lo X.Intercept.,0.14,2
+matched lo isMetaTRUE,-2.98,2
+matched hi X.Intercept.,0.48,2
+matched hi isMetaTRUE,5.65,2
+matched pval X.Intercept.,0.0018409,2
+matched pval isMetaTRUE,0.2515552,2
+matched avg for meta,1.64,2
+matched avg lo for meta,-7.78,2
+matched avg hi for meta,11.07,2
+matched avg pval for meta,0.27,2
+matched k total,17,2
+matched k from MA,3,2
+matched k from R,14,2
+matched age diff,-3.95407733386985,2
+pre-matching age diff,11.7836963585192,2
+matched subclass 1 isMeta FALSE k,6,2
+matched subclass 1 isMeta TRUE k,1,2
+matched subclass 2 isMeta FALSE k,8,2
+matched subclass 2 isMeta TRUE k,2,2
+pre-matching mean_age,239.132663608733,2
+matched mean_age subclass 1,124.721455824763,2
+matched mean_age subclass 2,206.356813465012,2
+IPW robu est X.Intercept.,0.394685966254886,2
+IPW robu est isMetaTRUE,0.394685966254886,2
+IPW robu lo X.Intercept.,-0.11,2
+IPW robu lo isMetaTRUE,-0.11,2
+IPW robu hi X.Intercept.,0.9,2
+IPW robu hi isMetaTRUE,0.9,2
+IPW robu pval X.Intercept.,0.119952345892366,2
+IPW robu pval isMetaTRUE,0.119952345892366,2

@@ -651,3 +651,39 @@ safe_boot_ci = function(x, boot.res, type) {
   })
 }  # end fn used lapply
 
+
+################################ DENSITY PLOT ################################
+
+# density plot of age stratified by source
+age_densities = function(.dat) {
+  # choose axis scaling
+  #summary(.dat$mean_agec)
+  xmin = -24
+  xmax = 30
+  tickJump = 6  # space between tick marks
+  
+  ggplot( data = .dat,
+          aes( x = mean_agec,
+               fill = studyTypePretty,
+               color = studyTypePretty ) ) +
+    
+    # ensemble estimates shifted to Z=0
+    geom_density(alpha = 0.3) +
+    
+    theme_bw() +
+    
+    xlab("Mean age (centered; months)") +
+    scale_x_continuous( limits = c(xmin, xmax),
+                        breaks = seq(xmin, xmax, tickJump)) +
+    
+    ylab("Density") +
+    
+    scale_color_manual( values = rev(colors), name = "Source" ) +
+    scale_fill_manual( values = rev(colors), name = "Source" ) +
+    
+    theme(axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank())
+  
+}
