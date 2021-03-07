@@ -115,7 +115,7 @@ vr = function(){
 # .simple.return: should fn return only the stats to be bootstrapped (as a numeric vector)
 #  or a more informative dataframe?
 
-# Phats for MA and reps are based on SUBSET models
+# **Phats for MA and reps are based on SUBSET models
 # .dat is an argument only to allow for bootstrapping
 # .mods SHOULD include isMeta
 # in returned stats, differences are always meta-analysis - replications

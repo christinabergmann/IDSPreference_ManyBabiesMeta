@@ -1,5 +1,9 @@
 
-# To do: Put analysis that doesn't match on age but matches on the others into manuscript. 
+# To do:
+
+# - Get tau for naiveRes and modRes by calling fit_mr again
+# - In tables, put in model-based CI limits for the averages?
+# - Put analysis that doesn't match on age but matches on the others into manuscript. 
 
 
 # stop using asterisks in file names bc they cause syncing trouble (for now, I just manually removed them)
@@ -43,15 +47,15 @@ source("MetaUtility development functions.R")
 
 ##### Code-Running Parameters #####
 # should we remove existing results file instead of overwriting individual entries? 
-start.res.from.scratch = FALSE
+start.res.from.scratch = TRUE
 # should we use the grateful package to scan and cite packages?
 cite.packages.anew = FALSE
 # should we bootstrap from scratch or read in old resamples?
 boot.from.scratch = FALSE
 # make plots from scratch?
-redo.plots = TRUE
+redo.plots = FALSE
 # redo iterative selection of moderators to get model to converge?
-redo.mod.selection = FALSE
+redo.mod.selection = TRUE
 
 if (redo.mod.selection == FALSE) {
   # read in the surviving moderators
@@ -88,7 +92,7 @@ mods = c( "study_type",
 
 ##### Read Datasets #####
 setwd(data.dir)
-d = suppressMessages( read_csv("mb_ma_combined_prepped.csv") )
+d = suppressMessages( suppressWarnings( read_csv("mb_ma_combined_prepped.csv") ) )
 
 # dataset with just the meta-analysis
 dma = d %>% filter(isMeta == TRUE)
@@ -173,9 +177,11 @@ section = 1
 
 
 ##### MA subset and MLR subset #####
+# this fn also writes stats to results csv
 ( naive.MA.only = fit_subset_meta( .dat = dma,
                                    .mods = "1",
                                    .label = "MA subset naive" ) )
+
 
 ( naive.reps.only = fit_subset_meta( .dat = dr,
                                      .mods = "1",
@@ -269,6 +275,9 @@ if ( redo.mod.selection == TRUE ) {
   setwd(results.dir)
   write.csv(mod.sets[[2]], file = "surviving_mods.csv")
   
+  # for later use
+  modsS = mod.sets[[2]]
+  
   ##### Sanity checks #####
   # sanity check: refit the naive and pruned models manually
   robu( yi ~ isMeta, 
@@ -289,25 +298,30 @@ if ( redo.mod.selection == TRUE ) {
 
 ############################## PROPORTION MEANINGFULLY STRONG EFFECTS - MARGINAL ##############################
 
-# this part might be obsolete because of fit_mr below?
-get_and_write_phat( .dat = dma,
-                    .q = 0,
-                    label = "Phat0MA")
+# # this part might be obsolete because of fit_mr below?
+# get_and_write_phat( .dat = dma,
+#                     .q = 0,
+#                     label = "Phat0MA")
+# 
+# get_and_write_phat( .dat = dma,
+#                     .q = 0.2,
+#                     label = "Phat0.2MA")
+# 
+# get_and_write_phat( .dat = dr,
+#                     .q = 0,
+#                     label = "Phat0R")
+# 
+# get_and_write_phat( .dat = dr,
+#                     .q = 0.2,
+#                     label = "Phat0.2R")
 
-get_and_write_phat( .dat = dma,
-                    .q = 0.2,
-                    label = "Phat0.2MA")
-
-get_and_write_phat( .dat = dr,
-                    .q = 0,
-                    label = "Phat0R")
-
-get_and_write_phat( .dat = dr,
-                    .q = 0.2,
-                    label = "Phat0.2R")
 
 
 
+############################## DENSITY PLOT OF META-ANALYSIS VS. REPLICATION CALIBRATED ESTIMATES ##############################
+
+
+##### Get Marginal Calibrated Estimates for Plot #####
 # SAVE calibR, calibM because needed for plot
 calibR = calib_ests(yi = dr$yi, sei = sqrt(dr$vi) )
 mean(calibR>0.2)
@@ -322,10 +336,7 @@ d$calibNaive[ d$isMeta == FALSE ] = calibR
 d$calibNaive[ d$isMeta == TRUE ] = calibMA
 
 
-
-############################## DENSITY PLOT OF META-ANALYSIS VS. REPLICATION CALIBRATED ESTIMATES ##############################
-
-
+##### Get Conditional Calibrated Estimates for Plot #####
 # fit the final, moderated models to each subset
 # to see what the heterogeneity looks like in each case
 # @move this?
@@ -521,16 +532,32 @@ if ( boot.from.scratch == FALSE ){
 
 
 # get stats on original data
-naiveRes = fit_mr( .dat = d, .mods = "isMeta" )
-modRes = fit_mr( .dat = d, .mods = modsS )
-diff = naiveRes - modRes
-( t0 = c(naiveRes, modRes, diff) )
+# "2" suffix is because we already have naiveRes and modRes from the model selection
+#   part, but those objects use the full return structure rather than the boot-friendly one
+naiveRes2 = fit_mr( .dat = d, .mods = "isMeta" )
+modRes2 = fit_mr( .dat = d, .mods = modsS )
+diff = naiveRes2 - modRes2
+( t0 = c(naiveRes2, modRes2, diff) )
 
 # NB: because of the way we hacked the "statistic" argument of boot()
 #  above st it actually creates a resample, the below will NOT match
 #  the actual estimates from original dataset
 # the bootstrap "bias" estimates will also be wrong for this reason
 # boot.res$t0
+
+# sanity check: agreement between fit_mr's two
+#  return structures
+#@make sure make notes about reason for needing both return structures
+expect_equal( naiveRes$est.ma, naiveRes2[1] )
+expect_equal( naiveRes$est.rep, naiveRes2[2] )
+expect_equal( naiveRes$avgDiff, naiveRes2[3] )
+expect_equal( naiveRes$Phat0.ma, naiveRes2[4] )
+expect_equal( naiveRes$Phat0.rep, naiveRes2[5] )
+expect_equal( naiveRes$Phat0.ma - naiveRes$Phat0.rep, naiveRes2[6] )
+expect_equal( naiveRes$Phat0.2.ma, naiveRes2[7] )
+expect_equal( naiveRes$Phat0.2.rep, naiveRes2[8] )
+expect_equal( naiveRes$Phat0.2.ma - naiveRes$Phat0.2.rep, naiveRes2[9] )
+
 
 # **critical step: replace boot()'s incorrect t0 with the correct one
 #  to allow boot.ci to work correctly
@@ -576,6 +603,7 @@ varNames = c( "AvgM",
 #    Phat0.2.rep,
 #    Phat0.2.diff )
 
+
 # 3 for number of calls to fit_mr
 res = res %>% add_column( stat = rep( varNames, 3 ), .before = 1 )
 res = res %>% add_column( model = rep( c("naive", "mod", "modelDiff" ), each = length(varNames) ),
@@ -595,6 +623,40 @@ res$hi[ res$est < res$lo | res$est > res$hi ] = NA
 res$lo[ is.na(res$hi) ] = NA
 res$hi[ is.na(res$lo) ] = NA
 
+# **all of the CIs in this df are bootstrapped
+
+### COMPARE BOOT VS. MODEL-BASED CIs FOR COEFF ESTIMATES:
+# **for coefficient estimates (i.e., not Phats), use the model-based CIs instead 
+# first just compare the 2 sets of CIs:
+# model-based ones are consistently a lot wider
+res[ res$model == "naive" & res$stat == "AvgM", c("lo", "hi") ]; c( naiveRes$est.ma.lo, naiveRes$est.ma.hi )
+
+res[ res$model == "naive" & res$stat == "AvgR", c("lo", "hi") ]; c( naiveRes$est.rep.lo, naiveRes$est.ma.hi )
+
+res[ res$model == "naive" & res$stat == "AvgDiff", c("lo", "hi") ]; c( naiveRes$avgDiffLo, naiveRes$avgDiffHi )
+
+# why are boot CIs so different from model-based ones?
+boot.res
+#bm
+boot.ci(boot.res, index=1)  # all types of boot CIs are pretty similar
+c( naiveRes$est.ma.lo, naiveRes$est.ma.hi )  # model-based much wider
+# I went through the browser of fit_br and confirmed that above model-based ones
+#  were extracted correctly
+
+# look at bootstraps themselves
+x = boot.res$t[,1]
+hist(x)
+mean(x, na.rm = TRUE); t0[1]
+# mean of bootstraps is definitely lower than the sample one, which could indicate bias
+# in MRM, we did see relative bias of 5% on average for conditional expectation
+# so this amount of bias is actually plausible
+
+# *for this reason, perhaps it actually makes more sense to use the boot CIs here
+# also for comparability within the table
+### END CI COMPARISON
+
+
+
 ##### Prettify and Save Results Tables #####
 
 ### unrounded numeric table (just for reproducibility)
@@ -613,6 +675,14 @@ res2[ inds, numVars ] = 100*res2[ inds, numVars ]
 res2$stat[ inds ] = str_replace( string = res2$stat[ inds ],
                                  pattern = "Phat",
                                  replacement = "Perc" )
+
+# make single key column for use with rlgetrum in TeX
+res2 = res2 %>% add_column( unique = paste( res2$model, res2$stat, sep = "_") )
+
+fwrite( res2, "table_model_diffs_rounded.csv" )
+
+# also save to Overleaf
+setwd(overleaf.dir)
 fwrite( res2, "table_model_diffs_rounded.csv" )
 
 
@@ -634,16 +704,21 @@ res3$valueString = str_replace( string = res3$valueString,
                                 replacement = "" )
 
 res3 = res3 %>% select(-numVars)
+res3 = res3 %>% select(-unique)
+
 
 # reshape table for readability
 res3 = res3 %>% pivot_wider( names_from = model,
                  values_from = valueString )
 
-
+setwd(results.dir)
+setwd("table_model_diffs")
 fwrite( res3, "table_model_diffs_rounded_pretty.csv" )
 
 # TeX for paper
 print( xtable(res3), include.rownames = FALSE)
+
+
 
 
 # also sanity-check the simple models using calls to quick_phat above
