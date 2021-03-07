@@ -1,19 +1,17 @@
 
 # To do:
 
-# - Get tau for naiveRes and modRes by calling fit_mr again
-# - In tables, put in model-based CI limits for the averages?
 # - Put analysis that doesn't match on age but matches on the others into manuscript. 
 
-
 # stop using asterisks in file names bc they cause syncing trouble (for now, I just manually removed them)
+
+# section variable needs updating after code structure is done
 
 # names of important model objects:
 # - naive.MA.only and naive.reps.only: meta-analyses within subsets; no moderators
 
 
-
-############################## PRELIMINARIES ############################## 
+# PRELIMINARIES ------------------------------------------------------------------
 
 library(tidyverse) 
 library(knitr)
@@ -45,7 +43,7 @@ source("analyze_helper.R")
 # package update not yet on CRAN, but we need the cluster-bootstrap functionality
 source("MetaUtility development functions.R")
 
-##### Code-Running Parameters #####
+# ~ Code-Running Parameters ------------------------------------------------------------------
 # should we remove existing results file instead of overwriting individual entries? 
 start.res.from.scratch = TRUE
 # should we use the grateful package to scan and cite packages?
@@ -66,7 +64,7 @@ if (redo.mod.selection == FALSE) {
 # wipe results csvs if needed
 if ( start.res.from.scratch == TRUE ) wr()
 
-##### Constants of Universe #####
+#~ Constants of Universe ------------------------------------------------------------------
 digits = 2
 pval.cutoff = 10^-4  # threshold for using "<"
 boot.reps = 1000 # for all bootstrapped inference 
@@ -90,7 +88,7 @@ mods = c( "study_type",
           "dependent_measure",
           "main_question_ids_preference" )
 
-##### Read Datasets #####
+# ~ Read Datasets ------------------------------------------------------------------
 setwd(data.dir)
 d = suppressMessages( suppressWarnings( read_csv("mb_ma_combined_prepped.csv") ) )
 
@@ -103,13 +101,13 @@ dr = d %>% filter(isMeta == FALSE)
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-#                       0. CHARACTERISTICS OF INCLUDED STUDIES            
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# 0. CHARACTERISTICS OF INCLUDED STUDIES ------------------------------------------------------------------           
+
 
 # for updating result csv
 section = 0
 
-############################## BASICS ############################## 
+# ~ BASICS ------------------------------------------------------------------
 
 t = d %>% group_by(study_type) %>%
   summarise( m = n(),
@@ -132,7 +130,7 @@ update_result_csv( name = paste( "median n", t$study_type, sep = " "),
                    value = t$nSubjMed )
 
 
-############################## MODERATORS ##############################
+# ~ MODERATORS ------------------------------------------------------------------
 
 # distribution of moderators in RRR and MA
 t = CreateTableOne(vars = mods, 
@@ -142,7 +140,7 @@ t = CreateTableOne(vars = mods,
 xtable( print(t, noSpaces = TRUE, printToggle = FALSE) )
 
 
-##### Moderator Correlation Matrix #####
+# ~~ Moderator Correlation Matrix ------------------------------------------------------------------
 
 # temporarily recode all categorical moderators as dummies
 cat.mods = mods[ !mods == "mean_agec" ]
@@ -169,14 +167,12 @@ write.csv(corrs, "moderator_cormat.csv")
 
 
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-#                       1. PRIMARY MODERATOR ANALYSES (PREREG'D)           
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# 1. PRIMARY MODERATOR ANALYSES (PREREG'D) ------------------------------------------------------------------
 
 section = 1
 
 
-##### MA subset and MLR subset #####
+# create MA subset and MLR subset
 # this fn also writes stats to results csv
 ( naive.MA.only = fit_subset_meta( .dat = dma,
                                    .mods = "1",
@@ -188,7 +184,7 @@ section = 1
                                      .label = "Reps subset naive" ) )
 
 
-############################## FIT NAIVE AND MODERATED META-REGRESSIONS ############################## 
+# ~ FIT NAIVE AND MODERATED META-REGRESSIONS ------------------------------------------------------------------ 
 
 
 if ( redo.mod.selection == TRUE ) {
@@ -278,7 +274,7 @@ if ( redo.mod.selection == TRUE ) {
   # for later use
   modsS = mod.sets[[2]]
   
-  ##### Sanity checks #####
+  ##### Sanity checks
   # sanity check: refit the naive and pruned models manually
   robu( yi ~ isMeta, 
         data = d, 
@@ -296,32 +292,11 @@ if ( redo.mod.selection == TRUE ) {
   
 } # end if ( redo.mod.selection == TRUE )
 
-############################## PROPORTION MEANINGFULLY STRONG EFFECTS - MARGINAL ##############################
 
-# # this part might be obsolete because of fit_mr below?
-# get_and_write_phat( .dat = dma,
-#                     .q = 0,
-#                     label = "Phat0MA")
-# 
-# get_and_write_phat( .dat = dma,
-#                     .q = 0.2,
-#                     label = "Phat0.2MA")
-# 
-# get_and_write_phat( .dat = dr,
-#                     .q = 0,
-#                     label = "Phat0R")
-# 
-# get_and_write_phat( .dat = dr,
-#                     .q = 0.2,
-#                     label = "Phat0.2R")
+# 2. DENSITY PLOT OF META-ANALYSIS VS. REPLICATION CALIBRATED ESTIMATES ------------------------------------------------------------------
 
 
-
-
-############################## DENSITY PLOT OF META-ANALYSIS VS. REPLICATION CALIBRATED ESTIMATES ##############################
-
-
-##### Get Marginal Calibrated Estimates for Plot #####
+# ~ Get Marginal Calibrated Estimates for Plot ------------------------------------------------------------------
 # SAVE calibR, calibM because needed for plot
 calibR = calib_ests(yi = dr$yi, sei = sqrt(dr$vi) )
 mean(calibR>0.2)
@@ -336,7 +311,7 @@ d$calibNaive[ d$isMeta == FALSE ] = calibR
 d$calibNaive[ d$isMeta == TRUE ] = calibMA
 
 
-##### Get Conditional Calibrated Estimates for Plot #####
+# ~ Get Conditional Calibrated Estimates for Plot ------------------------------------------------------------------
 # fit the final, moderated models to each subset
 # to see what the heterogeneity looks like in each case
 # @move this?
@@ -361,7 +336,7 @@ d$calibCond[ d$isMeta == TRUE ] = conditional_calib_ests(cond.MA.only)$calib.shi
 if ( redo.plots == TRUE ) {
   
   
-  ##### Marginal Calibrated Estimates #####
+  ##### Marginal Calibrated Estimates
   # choose axis scaling
   summary(d$yi)
   xmin = -1
@@ -410,7 +385,7 @@ if ( redo.plots == TRUE ) {
              height = 5 )
   
   
-  ##### Conditional Calibrated Estimates #####
+  ##### Conditional Calibrated Estimates
   ggplot( data = d,
           aes( x = calibCond,
                fill = studyTypePretty,
@@ -456,7 +431,7 @@ if ( redo.plots == TRUE ) {
   
 }
 
-############################## NAIVE AND MODERATED MODEL INFERENCE ##############################
+# 3. NAIVE AND MODERATED MODEL INFERENCE------------------------------------------------------------------
 
 # get inference for conditional Phats and their difference FOR the moderated model
 
@@ -478,6 +453,7 @@ if ( redo.plots == TRUE ) {
 #    Phat0.2.rep,
 #    Phat0.2.diff )
 
+# ~ Create the Resamples ------------------------------------------------------------------
 
 # with boot.reps - 1,000, takes about 10 min
 if ( boot.from.scratch == TRUE ) {
@@ -525,6 +501,9 @@ if ( boot.from.scratch == FALSE ){
   load("saved_bootstraps.RData")
 }
 
+
+
+# ~ Process the Resamples ------------------------------------------------------------------
 
 # number of non-failed bootstrap reps
 ( boot.reps.successful = sum( !is.na( boot.res$t[,1] ) ) )
@@ -609,7 +588,7 @@ res = res %>% add_column( model = rep( c("naive", "mod", "modelDiff" ), each = l
                           .before = 1 )
 
 
-##### Clean Up CIs #####
+# ~~ Clean Up CIs ------------------------------------------------------------------
 # sanity check: look for point estimates that aren't in their CIs
 res %>% filter( est > hi | est < lo )
 # this one makes sense b/c estimate was at ceiling
@@ -624,32 +603,32 @@ res$hi[ is.na(res$lo) ] = NA
 
 # **all of the CIs in this df are bootstrapped
 
-### COMPARE BOOT VS. MODEL-BASED CIs FOR COEFF ESTIMATES:
-# model-based ones are consistently a lot wider
-res[ res$model == "naive" & res$stat == "AvgM", c("lo", "hi") ]; c( naiveRes$est.ma.lo, naiveRes$est.ma.hi )
-
-res[ res$model == "naive" & res$stat == "AvgR", c("lo", "hi") ]; c( naiveRes$est.rep.lo, naiveRes$est.ma.hi )
-
-res[ res$model == "naive" & res$stat == "AvgDiff", c("lo", "hi") ]; c( naiveRes$avgDiffLo, naiveRes$avgDiffHi )
-
-# why are boot CIs so different from model-based ones?
-boot.res
-boot.ci(boot.res, index=1)  # all types of boot CIs are pretty similar
-c( naiveRes$est.ma.lo, naiveRes$est.ma.hi )  # model-based much wider
-# I went through the browser of fit_br and confirmed that above model-based ones
-#  were extracted correctly
-
-# look at bootstraps themselves
-x = boot.res$t[,1]
-hist(x)
-mean(x, na.rm = TRUE); t0[1]
-# mean of bootstraps is definitely lower than the sample one, which could indicate bias
-# in MRM, we did see relative bias of 5% on average for conditional expectation
-# so this amount of bias is actually plausible
-
-# *for this reason, perhaps it actually makes more sense to use the boot CIs here
-# also for comparability within the table
-### END CI COMPARISON
+# ### COMPARE BOOT VS. MODEL-BASED CIs FOR COEFF ESTIMATES:
+# # model-based ones are consistently a lot wider
+# res[ res$model == "naive" & res$stat == "AvgM", c("lo", "hi") ]; c( naiveRes$est.ma.lo, naiveRes$est.ma.hi )
+# 
+# res[ res$model == "naive" & res$stat == "AvgR", c("lo", "hi") ]; c( naiveRes$est.rep.lo, naiveRes$est.ma.hi )
+# 
+# res[ res$model == "naive" & res$stat == "AvgDiff", c("lo", "hi") ]; c( naiveRes$avgDiffLo, naiveRes$avgDiffHi )
+# 
+# # why are boot CIs so different from model-based ones?
+# boot.res
+# boot.ci(boot.res, index=1)  # all types of boot CIs are pretty similar
+# c( naiveRes$est.ma.lo, naiveRes$est.ma.hi )  # model-based much wider
+# # I went through the browser of fit_br and confirmed that above model-based ones
+# #  were extracted correctly
+# 
+# # look at bootstraps themselves
+# x = boot.res$t[,1]
+# hist(x)
+# mean(x, na.rm = TRUE); t0[1]
+# # mean of bootstraps is definitely lower than the sample one, which could indicate bias
+# # in MRM, we did see relative bias of 5% on average for conditional expectation
+# # so this amount of bias is actually plausible
+# 
+# # *for this reason, perhaps it actually makes more sense to use the boot CIs here
+# # also for comparability within the table
+# ### END CI COMPARISON
 
 
 
@@ -669,15 +648,15 @@ res[ res$model == "mod" & res$stat == "AvgDiff", c("lo", "hi") ] = c( mod1Res$av
 
 
 
-##### Prettify and Save Results Tables #####
+# ~~ Prettify and Save Results Tables ------------------------------------------------------------------
 
-### unrounded numeric table (just for reproducibility)
+# ~~~ Unrounded numeric table (just for reproducibility) ------------------------------------------------------------------
 setwd(results.dir)
 setwd("table_model_diffs")
 library(data.table)
 fwrite( res, "table_model_diffs_unrounded.csv" )
 
-### rounded numeric table (for piping numbers into manuscript)
+# ~~~ Rounded numeric table (for piping numbers into manuscript) ------------------------------------------------------------------
 res2 = res
 numVars = c("est", "lo", "hi")
 res2[ , numVars ] = round( res2[ , numVars ], 2 )
@@ -698,7 +677,7 @@ setwd(overleaf.dir)
 fwrite( res2, "table_model_diffs_rounded.csv" )
 
 
-### rounded character table (for manuscript table)
+# ~~~ Rounded character table (for manuscript table) ------------------------------------------------------------------
 res3 = res2
 res3 = res3 %>% mutate_at( numVars, as.character )
 
@@ -731,17 +710,31 @@ fwrite( res3, "table_model_diffs_rounded_pretty.csv" )
 print( xtable(res3), include.rownames = FALSE)
 
 
-
+# ~~ Sanity checks ------------------------------------------------------------------
 
 #@also sanity-check the simple models using calls to quick_phat above
 
+# get_and_write_phat( .dat = dma,
+#                     .q = 0,
+#                     label = "Phat0MA")
+# 
+# get_and_write_phat( .dat = dma,
+#                     .q = 0.2,
+#                     label = "Phat0.2MA")
+# 
+# get_and_write_phat( .dat = dr,
+#                     .q = 0,
+#                     label = "Phat0R")
+# 
+# get_and_write_phat( .dat = dr,
+#                     .q = 0.2,
+#                     label = "Phat0.2R")
 
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-#               2. PUBLICATION BIAS (SOME PREREG'D AND SOME POST HOC)           
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
-section = 2
+# 4. PUBLICATION BIAS (SOME PREREG'D AND SOME POST HOC) ------------------------------------------------------------------
+
+section = 4
 
 # @MOVE THIS
 # sanity check: should be similar to naive meta-regression model
@@ -750,7 +743,7 @@ expect_equal( as.numeric(naive.MA.only$b.r), round(naiveRes$est.ma, digits), tol
 expect_equal( as.numeric(naive.MA.only$reg_table$CI.L), round(naiveRes$est.ma.lo, digits), tol = 0.03 )
 expect_equal( as.numeric(naive.MA.only$reg_table$CI.U), round(naiveRes$est.ma.hi, digits), tol = 0.03 )
 
-##### Affirmative and Nonaffirmative Counts #####
+# ~ Affirmative and Nonaffirmative Counts ------------------------------------------------------------------
 
 t = d %>% group_by(isMeta) %>%
   summarise( k.affirm = sum(affirm),
@@ -763,7 +756,7 @@ update_result_csv( name = "MA k nonaffirmative",
 update_result_csv( name = "MA k affirmative",
                    value = t$k.affirm[ t$isMeta == TRUE ] )
 
-##### Hedges Selection Model #####
+# ~ Hedges Selection Model ------------------------------------------------------------------
 # be careful about inference due to correlated point estimates
 # can't fit model with 3 cutoffs because there are no significant negative studies
 ( m1 = weightfunct( effect = dma$yi,
@@ -787,7 +780,7 @@ update_result_csv( name = "weightr mu pval",
 
 
 
-##### Worst-Case Meta-Analysis ######
+# ~ Worst-Case Meta-Analysis------------------------------------------------------------------
 
 # meta-analyze only the nonaffirmatives
 # 2-sided pval
@@ -824,7 +817,7 @@ update_result_csv( name = "Worst mu pval",
                    value = round(pval.worst, 3) )
 
 
-##### S-values ######
+# ~ S-values ------------------------------------------------------------------
 # s-values to reduce to null
 ( Sval0 = svalue( yi = dma$yi,
                   vi = dma$vi,
@@ -835,7 +828,7 @@ update_result_csv( name = "Worst mu pval",
 
 
 
-##### Meta-Analysis with Eta = 4.70 (Post Hoc) ######
+# ~ Meta-Analysis with Eta = 4.70 (Post Hoc) ------------------------------------------------------------------
 # code modified from PublicationBias::significance_funnel innards
 eta = 4.70
 pvals = dma$pval
@@ -899,7 +892,7 @@ update_result_csv( name = "sval CI to reps",
                    print = FALSE )
 
 
-##### Significance Funnel ######
+# ~ Significance Funnel ------------------------------------------------------------------
 
 if ( redo.plots == TRUE ) {
   # modified from package
@@ -1156,12 +1149,12 @@ robu( yi ~ isMeta*mean_agec + test_lang + isMeta*(method=="b.hpp"),
 # 
 
 
-############################## TABLE AND FOREST PLOT OF SUBSET ESTIMATES ##############################
+# 5. TABLE AND FOREST PLOT OF SUBSET ESTIMATES ------------------------------------------------------------------
 
 # for each categorical moderator, fit subset meta-analysis
 
 
-##### Fit subset model to each level of each categorical model ##### 
+# ~ Fit subset model to each level of each categorical model ------------------------------------------------------------------
 modsCat = mods2[ !mods2 %in% c("isMeta", "mean_agec" ) ]
 
 for ( i in 1:length(modsCat) ) {
@@ -1202,7 +1195,7 @@ write.csv( res, "subsets_by_moderator.csv")
 
 
 
-##### Plot it like it's hot ##### 
+# ~ Plot it like it's hot ------------------------------------------------------------------
 
 if ( redo.plots == TRUE ) {
   # choose reasonable axis limits
@@ -1215,7 +1208,7 @@ if ( redo.plots == TRUE ) {
   prettyLabels = c( main_question_ids_preference = "Primary analysis")
   
   
-  # @to do in prep code: should make pretty versions of moderator variables (var names and levels) in prep code
+  #@to do in prep code: should make pretty versions of moderator variables (var names and levels) in prep code
   
   ggplot( data = res, 
           aes( x = est,
@@ -1252,25 +1245,20 @@ if ( redo.plots == TRUE ) {
   
 }
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-#                           4. MATCHING AND IPW (POST HOC)           
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# 6. MATCHING AND IPW (POST HOC) ------------------------------------------------------------------
 
-section = 4
+section = 6
 
-############################## MATCHING ##############################
+# ~ Matching  ------------------------------------------------------------------
 
-# another approach: match MLR and MA studies to one another
-
-
-##### Look at age distribution in each source ######
+# ~~ Look at age distribution in each source ------------------------------------------------------------------
 # this is the only continuous covariate to be matched
 # and it's one with little overlap
 age_densities(d)
 
 
 
-##### Make Matches - CEM #####
+# ~~ Make matches - CEM ------------------------------------------------------------------
 mods3 = mods2[ !mods2 %in% c("isMeta") ]
 
 string = paste( "isMeta ~ ",
@@ -1351,7 +1339,7 @@ CreateTableOne(vars = mods2,
 
 
 
-##### Analyze the CEM Matched Dataset! #####
+# ~ Analyze the CEM-matched dataset ------------------------------------------------------------------
 
 # simple
 t1 = dmt %>% group_by(isMeta) %>%
@@ -1406,7 +1394,7 @@ update_result_csv( name = "matched mean_age subclass 2",
 
 
 
-############################## IPW ##############################
+# ~ IPW ------------------------------------------------------------------
 
 
 # fit PS model
@@ -1426,7 +1414,7 @@ d$PSweight = 1/d$propScore
 
 
 
-# look at overlap
+# ~~ Look at covariate overlap  ------------------------------------------------------------------
 # very poor overlap, which is why we get so few matches
 ggplot( data = d[ d$isMeta == TRUE, ],
         aes(x = propScore,
@@ -1439,7 +1427,7 @@ ggplot( data = d[ d$isMeta == TRUE, ],
                      fill = factor(isMeta)))
 
 
-# look at weights
+# ~~ Look at weights  ------------------------------------------------------------------
 summary(d$PSweight)
 # very extreme weights, as expected given lack of overlap
 
@@ -1483,9 +1471,7 @@ update_result_csv( name = paste( "IPW robu pval", IPW.robu$labels ),
 
 
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-#                           5. FOREST PLOT           
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# 7. FOREST PLOT ------------------------------------------------------------------
 
 
 # don't move this section to be earlier! 
@@ -1493,12 +1479,12 @@ update_result_csv( name = paste( "IPW robu pval", IPW.robu$labels ),
 
 if ( redo.plots == TRUE ) {
   
+  # ~ Make plotting dataframe ------------------------------------------------------------------
+  
   # relative weight of each study in meta-analysis (within group)
   d = d %>% group_by(isMeta) %>%
     mutate( rel.wt = 100 * (1/vi) / sum(1/vi) )
-  
-  
-  
+ 
   # plotting df
   dp = d
   
@@ -1575,7 +1561,7 @@ if ( redo.plots == TRUE ) {
   #                                               "PLOS One" )  ))
   
   
-  ##### Make the Plot #####
+  # ~ Make the Plot ------------------------------------------------------------------
   
   # now color-coding by whether it's the pooled estimate or not
   colors2 = c("black", "red")
