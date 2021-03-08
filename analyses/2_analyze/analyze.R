@@ -229,8 +229,9 @@ section = 1
 
 # ~ Fit naive and moderated regressions ------------------------------------------------------------------ 
 
-
-if ( redo.mod.selection == TRUE ) {
+#@removed ability to skip this section because needs naiveRes and modRes later
+#if ( redo.mod.selection == TRUE ) {
+if ( TRUE ) {
   
   # order of importance given in prereg:
   # age, test_lang, method, speaker, speech_type, own_mother, presentation, DV, main question
@@ -1636,12 +1637,31 @@ quick_sens_analysis( .dat = dage,
 
 # ~ Exclude between-subjects designs  ------------------------------------------------------------------
 
+table(d$participant_design, d$sourcePretty, useNA = "ifany")
 
+update_result_csv( name = "k between-S studies",
+                   value = sum(d$participant_design == "between") )
 
+quick_sens_analysis( .dat = d[ d$participant_design != "between", ],
+                     .suffix = "WithinS" )
 
 
 
 # ~ Look at age linearity assumption  ------------------------------------------------------------------
+
+# this is not yet in manuscript
+# omit SEs because they'll be wrong
+ggplot(d, aes(mean_age, d_calc, color=sourcePretty)) +
+  geom_point() +
+  geom_smooth(se=FALSE) +
+  scale_color_manual(values=colors) +
+  theme_classic()
+
+# ggplot(d, aes(mean_age, d_calc, color=isMeta)) +
+#   geom_point() +
+#   geom_smooth(se=F) +
+#   theme_classic() +
+#   facet_wrap(method~test_lang)
 
 
 

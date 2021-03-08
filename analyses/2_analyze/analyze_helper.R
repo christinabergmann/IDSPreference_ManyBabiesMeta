@@ -626,6 +626,16 @@ quick_sens_analysis = function( .dat,
   cat("\n\n------------- NAIVE, REPS ONLY:\n")
   print(.naive.reps.only)
   
+  ### Naive, meta-analysis subset
+  .naive.meta.only = fit_subset_meta( .dat = .dat[ .dat$isMeta == TRUE, ],
+                                      .mods = "1",
+                                      .label = paste( "Meta subset naive",
+                                                      .suffix, 
+                                                      sep = "" ) )
+  
+  cat("\n\n------------- NAIVE, META ONLY:\n")
+  print(.naive.meta.only)
+  
   ### Naive, both sources
   .naiveRes = fit_mr( .dat = .dat,
                       .label = paste( "naive",
