@@ -4,7 +4,9 @@
 # ~ To do  ------------------------------------------------------------------
 
 
-# - Think about doing something IPD for age (look at raw data to see if this makes sense)
+# - Sens analysis: Age linearity assumption
+
+# - Sens analysis: Exclude between-S studies
 
 # - Update section variable after code structure is done
 
@@ -17,6 +19,9 @@
 # in the 0.75 dataset with the more stringent inclusion criterion, am I right in thinking that there are fewer effect sizes because some age groups are dropped completely? (but the mean age in MB doesn't change much at all)
 
 # the 0.125 dataset corresponds with main analysis, right?
+
+# Can we add codebook for data? What are n_1, n_2, and n? Why is n the average rather than the sum of those two? For example, study_id Kaplan1995a has a fractional n.
+
 
 
 # ~ Other notes  ------------------------------------------------------------------
@@ -1439,6 +1444,7 @@ update_result_csv( name = paste( "IPW robu pval", IPW.robu$labels ),
 
 
 # don't move this section to be earlier! 
+# must be after matching 
 # relies on having the matched dataset for coloring those points
 
 if ( redo.plots == TRUE ) {
@@ -1600,54 +1606,15 @@ if ( redo.plots == TRUE ) {
 section = 8
 setwd(data.dir)
 
-# replication dataset that excludes 
-# see n_trial_pairs_criterion variable in "2_get_tidy_MB_data.R" for how this is created
-
-# note that there are now fewer effect sizes, presumably because some age groups get lost completely upon excluding badly behaved subjects
-dim(dric)
-
-# ~ Subset model in MLR ------------------------------------------------------------------
-
-# with more stringent inclusion criteria, estimate in MLR increases from 0.35 to 0.43
-# still less than in meta-analysis
-# this fn also writes stats to results csv
-( naiveIC.reps.only = fit_subset_meta( .dat = dric,
-                                     .mods = "1",
-                                     .label = "Reps subset naiveIC" ) )
-
-# ~ Naive model with both sources ------------------------------------------------------------------
-naiveResIC = fit_mr( .dat = dic,
-                   .label = "naiveIC",
-                   .mods = "isMeta",
-                   .write.to.csv = TRUE,
-                   .write.table = TRUE,
-                   .simple.return = FALSE )
-
-# ~ Moderated model with both sources ------------------------------------------------------------------
-# again does not improve, and in fact somewhat worsens, the discrepancy
-modResIC = fit_mr( .dat = dic,
-                     .label = "modIC",
-                     .mods = modsS,
-                     .write.to.csv = TRUE,
-                     .write.table = TRUE,
-                     .simple.return = FALSE )
-
+quick_sens_analysis( .dat = dic,
+                     .suffix = "IC" )
 
 # 9. WITH IPD AGE-MATCHING IN MLR ------------------------------------------------------------------
 
 section = 9
 setwd(data.dir)
 
-# ~ Basic stats about the age-matched replication data  ------------------------------------------------------------------
-
-# only 14 effect sizes now
-update_result_csv( name = "k drage",
-                   value = nrow(drage) )
-
-# and 266 subjects
-update_result_csv( name = "n subj drage",
-                   value = sum(drage$n) )
-
+# some basic stats about age-matched data
 # this should be very close to 0 now
 update_result_csv( name = "mean mean_agec drage",
                    value = mean(drage$mean_agec) )
@@ -1661,33 +1628,20 @@ update_result_csv( name = "mean mean_age dma",
                    value = round( mean(dma$mean_age), 0 ) )
 
 
+quick_sens_analysis( .dat = dage,
+                     .suffix = "ageMatch" )
 
-# ~ Subset model in MLR ------------------------------------------------------------------
 
-# estimate in MLR further DECREASES from 0.35 to 0.162
-# still less than in meta-analysis
-# this fn also writes stats to results csv
-( naiveAge.reps.only = fit_subset_meta( .dat = drage,
-                                       .mods = "1",
-                                       .label = "Reps subset naiveAge" ) )
+# 10. OTHER SENSITIVITY ANALYSES (SUPPLEMENT)  ------------------------------------------------------------------
 
-# ~ Naive model with both sources ------------------------------------------------------------------
-naiveResAge = fit_mr( .dat = dage,
-                     .label = "naiveAge",
-                     .mods = "isMeta",
-                     .write.to.csv = TRUE,
-                     .write.table = TRUE,
-                     .simple.return = FALSE )
+# ~ Exclude between-subjects designs  ------------------------------------------------------------------
 
-# ~ Moderated model with both sources ------------------------------------------------------------------
-# discrepancies might decrease a little bit this time, but still 0.41
-modResAge = fit_mr( .dat = dage,
-                   .label = "modAge",
-                   .mods = modsS,
-                   .write.to.csv = TRUE,
-                   .write.table = TRUE,
-                   .simple.return = FALSE )
 
+
+
+
+
+# ~ Look at age linearity assumption  ------------------------------------------------------------------
 
 
 

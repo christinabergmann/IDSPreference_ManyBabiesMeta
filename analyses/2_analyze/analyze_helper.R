@@ -1,7 +1,6 @@
 
 ################################ MISCELLANEOUS ################################
 
-
 my_ggsave = function(name,
                      width,
                      height,
@@ -34,7 +33,7 @@ statCI_result_csv = function(name,
 # optionally, "section" describes the section of code producing a given result
 # expects global vars: overleaf.dir, results.dir
 update_result_csv = function( name,
-                              .section = section,  # defaults to global var
+                              .section = if( exists("section") ) section else "",  # defaults to global var
                               value = NA,
                               print = FALSE,
                               .results.dir = results.dir,
@@ -176,6 +175,11 @@ fit_mr = function( .dat,
     
     update_result_csv( name = paste(.label, "k"),
                        value = nrow(meta$data.full) )
+    
+    #@CHECK THIS because I'm not sure n is what I think it is
+    # temporarily rounding because it's fractional in study_id Kaplan1995a
+    update_result_csv( name = paste(.label, "n subj"),
+                       value = round( sum(.dat$n) ) )
     
     update_result_csv( name = paste( .label, "est", meta$labels ),
                        value = ests )
@@ -437,6 +441,11 @@ fit_subset_meta = function( .dat,
     update_result_csv( name = paste(.label, "k"),
                        value = nrow(meta$data.full) )
     
+    #@CHECK THIS because I'm not sure n is what I think it is
+    # temporarily rounding because it's fractional in study_id Kaplan1995a
+    update_result_csv( name = paste(.label, "n subj"),
+                       value = round( sum(.dat$n) ) )
+    
     update_result_csv( name = paste( .label, "est", meta$labels ),
                        value = ests )
     
@@ -594,6 +603,56 @@ conditional_calib_ests = function(.model){
 # myCalib = mod$b.r[1] + sqrt( c(t2) / ( c(t2) + dat$vi) ) * ( dat$yi - myLinpred ) 
 # expect_equal(myCalib, x$calib.shift)
 # # yesss
+
+
+# do a quick sensitivity analysis and write results to csv:
+#  - average effect size in replication subset
+#  - fit_mr stats from naive model
+#  - fit_mr stats from moderated model
+# expects section variable to be defined
+quick_sens_analysis = function( .dat,
+                                .suffix ) {
+  # # test only
+  # .dat = dic
+  # .suffix = "IC"
+  
+  ### Naive, replication subset
+  .naive.reps.only = fit_subset_meta( .dat = .dat[ .dat$isMeta == FALSE, ],
+                                      .mods = "1",
+                                      .label = paste( "Reps subset naive",
+                                                      .suffix, 
+                                                      sep = "" ) )
+  
+  cat("\n\n------------- NAIVE, REPS ONLY:\n")
+  print(.naive.reps.only)
+  
+  ### Naive, both sources
+  .naiveRes = fit_mr( .dat = .dat,
+                      .label = paste( "naive",
+                                      .suffix, 
+                                      sep = "" ),
+                      .mods = "isMeta",
+                      .write.to.csv = TRUE,
+                      .write.table = TRUE,
+                      .simple.return = FALSE )
+  
+  cat("\n\n------------- NAIVE, BOTH SOURCES:\n")
+  print(.naiveRes)
+  
+  ### Moderated, both sources 
+  .modRes = fit_mr( .dat = .dat,
+                    .label = paste( "mod",
+                                    .suffix, 
+                                    sep = "" ),
+                    .mods = modsS,
+                    .write.to.csv = TRUE,
+                    .write.table = TRUE,
+                    .simple.return = FALSE )
+  
+  cat("\n\n------------- MODERATED, BOTH SOURCES:\n")
+  print(.modRes)
+}
+
 
 
 
