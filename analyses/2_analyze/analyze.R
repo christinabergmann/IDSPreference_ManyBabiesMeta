@@ -6,11 +6,11 @@
 
 # - Think about doing something IPD for age (look at raw data to see if this makes sense)
 
-# - Put analysis that doesn't match on age but matches on the others into manuscript. 
+# - Update section variable after code structure is done
 
-# stop using asterisks in file names bc they cause syncing trouble (for now, I just manually removed them)
+# Remember not to use asterisks in file names bc they cause syncing trouble for CB.
 
-# section variable needs updating after code structure is done
+
 
 # ~ Ask CB, et al ------------------------------------------------------------------
 
@@ -1641,7 +1641,7 @@ setwd(data.dir)
 # ~ Basic stats about the age-matched replication data  ------------------------------------------------------------------
 
 # only 14 effect sizes now
-update_result_csv( name = "m ests drage",
+update_result_csv( name = "k drage",
                    value = nrow(drage) )
 
 # and 266 subjects
