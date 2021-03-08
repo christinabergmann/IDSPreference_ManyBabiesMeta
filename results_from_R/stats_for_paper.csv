@@ -107,3 +107,122 @@ modAge avg for meta,0.75,9
 modAge avg lo for meta,0.42,9
 modAge avg hi for meta,1.08,9
 modAge avg pval for meta,2e-03,9
+m ests drage,14,9
+n subj drage,266,9
+mean mean_agec drage,0.00657463226064569,9
+m ests MA,51,0
+m ests MB,104,0
+m ests total,155,0
+k studies MA,16,0
+k studies MB,62,0
+median n MA,20,0
+median n MB,16,0
+MA subset naive tau,0.45,1
+MA subset naive k,51,1
+MA subset naive est X.Intercept.,0.7,1
+MA subset naive lo X.Intercept.,0.37,1
+MA subset naive hi X.Intercept.,1.02,1
+MA subset naive pval X.Intercept.,0.00056364,1
+Reps subset naive tau,0.11,1
+Reps subset naive k,104,1
+Reps subset naive est X.Intercept.,0.35,1
+Reps subset naive lo X.Intercept.,0.28,1
+Reps subset naive hi X.Intercept.,0.43,1
+Reps subset naive pval X.Intercept.,< 0.0001,1
+MA subset mods tau,0.48,1
+MA subset mods k,51,1
+MA subset mods est X.Intercept.,0.77,1
+MA subset mods est mean_agec,0.04,1
+MA subset mods est test_langb.nonnative,-0.3,1
+MA subset mods est test_langc.artificial,-0.51,1
+MA subset mods est methodb.hpp,-0.39,1
+MA subset mods est methodc.other,0.57,1
+MA subset mods lo X.Intercept.,0.36,1
+MA subset mods lo mean_agec,-0.01,1
+MA subset mods lo test_langb.nonnative,-1.02,1
+MA subset mods lo test_langc.artificial,-2.02,1
+MA subset mods lo methodb.hpp,-2.3,1
+MA subset mods lo methodc.other,-0.9,1
+MA subset mods hi X.Intercept.,1.18,1
+MA subset mods hi mean_agec,0.09,1
+MA subset mods hi test_langb.nonnative,0.42,1
+MA subset mods hi test_langc.artificial,1.01,1
+MA subset mods hi methodb.hpp,1.52,1
+MA subset mods hi methodc.other,2.03,1
+MA subset mods pval X.Intercept.,0.0060568,1
+MA subset mods pval mean_agec,0.1078098,1
+MA subset mods pval test_langb.nonnative,0.2709201,1
+MA subset mods pval test_langc.artificial,0.3249946,1
+MA subset mods pval methodb.hpp,0.5854501,1
+MA subset mods pval methodc.other,0.3002101,1
+Reps subset mods tau,0,1
+Reps subset mods k,104,1
+Reps subset mods est X.Intercept.,0.1,1
+Reps subset mods est mean_agec,0.02,1
+Reps subset mods est test_langb.nonnative,-0.08,1
+Reps subset mods est methodb.hpp,0.22,1
+Reps subset mods lo X.Intercept.,-0.05,1
+Reps subset mods lo mean_agec,0.01,1
+Reps subset mods lo test_langb.nonnative,-0.19,1
+Reps subset mods lo methodb.hpp,0.12,1
+Reps subset mods hi X.Intercept.,0.25,1
+Reps subset mods hi mean_agec,0.03,1
+Reps subset mods hi test_langb.nonnative,0.04,1
+Reps subset mods hi methodb.hpp,0.32,1
+Reps subset mods pval X.Intercept.,0.18890107,1
+Reps subset mods pval mean_agec,0.00025827,1
+Reps subset mods pval test_langb.nonnative,0.19330973,1
+Reps subset mods pval methodb.hpp,0.00014279,1
+MA k nonaffirmative,29,4
+MA k affirmative,22,4
+weightr mu ,0.92,4
+weightr mu lo,0.6,4
+weightr mu hi,1.23,4
+weightr mu pval,< 0.0001,4
+Worst mu ,0.21,4
+Worst mu lo,-0.06,4
+Worst mu hi,0.48,4
+Worst mu pval,0.11,4
+Corr MA est,0.4,4
+Corr MA lo,0.13,4
+Corr MA hi,0.68,4
+Corr MA pval,0.0099117,4
+sval est to reps,7.76,4
+sval CI to reps,1.09,4
+pre-matching age diff,11.7836963585192,9
+pre-matching mean_age,239.132663608733,9
+matched tau,0.32,9
+matched k,17,9
+matched est X.Intercept.,0.31,9
+matched est isMetaTRUE,1.33,9
+matched lo X.Intercept.,0.14,9
+matched lo isMetaTRUE,-2.98,9
+matched hi X.Intercept.,0.48,9
+matched hi isMetaTRUE,5.65,9
+matched pval X.Intercept.,0.0018409,9
+matched pval isMetaTRUE,0.2515552,9
+matched avg for meta,1.64,9
+matched avg lo for meta,-7.78,9
+matched avg hi for meta,11.07,9
+matched avg pval for meta,0.27,9
+matched k total,17,9
+matched k from MA,3,9
+matched k from R,14,9
+matched age diff,-3.95407733386985,9
+matched subclass 1 isMeta FALSE k,6,9
+matched subclass 1 isMeta TRUE k,1,9
+matched subclass 2 isMeta FALSE k,8,9
+matched subclass 2 isMeta TRUE k,2,9
+matched mean_age subclass 1,124.721455824763,9
+matched mean_age subclass 2,206.356813465012,9
+IPW robu est X.Intercept.,0.394685966254886,9
+IPW robu est isMetaTRUE,0.394685966254886,9
+IPW robu lo X.Intercept.,-0.11,9
+IPW robu lo isMetaTRUE,-0.11,9
+IPW robu hi X.Intercept.,0.9,9
+IPW robu hi isMetaTRUE,0.9,9
+IPW robu pval X.Intercept.,0.119952345892366,9
+IPW robu pval isMetaTRUE,0.119952345892366,9
+mean mean_age drage,144,9
+mean mean_age dma,144,9
+k drage,14,9

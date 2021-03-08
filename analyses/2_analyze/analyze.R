@@ -89,6 +89,7 @@ colors = c("darkgray", "red")  # replications, originals
 options(scipen=999)
 
 # moderator names
+# as used in table
 mods = c( "study_type",
           "mean_agec",
           "test_lang",  # whether stimuli were in native language; almost constant in meta
@@ -101,6 +102,22 @@ mods = c( "study_type",
           "presentation",
           "dependent_measure",
           "main_question_ids_preference" )
+
+# and as used in meta-regression (prior to selection to get model to converge)
+# same list as mods except has isMeta instead of study_type
+#  and does not have native_lang
+#  also used in matching
+mods2 = c( "isMeta",  # code this way since we expect meta to have larger effect sizes
+           "mean_agec",
+           "test_lang",  # whether stimuli were in native language; almost constant in meta
+           "method",
+           
+           # constant in RRR:
+           "speech_type",
+           "own_mother",
+           "presentation",
+           "dependent_measure",  # causes singularity
+           "main_question_ids_preference" )
 
 # ~ Read Datasets ------------------------------------------------------------------
 setwd(data.dir)
@@ -215,23 +232,6 @@ if ( redo.mod.selection == TRUE ) {
   
   # per prereg, if model isn't estimable, the moderators are to be removed in the opposite order
   #  of this importance list
-  
-  # try to fit meta-regression
-  # same list as mods except has isMeta instead of study_type
-  #  and does not have native_lang
-  mods2 = c( "isMeta",  # code this way since we expect meta to have larger effect sizes
-             "mean_agec",
-             "test_lang",  # whether stimuli were in native language; almost constant in meta
-             "method",
-             
-             # constant in RRR:
-             "speech_type",
-             "own_mother",
-             "presentation",
-             "dependent_measure",  # causes singularity
-             "main_question_ids_preference" )
-  
-  
   
   mod.sets = list( c("isMeta"),  # naive model
                    mods2 )
@@ -1222,7 +1222,6 @@ section = 6
 age_densities(d)
 
 
-
 # ~~ Make matches - CEM ------------------------------------------------------------------
 mods3 = mods2[ !mods2 %in% c("isMeta") ]
 
@@ -1639,11 +1638,29 @@ modResIC = fit_mr( .dat = dic,
 section = 9
 setwd(data.dir)
 
-# only 14 effect sizes now
-nrow(drage)
+# ~ Basic stats about the age-matched replication data  ------------------------------------------------------------------
 
-# sanity check: should be very close to 0 now
-mean(drage$mean_agec)
+# only 14 effect sizes now
+update_result_csv( name = "m ests drage",
+                   value = nrow(drage) )
+
+# and 266 subjects
+update_result_csv( name = "n subj drage",
+                   value = sum(drage$n) )
+
+# this should be very close to 0 now
+update_result_csv( name = "mean mean_agec drage",
+                   value = mean(drage$mean_agec) )
+
+# raw age
+update_result_csv( name = "mean mean_age drage",
+                   value = round( mean(drage$mean_age), 0 ) )
+
+# raw age in MA for comparison
+update_result_csv( name = "mean mean_age dma",
+                   value = round( mean(dma$mean_age), 0 ) )
+
+
 
 # ~ Subset model in MLR ------------------------------------------------------------------
 
@@ -1671,8 +1688,7 @@ modResAge = fit_mr( .dat = dage,
                    .write.table = TRUE,
                    .simple.return = FALSE )
 
-#bm: this analysis seems useful; should clean up the 2_XXX prep file
-#  and merge this branch into master
+
 
 
 # (Obsolete?) SUBSET MODELS ------------------------------------------------------------------ 
