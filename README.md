@@ -1,5 +1,11 @@
 
-# Data prep
+# Dataset
+
+* Where is the codebook?
+
+# Code
+
+## Data prep code
 
 Some parts of code need to be run multiple times to create different datasets for sensitivity analyses:
 
@@ -9,4 +15,9 @@ Some parts of code need to be run multiple times to create different datasets fo
 
 * After these data prep steps, the analysis script only needs to be run once. It conducts the main analyses as well as the sensitivity analyses. 
 
-# Where is codebook?
+## Analysis code
+
+
+# Results files
+
+* In `tables_to_prettify`, titles with uppercase model names represent main analyses

@@ -4,10 +4,6 @@
 # ~ To do  ------------------------------------------------------------------
 
 
-# - Sens analysis: Age linearity assumption
-
-# - Sens analysis: Exclude between-S studies
-
 # - Update section variable after code structure is done
 
 # Remember not to use asterisks in file names bc they cause syncing trouble for CB.
@@ -1087,14 +1083,16 @@ robu( yi ~ mean_agec + test_lang + method,
 
 # *a key difference: HPP (vs. CF) is associated with LARGER ES in replications, but SMALLER ES in meta-analysis
 
-# sanity check: fit pruned model within MA and MLR separately
+# fit pruned model within MA and MLR separately
 #  to look heuristically at interactions
+# this xtable is in paper
 fit_mr( .dat = dma,
         .label = "mod1_MA_only",
         .mods = c("mean_agec", "test_lang", "method"),
         #.write.to.csv = TRUE,
         .write.table = TRUE )
 
+# this xtable is in paper
 fit_mr( .dat = dr,
         .label = "mod1_MLR_only",
         .mods = c("mean_agec", "test_lang", "method"),
@@ -1103,7 +1101,7 @@ fit_mr( .dat = dr,
 
 
 
-
+# sanity check: refit models manually
 robu( yi ~ isMeta + mean_agec + test_lang + (method=="b.hpp"), 
       data = d, 
       studynum = as.factor(study_id),
@@ -1651,11 +1649,14 @@ quick_sens_analysis( .dat = d[ d$participant_design != "between", ],
 
 # this is not yet in manuscript
 # omit SEs because they'll be wrong
-ggplot(d, aes(mean_age, d_calc, color=sourcePretty)) +
+ggplot(d, aes(mean_age, calibNaive, color=sourcePretty)) +
   geom_point() +
   geom_smooth(se=FALSE) +
   scale_color_manual(values=colors) +
   theme_classic()
+
+# apparent nonlinearity in replications seems largely driven by the outlying replication
+#  study with largest mean age
 
 # ggplot(d, aes(mean_age, d_calc, color=isMeta)) +
 #   geom_point() +
