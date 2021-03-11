@@ -1,7 +1,8 @@
 
 # Dataset
 
-Codebook: https://github.com/christinabergmann/IDSPreference_ManyBabiesMeta/blob/master/data/codebook.xlsx
+Meta-Analysis Codebook: https://github.com/christinabergmann/IDSPreference_ManyBabiesMeta/blob/master/data/codebook.xlsx
+
 
 # Code
 
