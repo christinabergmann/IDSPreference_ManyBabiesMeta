@@ -1,7 +1,7 @@
 
 # Dataset
 
-* Where is the codebook?
+Codebook: https://github.com/christinabergmann/IDSPreference_ManyBabiesMeta/blob/master/data/codebook.xlsx
 
 # Code
 
