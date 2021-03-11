@@ -1,0 +1,90 @@
+Field Name ,Description,Type,Format,Example,Required?,Notes
+Paper Description,,,,,,
+study_ID,uniquely identifies a study,string,"last name of first author, year, and letter if necessary. Small caps only, no space or special character (no _ or -).",smith2015a,yes,
+long_cite,long citation,string,full APA-style citation,,yes,
+short_cite,short citation,string,author (year) APA-style in-text citation,Smith (2015),yes,
+doi,"doi of the paper, if available",,,10.1111/j.1467-8624.1990.tb02885.x,,
+peer_reviewed,"indicates whether study is from a peer-reviewed publication (typically yes if it is a journal paper, no otherwise [with a few exceptions])",options,yes or no,yes,yes,
+original_ma,Was the article included in the original Dunst et al. (2012) meta-analysis?,options,yes or no,yes,yes,
+coder,person(s) who coded entry,string,"full names or initials, separated by commas","Molly Lewis, Michael Frank;  ML, MF",yes,
+2nd coder,person(s) who double-checked/ were second coder on the entry,string,"full names or initials, separated by commas","Molly Lewis, Michael Frank;  ML, MF",no,
+expt_num,experiment/study number in the source paper / report (for later identification of the corresponding effect size),numeric,"copied directly from the paper's numbering, if there are no numbers default to 1",1; 2 (if paper has Experiments 1 and 2),yes,
+expt_condition,identifier of condition within same experiment number (for later identification of corresponding effect size),string," any way of uniquely referring to conditions within the same experiment (if there is just one condition, use expt_num)",nouns; verbs (if experiment has nouns and verbs as conditions),yes,
+same_infant,identifier of group of infants within a study (for determining if effect sizes in multiple rows are statistically independent),string,"any way of uniquely referring to group of infants within a study, if infants were tested in more than one condition, otherwise same as expt_condition",12_month_olds,yes,
+main_question_IDS_preference,whether the main hypothesis/ question tested in the study was investigating the preference for infant-directed speech (over adult-directed speech),string,yes or no,yes,yes,
+Experiment description,,,,,,
+trial_control,Were trials played until the end or did they stop when infants looked away (e.g. after 2 consecutive seconds),string,yes or no,,,
+response_mode,way of measuring response in the experiment,options,"options:
+      - behavior: non-oculomotor, choice behavior (e.g. headturn, pointing)
+      - eye-tracking: oculomotor (even if human coding is used; e.g., video-coded central fixation)
+      - physiology: e.g. heart rate
+      - EEG: electroencephalography, mostly ERP
+      - NIRS: near-infrared spectroscopy
+      - other:",eye-tracking,yes,
+exposure_phase,"type of pre-test exposure phase; refers specifically to exposure to the relevant stimuli (i.e. in this instance, IDS/ ADS)",options,"options:
+      - conditioning
+      - habituation
+      - familiarization
+      - test_only",habituation,yes,
+method,"method used, names as commonly used in the literature",options,see separate sheet,HPP,yes,
+dependent_measure,type of dependent measure used in experiment,options,see separate sheet,looking_time,yes,
+human_coded,"in looking_time studies, was the duration of looking determined by a human coder or automatically by an eyetracker or similar?",string,yes or no,,,
+between_participant,whether the manipulation of interest was between or within participant (redundant with participant_design and dropped in future codding iterations),options,1 (=between) or 0 (=within),1,no,not used in later coding iterations
+participant_design,indicates the groups that are the comparison of interest for effect size,options,"    - between:    between two groups of participants
+    - within_two: within one group of participants with two measurement points
+    - within_one: within one group of participants with one measurement point ",,yes,
+native_lang,"participants' native language(s), if possible coded for region",string,languages separated by commas,American English,yes,
+infant_type,development characteristic of experiment participants,string," typical for monolingual, full-term infants with no hearing, language, or cognitive impairments, otherwise, main unusual characteristic, with mixed for group that combines typical and atypical characteristics",mixed,yes,
+Information to compute ES,,,,,,
+group_name_1,"name of participant group, can be empty if it is a within-participant design. IDS in between-subjects design",string,"if participant_design = between: maps onto group_name_1, mean_age_1, x_1, SD_1",experimental,yes,
+group_name_2,"name of participant group if there are two groups in a between design, otherwise empty. ADS in between-subjects design",string,"if participant_design = between: maps onto group_name_2, mean_age_2, x_2, SD_2",control,yes,
+n_1,number of participants in group_1 (if participant design = between) or of all participants for within-participant designs,numeric,"if participant_design = between: maps onto group_name_1, mean_age_1, x_1, SD_1",,yes,
+n_2,"number of participants in group_1 (if participant design = between) if there are two groups in a between design, otherwise empty",numeric,"if participant_design = between: maps onto group_name_2, mean_age_2, x_2, SD_2",,yes,
+mean_age_1,mean age of participants in days (1 month = 30.44 days; 1 year = 365.25 days),numeric,"if participant_design = between: maps onto group_name_1, mean_age_1, x_1, SD_1",,yes,
+mean_age_2,"mean age of participants in group_2 in days (1 month = 30.44 days; 1 year = 365.25 days), if there are two groups in a between design",numeric,"if participant_design = between: maps onto group_name_2, n_2, x_2, SD_2",,yes,
+x_1,"mean of dependent variable for measure 1 (participant_design = within_one, within_two) or group 1 (participant_design = between). IDS in within-subjects design",numeric,"if participant_design = between: maps onto group_name_1, mean_age_1, x_1, SD_1",IDS,yes,
+x_2,"mean of dependent variable for measure 2 (participant_design = within_two) or group 2 (participant_design = between) or chance level (participant_design = within_one, if applicable). ADS in within-subjects design",numeric,"second measure if participant_design = within_two; chance level if participant_design = within_one; if participant_design = between maps onto group_name_2, n_2, mean_age_2, SD_2",ADS,yes,
+SD_1,"standard deviation of dependent variable for measure 1 (participant_design = within_one, within_two) or group 1 (participant_design = between).  SD of IDS in within-subjects design",numeric,"if participant_design = between: maps onto group_name_1, mean_age_1, x_1, SD_1",,yes,
+SD_2,standard deviation of dependent variable for measure 2 (participant_design = within_two) or group 2 (participant_design = between).  SD of ADS in within-subjects design,numeric,,,yes,
+t,"t-statistic for the comparison of interest as specified in participant_design, ideally always note even if means and SDs are available",numeric,,,yes,
+F,F-statistic for the comparison of interest as specified in participant_design (main effect comparing two measures),numeric,,,yes,
+r ,Pearson's correlation coefficient,numeric,,,yes,
+d,"Cohen's d effect size measure, if reported",numeric,,,yes,
+d_var,"Cohen's d effect size variance, if reported",numeric,,,yes,
+corr,"if participant_design = within_two: Pearson's correlation coefficient of the two dependent measures, this number is needed to calculate effect size / variance ",numeric,,,yes,
+effect_significance_reported,Whether the effect is reported as significant or not by the authors,string,"options: significant, non-significant, not reported",significant,yes,
+Suggestions for further fields,,,,,,
+test_lang,testing language compared to infants' native language,options,"options:
+      - native
+      - accented
+      - non-native
+      - artificial",,no,
+stimuli_link, link to stimulus material (ideally with documentation),string,,,,
+data_link,link to dataset (ideally with documentation),string,,,,
+age_range_1,difference between max age and min age of participants in days (1 month = 30.44 days; 1 year = 365.25 days),numeric,,,no,
+age_range_2,difference between max age and min age of participants in days (1 month = 30.44 days; 1 year = 365.25 days),numeric,,,no,
+n_excluded_1,number participants excluded for any reason,numeric,,,no,
+n_excluded_2,number participants excluded for any reason,numeric,,,no,
+fussers,number of participants explicitly stated as excluded for fussiness,numeric,e.g. = 4 if paper states that 4 participants were excluded for fussiness,4,,
+non_criterion,number of participants excluded for failure to meet a certain criterion,numeric,e.g. = 5 if paper states that 5 participants were excluded for listening for less than some criterion,5,,
+criterion,numeric representation of the criterion,numeric,3 (if criterion_definition is same as below),3,,
+criterion_definition,sentence description of what the criterion is,string,"a full description of the criterion implemented - to aid in interpreting the criterion column, which notes the specific numeric cutoff used",failing to listen for a total of at least 3 seconds to one or more of the four conditions,,
+exclusionCriteria,list of the exclusion criteria (and number of participants excluded for each reason) mentioned in the paper,string,"list of exclusion criteria mentioned in the paper separated by the ""|"" character; if the number of participants excluded for each case are mentioned, include the number after the specific exclusion case using the ""_"" character to separate the exclusion case and the number of exclusions. For example, if 3 infants were excluded for parental interference, 6 infants were excluded for equipment error, and 10 infants were excluded for fussiness, the coding would be ""parental interference_3|equipment error_6|fussiness_10""",parental interference_3|equipment error_6|fussiness_10|failure to complete experiment_1,no,
+gender_1,proportion of female participants,numeric,e.g. = 13/24 for 13 girls in a sample of 24 participants,0.541,no,
+gender_2,"proportion of female participants in group 2, if participant_design = between",numeric,,,no,
+num_trials,number of test trials,numeric,,,no,
+mean_vocab,vocabulary size of participant (not used),numeric,-,-,no,not used in later coding iterations
+method_secondary,description of the dependent measure used (not included in future iterations of coding),character,,,no,not used in later coding iterations
+stim_language,language inn which the stimulus is presented (not used in later coding iterations),character,,English,no,not used in later coding iterations
+contrast,the conceptualization of the contrast between IDS/ ADS in the experiment,character,,main,no,not used in later coding iterations
+type,verbal description of the type of stimulus contrast used,character,,Infant directed and adult directed speech,no,not used in later coding iterations
+speaker_fam,Is the speaker in the stimulus familiar to the child?,numeric,0 or 1,1,no,
+speaker_female,Is the speaker in the stimulus female?,numeric,0 or 1,1,no,
+speaker_experience,"Does the speaker have experience speaking to a child (usually, a parent)?",numeric,0 or 1,1,no,
+speaker,identity of the speaker who generated the stimlui,string,options: child's mother; child's father; unfamiliar mother; unfamiliar father; unfamiliar female; unfamiliar male,unfamiliar mother,no,child's mother / father - speaker is the child's actual mother or father; unfamiliar mother / father - article specifies that the person recording the stimuli was a mother or father (maybe from a separate experiment) but the speaker is not the child participants' mother/father; unfamiliar female/male - it is not specified that the speaker has any relation to the child or is a parent
+presentation,method with which speech was presented to infants (focused on the media type),string,options: -Tape recording (if infant presented only with audio and an unrelated visual stimulus) - Video recording (infants are presented with a video of someone speaking IDS vs. ADS),video,no,
+setting,,,,,no,
+speech_type,Type/ context/ manipulation of speech stimulus. From Dunst et al.: Naturalistic speech: mothers talking to infants or adults as they normally would. Simulated: adults being asked to speak preselected sentences or phrases to infants or adults. Filtered speech: either naturalistic or simulated speech where the higher-frequency components of the speech were removed. Synthesized speech: digitized speech signals that extracted fundamental frequency and amplitude information from natural speech samples.,string,options: Naturalistic; Simulated; Synthesized;  Filtered,Simulated,no,
+My comments,field for a coder to make comments about the article/ difficult aspects of coding the paper/ remaining uncertainties,string,,,no,not used in later coding iterations
+1st Coder comments,field for the 1st coder to make comments about the article/ difficult aspects of coding the paper/ remaining uncertainties,,,,no,
+2nd Coder comments,field for the second coder to make comments about the article/ difficult aspects of coding the paper/ remaining uncertainties,,,,no,
