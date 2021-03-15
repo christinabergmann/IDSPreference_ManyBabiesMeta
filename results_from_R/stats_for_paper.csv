@@ -1,11 +1,11 @@
 name,value,section
-m ests MA,51,0
-m ests MB,104,0
-m ests total,155,0
-k studies MA,16,0
-k studies MB,62,0
-median n MA,20,0
-median n MB,16,0
+m ests MA,51,1
+m ests MB,104,1
+m ests total,155,1
+k studies MA,16,1
+k studies MB,62,1
+median n MA,20,1
+median n MB,16,1
 MA subset naive tau,0.45,1
 MA subset naive k,51,1
 MA subset naive n subj,1142,1

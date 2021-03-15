@@ -5,18 +5,16 @@
 
 
 # - Update section variable after code structure is done
-
-# Remember not to use asterisks in file names bc they cause syncing trouble for CB.
-
+# - Remember not to use asterisks in file names bc they cause syncing trouble for CB.
 
 
 # ~ Ask CB, et al ------------------------------------------------------------------
 
-# in the 0.75 dataset with the more stringent inclusion criterion, am I right in thinking that there are fewer effect sizes because some age groups are dropped completely? (but the mean age in MB doesn't change much at all)
+# - In the 0.75 dataset with the more stringent inclusion criterion, am I right in thinking that there are fewer effect sizes because some age groups are dropped completely? (but the mean age in MB doesn't change much at all)
 
-# the 0.125 dataset corresponds with main analysis, right?
+# - The 0.125 dataset corresponds with main analysis, right?
 
-# Can we add codebook for data? What are n_1, n_2, and n? Why is n the average rather than the sum of those two? For example, study_id Kaplan1995a has a fractional n.
+# - Can we add codebook for data? What are n_1, n_2, and n? Why is n the average rather than the sum of those two? For example, study_id Kaplan1995a has a fractional n.
 
 
 
@@ -26,7 +24,7 @@
 # - naive.MA.only and naive.reps.only: meta-analyses within subsets; no moderators
 
 
-# PRELIMINARIES ------------------------------------------------------------------
+# 0. PRELIMINARIES ------------------------------------------------------------------
 
 library(tidyverse) 
 library(knitr)
@@ -43,6 +41,11 @@ library(testthat)
 library(ggplot2)
 library(metafor)
 library(MatchIt)
+library(renv)
+
+# keep track of package versions we used
+# run this ONLY if you want to update the package versions!
+# snapshot()
 
 data.dir = here("data")
 # where to save results
@@ -57,6 +60,7 @@ source("analyze_helper.R")
 
 # package update not yet on CRAN, but we need the cluster-bootstrap functionality
 source("MetaUtility development functions.R")
+
 
 # ~ Code-Running Parameters ------------------------------------------------------------------
 # should we remove existing results file instead of overwriting individual entries? 
@@ -79,7 +83,7 @@ if (redo.mod.selection == FALSE) {
 # wipe results csvs if needed
 if ( start.res.from.scratch == TRUE ) wr()
 
-#~ Constants of Universe ------------------------------------------------------------------
+# ~ Constants of Universe ------------------------------------------------------------------
 digits = 2
 pval.cutoff = 10^-4  # threshold for using "<"
 boot.reps = 1000 # for all bootstrapped inference 
@@ -140,12 +144,12 @@ drage = dage %>% filter(isMeta == FALSE)
 
 
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-# 0. CHARACTERISTICS OF INCLUDED STUDIES ------------------------------------------------------------------           
+
+# 1. CHARACTERISTICS OF INCLUDED STUDIES ------------------------------------------------------------------           
 
 
 # for updating result csv
-section = 0
+section = 1
 
 # ~ Basics ------------------------------------------------------------------
 
@@ -154,7 +158,6 @@ t = d %>% group_by(study_type) %>%
              k = length(unique(study_id) ),
              nSubjMed = median(n) )
 t
-# seems like way fewer than what we expected?
 
 
 update_result_csv( name = paste( "m ests", t$study_type, sep = " "),
