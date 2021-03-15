@@ -82,6 +82,10 @@ update_result_csv = function( name,
   if ( print == TRUE ) {
     View(res)
   }
+  
+  # also save as global object 
+  #  useful for running sanity checks
+  resCSV <<- res
 }
 
 
@@ -346,7 +350,6 @@ fit_mr = function( .dat,
       .res$avgDiffLo = meta$reg_table$CI.L[ meta$labels == "isMetaTRUE"]
       .res$avgDiffHi = meta$reg_table$CI.U[ meta$labels == "isMetaTRUE"]
       
-      #bm
       .res$Phat0.rep = Phat0.rep
       .res$Phat0.ma = Phat0.ma
       .res$Phat0.2.rep = Phat0.2.rep
@@ -380,9 +383,7 @@ fit_mr = function( .dat,
 
 
 
-
-
-
+# this fn survived a sanity check in analyze.R
 fit_subset_meta = function( .dat,
                             .label = NA,  # name of the analysis for the results csv
                             .mods,

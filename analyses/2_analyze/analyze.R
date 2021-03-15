@@ -18,9 +18,15 @@
 
 
 
-# ~ Other notes  ------------------------------------------------------------------
+# ~ Usage notes  ------------------------------------------------------------------
 
-# names of important model objects:
+# - Code write graphics straight to relative directories and to a fixed directory
+#  on MBM's machine that pipes into the LaTeX manuscript.
+
+# - Code also writes numerical results to stats_for_paper.csv in a format that can be piped into LaTeX. To see the results as you run the code, use vr(). You can wipe that file using wr().
+
+
+# - Names of important model objects:
 # - naive.MA.only and naive.reps.only: meta-analyses within subsets; no moderators
 
 
@@ -71,8 +77,6 @@ cite.packages.anew = FALSE
 boot.from.scratch = FALSE
 # make plots from scratch?
 redo.plots = FALSE
-# redo iterative selection of moderators to get model to converge?
-redo.mod.selection = FALSE
 
 if (redo.mod.selection == FALSE) {
   # read in the surviving moderators
@@ -87,6 +91,9 @@ if ( start.res.from.scratch == TRUE ) wr()
 digits = 2
 pval.cutoff = 10^-4  # threshold for using "<"
 boot.reps = 1000 # for all bootstrapped inference 
+excelMax = 8
+# max digits in Excel; only used for running sanity checks against the results that are auto-written to a csv file
+
 # plot colors
 colors = c("darkgray", "red")  # replications, originals
 
@@ -186,6 +193,7 @@ xtable( print(t, noSpaces = TRUE, printToggle = FALSE) )
 # ~~ Moderator Correlation Matrix ------------------------------------------------------------------
 
 # temporarily recode all categorical moderators as dummies
+# dataset already has dummies, but this is easier than subsetting the right names
 cat.mods = mods[ !mods == "mean_agec" ]
 temp = dummy_cols( d[,cat.mods],
                    select_columns = cat.mods,
@@ -210,12 +218,11 @@ write.csv(corrs, "moderator_cormat.csv")
 
 
 
-# 1. PRIMARY MODERATOR ANALYSES (PREREG'D) ------------------------------------------------------------------
+# 2. PRIMARY MODERATOR ANALYSES (PREREG'D) ------------------------------------------------------------------
 
-section = 1
+section = 2
 
-
-# create MA subset and MLR subset
+# ~ Subset meta-analyses for MA an MLR ------------------------------------------------------------------
 # this fn also writes stats to results csv
 ( naive.MA.only = fit_subset_meta( .dat = dma,
                                    .mods = "1",
@@ -227,97 +234,186 @@ section = 1
                                      .label = "Reps subset naive" ) )
 
 
-# ~ Fit naive and moderated regressions ------------------------------------------------------------------ 
 
-#@removed ability to skip this section because needs naiveRes and modRes later
-#if ( redo.mod.selection == TRUE ) {
-if ( TRUE ) {
+# sanity check: refit one of these models manually
+# resCSV is assigned as a global var by fns that call update_result_csv
+if ( exists("resCSV") ) {
   
-  # order of importance given in prereg:
-  # age, test_lang, method, speaker, speech_type, own_mother, presentation, DV, main question
+  temp = robu( yi ~ 1, 
+               data = dma, 
+               studynum = as.factor(study_id),
+               var.eff.size = vi,
+               modelweights = "HIER",
+               small = TRUE)
   
-  # per prereg, if model isn't estimable, the moderators are to be removed in the opposite order
-  #  of this importance list
+  expect_equal( resCSV$value[ resCSV$name == "MA subset naive est X.Intercept." ],
+                as.character( round(temp$b.r, 2) ) )
   
-  mod.sets = list( c("isMeta"),  # naive model
-                   mods2 )
+  expect_equal( resCSV$value[ resCSV$name == "MA subset naive lo X.Intercept." ],
+                as.character( round(temp$reg_table$CI.L, 2) ) )
   
-  labels = c("naive",
-             "moderated")
+  expect_equal( resCSV$value[ resCSV$name == "MA subset naive hi X.Intercept." ],
+                as.character( round(temp$reg_table$CI.U, 2) ) )
   
-  # fit the naive model
-  # fit_mr automatically writes results to the results csv file and table
-  # caps indicates it's a primary model
-  naiveRes = fit_mr( .dat = d,
-                     .label = "NAIVE",
-                     .mods = mod.sets[[1]],
-                     .write.to.csv = TRUE,
-                     .write.table = TRUE,
-                     .simple.return = FALSE )
+  expect_equal( resCSV$value[ resCSV$name == "MA subset naive pval X.Intercept." ],
+                as.character( round(temp$reg_table$prob, excelMax) ) )
   
+}
+
+
+
+
+# ~ Both sources: naive and moderated regressions ------------------------------------------------------------------ 
+
+# cannot skip this section because needs naiveRes and modRes later
+
+# order of moderator importance given in prereg:
+# age, test_lang, method, speaker, speech_type, own_mother, presentation, DV, main question
+
+# per prereg, if model isn't estimable, the moderators are to be removed in the opposite order
+#  of this importance list
+
+# list of moderators to attempt for each of 2 models
+mod.sets = list( c("isMeta"),  # naive model
+                 mods2 )  # moderated model
+
+labels = c("naive",
+           "moderated")
+
+# fit the naive model
+# fit_mr automatically writes results to the results csv file and table
+# caps indicates it's a primary model
+naiveRes = fit_mr( .dat = d,
+                   .label = "NAIVE",
+                   .mods = mod.sets[[1]],
+                   .write.to.csv = TRUE,
+                   .write.table = TRUE,
+                   .simple.return = FALSE )
+
+
+# fit the meta-regression with all covariates 
+#  and remove them in prespecified order if needed until 
+#  model becomes estimables
+
+section = 1  # loop will break otherwise
+
+gotError = TRUE  # initialize so the while-loop is entered
+
+
+# this will print an xtable with the moderator estimates for use in the paper
+while ( gotError == TRUE ) {
   
-  # fit the meta-regression with all covariates 
-  #  and remove them in prespecified order if needed until 
-  #  model becomes estimables
-  
-  section = 1  # loop will break otherwise
-  
-  gotError = TRUE  # initialize so the while-loop is entered
-  
-  
-  # this will print an xtable with the moderator estimates for use in the paper
-  while ( gotError == TRUE ) {
+  tryCatch({
+    mod1Res = fit_mr( .dat = d,
+                      .label = "MOD1",
+                      .mods = mod.sets[[2]],
+                      .write.to.csv = TRUE,
+                      .write.table = TRUE,
+                      .simple.return = FALSE )
+    gotError = FALSE
+    message("MODEL WAS ESTIMABLE. OH YASSSSS <3")
     
-    tryCatch({
-      mod1Res = fit_mr( .dat = d,
-                        .label = "MOD1",
-                        .mods = mod.sets[[2]],
-                        .write.to.csv = TRUE,
-                        .write.table = TRUE,
-                        .simple.return = FALSE )
-      gotError = FALSE
-      
-    }, error = function(err){
-      gotError <<- TRUE
-      
-      # remove one moderator from the end of the list
-      message( paste( "\n Removing ", 
-                      mod.sets[[2]][ length(mod.sets[[2]]) ],
-                      " from moderators and trying again" ) )
-      mod.sets[[2]] <<- mod.sets[[2]][ 1 : ( length(mod.sets[[2]]) - 1 ) ]
-      
-      
-    })
+  }, error = function(err){
+    gotError <<- TRUE
     
-  }
+    # remove one moderator from the end of the list
+    message( paste( "\n Removing ", 
+                    mod.sets[[2]][ length(mod.sets[[2]]) ],
+                    " from moderators and trying again" ) )
+    mod.sets[[2]] <<- mod.sets[[2]][ 1 : ( length(mod.sets[[2]]) - 1 ) ]
+    
+    
+  })
   
-  # look at the surviving moderators
-  mod.sets[[2]]
+}
+
+# look at the surviving moderators
+mod.sets[[2]]
+
+# write the list of moderators  so we don't have to do this again
+setwd(results.dir)
+write.csv(mod.sets[[2]], file = "surviving_mods.csv")
+
+# for later use
+modsS = mod.sets[[2]]
+
+##### Sanity checks
+# sanity check: refit one of these models manually
+# resCSV is assigned as a global var by fns that call update_result_csv
+if ( exists("resCSV") ) {
   
-  # write the list of moderators  so we don't have to do this again
-  setwd(results.dir)
-  write.csv(mod.sets[[2]], file = "surviving_mods.csv")
+  # refit naive model
+  temp = robu( yi ~ isMeta, 
+               data = d, 
+               studynum = as.factor(study_id),
+               var.eff.size = vi,
+               modelweights = "HIER",
+               small = TRUE)
   
-  # for later use
-  modsS = mod.sets[[2]]
   
-  ##### Sanity checks
-  # sanity check: refit the naive and pruned models manually
-  robu( yi ~ isMeta, 
-        data = d, 
-        studynum = as.factor(study_id),
-        var.eff.size = vi,
-        modelweights = "HIER",
-        small = TRUE)
+  expect_equal( resCSV$value[ resCSV$name == "NAIVE k" ],
+                as.character( round( nrow(d), 0) ) )
   
-  robu( yi ~ isMeta + mean_agec + test_lang + method, 
-        data = d, 
-        studynum = as.factor(study_id),
-        var.eff.size = vi,
-        modelweights = "HIER",
-        small = TRUE)
+  expect_equal( resCSV$value[ resCSV$name == "NAIVE n subj" ],
+                as.character( round( sum(d$n), 0) ) )
+                
+  expect_equal( resCSV$value[ resCSV$name == "NAIVE tau" ],
+                as.character( round( sqrt(temp$mod_info$tau.sq), 2) )
+                
+  # intercept estimate and inference
+  expect_equal( resCSV$value[ resCSV$name == "NAIVE est X.Intercept." ],
+                              as.character( round(temp$b.r[1], 2) ) )
   
-} # end if ( redo.mod.selection == TRUE )
+  expect_equal( resCSV$value[ resCSV$name == "NAIVE lo X.Intercept." ],
+                as.character( round(temp$reg_table$CI.L[1], 2) ) )
+  
+  expect_equal( resCSV$value[ resCSV$name == "NAIVE hi X.Intercept." ],
+                as.character( round(temp$reg_table$CI.U[1], 2) ) )
+                
+  expect_equal( resCSV$value[ resCSV$name == "NAIVE pval X.Intercept." ],
+                format.pval(temp$reg_table$prob[1], eps = pval.cutoff) )              
+  # moderator estimate and inference
+  expect_equal( resCSV$value[ resCSV$name == "NAIVE est isMetaTRUE" ],
+                as.character( round(temp$b.r[2], 2) ) )
+  
+  expect_equal( resCSV$value[ resCSV$name == "NAIVE lo isMetaTRUE" ],
+                as.character( round(temp$reg_table$CI.L[2], 2) ) )
+  
+  expect_equal( resCSV$value[ resCSV$name == "NAIVE hi isMetaTRUE" ],
+                as.character( round(temp$reg_table$CI.U[2], 2) ) )
+  
+  expect_equal( resCSV$value[ resCSV$name == "NAIVE pval isMetaTRUE" ],
+                format.pval(temp$reg_table$prob[2], eps = pval.cutoff) )                   
+                
+  # average for meta-analysis obtained by recoding isMeta
+  temp = robu( yi ~ isRep, 
+                data = d, 
+                studynum = as.factor(study_id),
+                var.eff.size = vi,
+                modelweights = "HIER",
+                small = TRUE)
+  
+  expect_equal( resCSV$value[ resCSV$name == "NAIVE avg for meta" ],
+                as.character( round(temp$b.r[1], 2) ) )
+  
+  expect_equal( resCSV$value[ resCSV$name == "NAIVE avg lo for meta" ],
+                as.character( round(temp$reg_table$CI.L[1], 2) ) )
+  
+  # this one is in scientific notation; what a PITA
+  format.pval(temp$reg_table$prob[1], eps = pval.cutoff)
+  resCSV$value[ resCSV$name == "NAIVE avg pval for meta" ]
+  
+  #bm: stopped here with sanity checks :)
+  # moderated model
+  # for this one, maybe just spot-check some of the moderators?
+  temp = robu( yi ~ isMeta + mean_agec + test_lang + method, 
+                 data = d, 
+                 studynum = as.factor(study_id),
+                 var.eff.size = vi,
+                 modelweights = "HIER",
+                 small = TRUE)
+  
+}
 
 
 # 2. DENSITY PLOT OF META-ANALYSIS VS. REPLICATION CALIBRATED ESTIMATES ------------------------------------------------------------------
@@ -727,7 +823,7 @@ res3 = res3 %>% select(-unique)
 
 # reshape table for readability
 res3 = res3 %>% pivot_wider( names_from = model,
-                 values_from = valueString )
+                             values_from = valueString )
 
 setwd(results.dir)
 setwd("table_model_diffs")
@@ -1080,7 +1176,6 @@ if ( redo.plots == TRUE ) {
 }
 
 # percent of one-tailed p-values below 0.025 and above 0.975
-#bm
 
 # one-tailed p-vals
 pvalOne = 1 - pnorm( dma$yi / sqrt(dma$vi) )
@@ -1487,7 +1582,7 @@ if ( redo.plots == TRUE ) {
   # relative weight of each study in meta-analysis (within group)
   d = d %>% group_by(isMeta) %>%
     mutate( rel.wt = 100 * (1/vi) / sum(1/vi) )
- 
+  
   # plotting df
   dp = d
   
@@ -1708,9 +1803,9 @@ dma2 = dma %>% filter( !is.na(reportedSignif) )
 # proportions reported significant, stratified by whether calculated 
 #  p-value was < 0.05
 ( t = dma2 %>%
-  group_by(pvalSignif) %>%
-  summarise( n(),
-             mean(reportedSignif) ) )
+    group_by(pvalSignif) %>%
+    summarise( n(),
+               mean(reportedSignif) ) )
 
 update_result_csv( name = paste( "Perc reportedSignif when pvalSignif was", t$pvalSignif ),
                    value = round( 100*t$`mean(reportedSignif)`, 0) )
@@ -1724,11 +1819,11 @@ dma2$affirm2 = (dma2$reportedSignif == 1) & (dma2$yi > 0)
 
 # this worst-case estimate is a bit smaller than the one in main analysis
 ( meta.worst2 = robu( yi ~ 1, 
-                     data = dma2[ dma2$affirm2 == FALSE, ], 
-                     studynum = study_id,
-                     var.eff.size = vi,
-                     modelweights = "HIER",
-                     small = TRUE) )
+                      data = dma2[ dma2$affirm2 == FALSE, ], 
+                      studynum = study_id,
+                      var.eff.size = vi,
+                      modelweights = "HIER",
+                      small = TRUE) )
 
 mu.worst = meta.worst2$b.r
 t2.worst = meta.worst2$mod_info$tau.sq
@@ -1740,12 +1835,12 @@ pval.worst = meta.worst2$reg_table$prob
 
 # sanity check
 corrected_meta_2(yi = dma2$yi,
-               vi = dma2$vi,
-               reportedSignif = dma2$reportedSignif,
-               eta = 1000,
-               clustervar = dma2$study_id,
-               favor.positive = TRUE,
-               model = "robust")
+                 vi = dma2$vi,
+                 reportedSignif = dma2$reportedSignif,
+                 eta = 1000,
+                 clustervar = dma2$study_id,
+                 favor.positive = TRUE,
+                 model = "robust")
 
 
 statCI_result_csv( "Worst reportedSignif mu",
@@ -1777,12 +1872,12 @@ eta = 4.70
 
 
 metaCorr2 = corrected_meta_2( yi = dma2$yi,
-                           vi = dma2$vi,
-                           reportedSignif = dma2$reportedSignif,
-                           eta = eta,
-                           clustervar = dma2$study_id,
-                           model = "robust",
-                           favor.positive = TRUE )
+                              vi = dma2$vi,
+                              reportedSignif = dma2$reportedSignif,
+                              eta = eta,
+                              clustervar = dma2$study_id,
+                              model = "robust",
+                              favor.positive = TRUE )
 
 # again quite close to replication mean
 

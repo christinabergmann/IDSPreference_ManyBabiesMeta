@@ -6,20 +6,20 @@ k studies MA,16,1
 k studies MB,62,1
 median n MA,20,1
 median n MB,16,1
-MA subset naive tau,0.45,1
-MA subset naive k,51,1
-MA subset naive n subj,1142,1
-MA subset naive est X.Intercept.,0.7,1
-MA subset naive lo X.Intercept.,0.37,1
-MA subset naive hi X.Intercept.,1.02,1
-MA subset naive pval X.Intercept.,0.00056364,1
-Reps subset naive tau,0.11,1
-Reps subset naive k,104,1
-Reps subset naive n subj,2139,1
-Reps subset naive est X.Intercept.,0.35,1
-Reps subset naive lo X.Intercept.,0.28,1
-Reps subset naive hi X.Intercept.,0.43,1
-Reps subset naive pval X.Intercept.,< 0.0001,1
+MA subset naive tau,0.45,2
+MA subset naive k,51,2
+MA subset naive n subj,1142,2
+MA subset naive est X.Intercept.,0.7,2
+MA subset naive lo X.Intercept.,0.37,2
+MA subset naive hi X.Intercept.,1.02,2
+MA subset naive pval X.Intercept.,0.00056364,2
+Reps subset naive tau,0.11,2
+Reps subset naive k,104,2
+Reps subset naive n subj,2139,2
+Reps subset naive est X.Intercept.,0.35,2
+Reps subset naive lo X.Intercept.,0.28,2
+Reps subset naive hi X.Intercept.,0.43,2
+Reps subset naive pval X.Intercept.,< 0.0001,2
 MA subset mods tau,0.48,1
 MA subset mods k,51,1
 MA subset mods n subj,1142,1
