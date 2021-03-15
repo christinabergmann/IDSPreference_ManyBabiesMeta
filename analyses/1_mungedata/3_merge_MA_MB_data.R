@@ -8,7 +8,7 @@ library(here)
 ic.dataset = FALSE
 
 # for replications, should we look at the much smaller, age-matched dataset instead?
-age.matched = TRUE
+age.matched = FALSE
 
 MA_DATA_PATH <- here("data/ma_data_tidy.csv")
 
@@ -69,10 +69,11 @@ ma_data_tidy <- ma_data_raw %>%
          infant_type = case_when(infant_type != "typical" ~ "non-typical",
                                  TRUE ~ infant_type))
 
+
 tidy_df <- bind_rows(mb_data_tidy, ma_data_tidy) %>%
-  select(study_type, study_id, short_cite,  mean_age, age_group,
+  select(study_type, study_id, expt_num, short_cite,  mean_age, age_group,
          n, d_calc, d_var_calc, native_lang, prop_nae, infant_type,
-         main_question_ids_preference, same_infant, method, dependent_measure,  presentation, response_mode,
+         main_question_ids_preference, same_infant, method, dependent_measure,  presentation, response_mode, effect_significance_reported,
          everything())
 
 

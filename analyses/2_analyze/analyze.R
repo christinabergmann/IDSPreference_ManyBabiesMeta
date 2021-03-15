@@ -139,6 +139,7 @@ dage = suppressMessages( suppressWarnings( read_csv("mb_ma_combined_prepped_0.12
 drage = dage %>% filter(isMeta == FALSE)
 
 
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 # 0. CHARACTERISTICS OF INCLUDED STUDIES ------------------------------------------------------------------           
 
@@ -800,6 +801,7 @@ statCI_result_csv( "weightr mu",
 
 update_result_csv( name = "weightr mu pval",
                    value = format_stat( 2 * ( 1 - pnorm( abs(m1[[2]]$par[2]) / ses[2] ) ), cutoffs = c(0.10, pval.cutoff) ) )
+
 
 
 
@@ -1663,6 +1665,34 @@ ggplot(d, aes(mean_age, calibNaive, color=sourcePretty)) +
 #   geom_smooth(se=F) +
 #   theme_classic() +
 #   facet_wrap(method~test_lang)
+
+
+
+# ~ Publication bias with reported (not calculated) significance  ------------------------------------------------------------------
+
+#bm
+
+dma3 %>%
+  group_by(pvalSignif) %>%
+  summarise( n(),
+             mean(reportedSignif) )
+
+# huh! not a very strong correlation between 
+#  calculated and reported significance
+cor.test(dma3$reportedSignif, dma3$pvalSignif)
+
+# new affirmative indicator
+dma3$affirm2 = (dma3$reportedSignif == 1) & dma3$
+
+
+
+( meta.worst2 = robu( yi ~ 1, 
+                     data = dma2[ dma2$affirm2 == FALSE, ], 
+                     studynum = study_id,
+                     var.eff.size = vi,
+                     modelweights = "HIER",
+                     small = TRUE) )
+
 
 
 

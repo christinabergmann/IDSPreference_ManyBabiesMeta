@@ -8,12 +8,12 @@ MONTH_IN_DAYS <- 365.25/12
 MA1_PATH <- here("data/Dunst.csv")
 MA_OUT_PATH <- here("data/ma_data_tidy.csv")
 
-TARGET_VARS <- c("study_id", "short_cite", "original_ma", "main_question_ids_preference", 
+TARGET_VARS <- c("study_id", "short_cite", "expt_num", "original_ma", "main_question_ids_preference", 
                  "response_mode", "exposure_phase", "method", "dependent_measure", "participant_design",
                  "native_lang", "test_lang", "infant_type", "group_name_1", "group_name_2",
                  "t", "n_1", "n_2", "mean_age_1", "same_infant", "mean_age_2", "x_1", "x_2", "sd_1", "sd_2", "d", "d_var",
                  "r", "corr", "gender_1", "num_trials", "speaker_fam", "speaker_experience", "speaker_female",
-                 "speaker", "presentation", "setting", "speech_type")
+                 "speaker", "presentation", "setting", "speech_type", "effect_significance_reported")
 
 
 ma_data_raw <- read_csv(file = MA1_PATH) %>%

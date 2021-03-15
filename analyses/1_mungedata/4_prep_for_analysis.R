@@ -18,7 +18,7 @@ ic.dataset = FALSE
 
 # to reproduce main analyses, set to FALSE
 # for replications, should we look at the much smaller, age-matched dataset instead?
-age.matched = TRUE
+age.matched = FALSE
 
 data.dir = here("data")
 # where to save results
@@ -28,6 +28,10 @@ overleaf.dir = "~/Dropbox/Apps/Overleaf/MB-Meta/R_objects"
 code.dir = here("analyses/1_mungedata")
 
 
+setwd(code.dir)
+source("prep_helper.R")
+
+
 # should we use the grateful package to scan and cite packages?
 cite.packages.anew = FALSE
 
@@ -35,7 +39,6 @@ cite.packages.anew = FALSE
 # source( here("analyses/2_analyze/analyze_helper.R") )
 
 # read in dataset
-
 setwd(data.dir)
 # codebook: https://github.com/langcog/metalab2/blob/master/metadata/spec.yaml
 
@@ -63,9 +66,6 @@ if(prereg){
   if ( ic.dataset == FALSE & age.matched == TRUE ) d = read_csv("mb_ma_combined_0.125_age_matched.csv")
   if ( ic.dataset == TRUE & age.matched == TRUE ) stop("Case not handled")
 }
-
-  
-
 
 
 ############################## RECODE MODERATORS ############################## 
@@ -104,10 +104,6 @@ d$isMeta = (d$study_type == "MA")
 d$isRep = (d$study_type == "MB")
 
 
-setwd(code.dir)
-source("prep_helper.R")
-
-
 # center continuous moderators
 # age in months
 d$mean_agec = d$mean_age/12 - mean( d$mean_age[ d$isMeta == TRUE ]/12, na.rm = TRUE)
@@ -128,8 +124,6 @@ CreateTableOne(vars = mods,
                strata = "study_type",
                data = d)
 
-
-
 # recode all moderators so reference levels are mode in meta-analysis
 #  (recode via alphabetization)
 d = d %>% mutate_at( .vars = mods[ !mods == contMods ],
@@ -137,8 +131,12 @@ d = d %>% mutate_at( .vars = mods[ !mods == contMods ],
                                                            isMeta = d$isMeta) ) #Needed to hack this
 
 
-#@also recode as dummy variables for meta-regression joy
-d = cbind( d, d %>% select(mods) %>% dummy_cols() )
+# also recode as dummy variables for meta-regression joy
+dummyMods = d %>% select(mods) %>%
+  dummy_cols() %>%
+  # remove pre-recoding moderators to avoid duplicated names below
+  select(-mods)
+d = bind_cols( d, dummyMods)
 
 
 # same table again, after recoding
@@ -151,7 +149,8 @@ CreateTableOne(vars = mods,
 ############################## MAKE OTHER VARIABLES ############################## 
 
 # unique ID
-d = d %>% group_by(study_id) %>% 
+# don't use expt_num here because it's only defined for MA studies
+d = d %>% group_by(study_id) %>%
   mutate( unique = paste( study_id, row_number(), sep = ", #" ) )
 
 
@@ -164,11 +163,6 @@ d$sei = sqrt(d$vi)
 d$lo = d$yi - qnorm(0.975) * sqrt(d$vi)
 d$hi = d$yi + qnorm(0.975) * sqrt(d$vi)
 
-# p-values and affirmative status for publication bias analyses
-#@return to this; maybe use t-dist with n
-d$pval = 2 * ( 1 - pnorm( abs(d$yi/d$sei) ) )
-d$affirm = ( d$yi > 0 ) & ( d$pval < 0.05 )
-
 # recode for plotting joy
 d$studyTypePretty = NA
 d$studyTypePretty[ d$isMeta == TRUE ] = "Meta-analysis"
@@ -176,6 +170,21 @@ d$studyTypePretty[ d$isMeta == FALSE ] = "Replications"
 
 d$sourcePretty = "Meta-analysis"
 d$sourcePretty[ d$isMeta == FALSE ] = "Replications"
+
+# p-values and affirmative status for publication bias analyses
+d$pval = 2 * ( 1 - pnorm( abs(d$yi/d$sei) ) )
+d$affirm = ( d$yi > 0 ) & ( d$pval < 0.05 )
+
+
+# for additional publication bias analysis:
+# add indicator for whether effect was *reported* to be significant
+if ( ic.dataset == FALSE & age.matched == FALSE ) {
+  d$pvalSignif = as.numeric(d$pval < 0.05)
+  
+  d$reportedSignif = NA
+  d$reportedSignif[ d$effect_significance_reported == "significant" ] = 1 
+  d$reportedSignif[ d$effect_significance_reported == "non-significant" ] = 0
+}
 
 
 ############################## SAVE DATASET ############################## 

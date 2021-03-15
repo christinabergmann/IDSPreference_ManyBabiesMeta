@@ -721,7 +721,7 @@ safe_boot_ci = function(x, boot.res, type) {
 }  # end fn used lapply
 
 
-################################ DENSITY PLOT ################################
+# ~ DENSITY PLOT -----------------------------------------
 
 # density plot of age stratified by source
 age_densities = function(.dat) {
@@ -756,3 +756,488 @@ age_densities = function(.dat) {
           panel.grid.minor = element_blank())
   
 }
+
+
+# MODIFIED PUBLICATION BIAS FNS -----------------------------------------
+
+# fns are taken straight from PublicationBias package,
+#  but redefine affirmative indicator to use the variable reportedSignif
+#  search "EDITED" to find differences from R package
+corrected_meta_2 = function( yi,
+                           vi,
+                           reportedSignif,  # EDITED
+                           eta,
+                           clustervar = 1:length(yi),
+                           model,
+                           selection.tails = 1,
+                           favor.positive,
+                           alpha.select = 0.05,
+                           CI.level = 0.95,
+                           small = TRUE ) {
+  
+  # stop if eta doesn't make sense
+  if ( eta < 1 ) stop( "Eta must be at least 1.")
+  
+  # number of point estimates
+  k = length(yi)
+  
+  # calculate alpha for inference on point estimate
+  alpha = 1 - CI.level
+  
+  # warn if clusters but user said fixed
+  nclusters = length( unique( clustervar ) )
+  if ( nclusters < k & model == "fixed" ) {
+    warning( "Clusters exist, but will be ignored due to fixed-effects specification. To accommodate clusters, instead choose model = robust.")
+  }
+  
+  ##### Flip Estimate Signs If Needed #####
+  # if favor.positive == TRUE, then we don't need to fit a naive meta-analysis or do anything
+  if ( favor.positive == TRUE ) {
+    # keep track of whether we flipped for reporting at the end
+    flipped = FALSE
+    yif = yi
+  } else {
+    flipped = TRUE
+    yif = -yi
+  }
+  
+  # OLD VERSION: decides whether to flip signs based on naive meta-analysis
+  # # check and flip if naive point estimate is negative
+  # # do standard meta
+  # m0 = rma.uni(yi, vi)
+  #
+  # # reverse signs if needed to have pooled point estimate > 0
+  # if ( m0$b < 0 ) {
+  #   # keep track so that we can flip back at the end
+  #   flipped = TRUE
+  #   yif = -yi
+  # } else {
+  #   flipped = FALSE
+  #   yif = yi
+  # }
+  
+  # 2-sided p-values for each study even if 1-tailed selection
+  pvals = 2 * ( 1 - pnorm( abs(yif) / sqrt(vi) ) )
+  
+  # affirmative indicator based on selection tails
+  # EDITED
+  if ( selection.tails == 1 ) A = (reportedSignif == 1) & (yif > 0)
+  if ( selection.tails == 2 ) A = (reportedSignif == 1)
+  
+  k.affirmative = sum(A)
+  k.nonaffirmative = k - sum(A)
+  
+  # eta condition is because svalue automatically calls corrected_meta with eta=1
+  #  to fit the naive meta-analysis, and in that case it doesn't matter
+  # bm
+  if ( eta > 1 ) {
+    if ( k.affirmative == 0 | k.nonaffirmative == 0 ) {
+      stop( "There are zero affirmative studies or zero nonaffirmative studies. Model estimation cannot proceed.")
+    }
+  }
+  
+  
+  dat = data.frame( yi, yif, vi, A, clustervar )
+  
+  
+  ##### Fixed-Effects Model #####
+  if ( model == "fixed" ) {
+    
+    # FE mean and sum of weights stratified by affirmative vs. nonaffirmative
+    strat = dat %>% group_by(A) %>%
+      summarise( nu = sum( 1 / vi ),
+                 ybar = sum( yi / vi ) )
+    
+    # components of bias-corrected estimate by affirmative status
+    ybarN = strat$ybar[ strat$A == 0 ]
+    ybarS = strat$ybar[ strat$A == 1 ]
+    nuN = strat$nu[ strat$A == 0 ]
+    nuS = strat$nu[ strat$A == 1 ]
+    
+    # corrected pooled point estimate
+    est = ( eta * ybarN + ybarS ) / ( eta * nuN + nuS )
+    
+    # inference
+    var = ( eta^2 * nuN + nuS ) / ( eta * nuN + nuS )^2
+    se = sqrt(var)
+    
+    # z-based inference
+    if ( small == FALSE ) {
+      lo = est - qnorm( 1 - (alpha/2) ) * sqrt(var)
+      hi = est + qnorm( 1 - (alpha/2) ) * sqrt(var)
+      z =  abs( est / sqrt(var) )
+      pval.est = 2 * ( 1 - pnorm( z ) )
+    }
+    
+    # t-based inference
+    if ( small == TRUE ) {
+      df = k - 1
+      lo = est - qt( 1 - (alpha/2), df = df ) * sqrt(var)
+      hi = est + qt( 1 - (alpha/2), df = df ) * sqrt(var)
+      t =  abs( est / sqrt(var) )
+      pval.est = 2 * ( 1 - pt( t, df = df ) )
+    }
+  } # end fixed = TRUE
+  
+  ##### Robust Independent and Robust Clustered #####
+  if ( model == "robust" ) {
+    
+    # weight for model
+    weights = rep( 1, length(pvals) )
+    weights[ A == FALSE ] = eta
+    
+    # initialize a dumb (unclustered and uncorrected) version of tau^2
+    # which is only used for constructing weights
+    meta.re = rma.uni( yi = yi,
+                       vi = vi)
+    t2hat.naive = meta.re$tau2
+    
+    # fit weighted robust model
+    meta.robu = robu( yi ~ 1,
+                      studynum = clustervar,
+                      data = dat,
+                      userweights = weights / (vi + t2hat.naive),
+                      var.eff.size = vi,
+                      small = small )
+    
+    est = as.numeric(meta.robu$b.r)
+    se = meta.robu$reg_table$SE
+    lo = meta.robu$reg_table$CI.L
+    hi = meta.robu$reg_table$CI.U
+    pval.est = meta.robu$reg_table$prob
+    eta = eta
+  } # end robust = TRUE
+  
+  return( data.frame( est,
+                      se,
+                      lo,
+                      hi,
+                      pval = pval.est,
+                      eta = eta,
+                      k.affirmative,
+                      k.nonaffirmative,
+                      signs.recoded = flipped ) )
+}
+
+
+
+svalue_2 = function( yi,
+                   vi,
+                   reportedSignif, # EDITED
+                   q,
+                   clustervar = 1:length(yi),
+                   model,
+                   alpha.select = 0.05,
+                   eta.grid.hi = 200,
+                   favor.positive,
+                   CI.level = 0.95,
+                   small = TRUE,
+                   return.worst.meta = FALSE ) {
+
+  
+  # stop if eta doesn't make sense
+  if ( eta.grid.hi < 1 ) stop( "eta.grid.hi must be at least 1.")
+  
+  # number of point estimates
+  k.studies = length(yi)
+  
+  alpha = 1 - CI.level
+  
+  # warn if clusters but user said fixed
+  nclusters = length( unique( clustervar ) )
+  if ( nclusters < k.studies & model == "fixed" ) {
+    warning( "You indicated there are clusters, but these will be ignored due to fixed-effects specification. To accommodate clusters, instead choose model = robust.")
+  }
+  
+  # fit uncorrected model
+  # no need to pass alpha.select here
+  m0 = corrected_meta( yi = yi,
+                       vi = vi,
+                       eta = 1,
+                       model = model,
+                       clustervar = clustervar,
+                       selection.tails = 1,
+                       favor.positive = favor.positive,
+                       CI.level = CI.level,
+                       small = small )
+  
+  # stop if q is on wrong side of null
+  if ( m0$est > 0 & q > m0$est ) stop( paste( "The uncorrected pooled point estimate is ", round2(m0$est),
+                                              ". q must be less than this value (i.e., closer to zero).",
+                                              sep = "" ) )
+  if ( m0$est < 0 & q < m0$est ) stop( paste( "The uncorrected pooled point estimate is ", round2(m0$est),
+                                              ". q must be greater than this value (i.e., closer to zero).",
+                                              sep = "" ) )
+  
+  # # reverse signs if needed to have pooled point estimate > 0
+  # if ( m0$est < 0 ) {
+  #   # keep track so that we can flip back at the end
+  #   flipped = TRUE
+  #   yi = -yi
+  #   q = -q
+  # } else {
+  #   flipped = FALSE
+  # }
+  ##### Flip Estimate Signs If Needed #####
+  
+  # if favor.positive == TRUE, then we don't need to fit a naive meta-analysis or do anything
+  if ( favor.positive == TRUE ) {
+    # keep track of whether we flipped for reporting at the end
+    flipped = FALSE
+  } else {
+    flipped = TRUE
+    yi = -yi
+    q = -q
+  }
+  
+  # 2-sided p-values for each study even if 1-tailed selection
+  pvals = 2 * ( 1 - pnorm( abs(yi) / sqrt(vi) ) )
+  
+  # affirmative indicator under 1-tailed selection
+  # EDITED 
+  A = (reportedSignif == 1) & (yi > 0)
+  
+  k.affirmative = sum(A)
+  k.nonaffirmative = k.studies - sum(A)
+  
+  if ( k.affirmative == 0 | k.nonaffirmative == 0 ) {
+    stop( "There are zero affirmative studies or zero nonaffirmative studies. Model estimation cannot proceed.")
+  }
+  
+  dat = data.frame( yi, vi, A, clustervar )
+  
+  
+  ##### Fixed-Effects Model #####
+  if ( model == "fixed" ) {
+    
+    if (k.nonaffirmative > 1){
+      # first fit worst-case meta
+      meta.worst = rma.uni( yi = yi,
+                            vi = vi,
+                            data = dat[ A == FALSE, ],
+                            method = "FE" )
+      
+      
+      est.worst = as.numeric(meta.worst$b)
+      lo.worst = meta.worst$ci.lb
+    }
+    
+    if (k.nonaffirmative == 1) {
+      est.worst = dat$yi[ A == FALSE ]
+      lo.worst = dat$yi[ A == FALSE ] - qnorm(0.975) * sqrt(dat$vi[ A == FALSE ])
+    }
+    
+    # FE mean and sum of weights stratified by affirmative vs. nonaffirmative
+    strat = dat %>% group_by(A) %>%
+      summarise( nu = sum( 1 / vi ),
+                 ybar = sum( yi / vi ) )
+    
+    # components of bias-corrected estimate by affirmative status
+    ybarN = strat$ybar[ strat$A == 0 ]
+    ybarA = strat$ybar[ strat$A == 1 ]
+    nuN = strat$nu[ strat$A == 0 ]
+    nuA = strat$nu[ strat$A == 1 ]
+    
+    # S-value for point estimate
+    sval.est = ( nuA * q - ybarA ) / ( ybarN - nuN * q )
+    
+    # S-value for CI (to shift it to q)
+    # match term names used in Wolfram Alpha
+    a = ybarN
+    b = ybarA
+    c = nuN
+    d = nuA
+    
+    if ( small == FALSE ) k = qnorm( 1 - (alpha/2) )
+    if ( small == TRUE ) {
+      df = k.studies - 1
+      k = qt( 1 - (alpha/2), df = df )
+    }
+    
+    # # version directly from Wolfram
+    # termA = a^2 * d * k^2 - (2 * a * c * d * k^2 * q) +
+    #           b^2 * c * k^2 -
+    #           (2 * b * c * d * k^2 * q) +
+    #           c^2 * d * k^2 * q^2 +
+    #           c * d^2 * k^2 * q^2 -
+    #           c * d * k^4
+    
+    # manually simplied version
+    termA = k^2 * ( a^2 * d -
+                      (2 * c * d * q) * (a + b) +
+                      b^2 * c +
+                      q^2 * (c^2 * d + d^2 * c) -
+                      c * d * k^2 )
+    
+    termB = -a*b + a*d*q + b*c*q - c*d*q^2
+    
+    termC = a^2 - 2*a*c*q + c^2*q^2 - c*k^2
+    
+    sval.ci = ( -sqrt(termA) + termB ) / termC
+    if ( sval.ci < 0 ) sval.ci = ( sqrt(termA) + termB ) / termC
+    
+    # # sanity check by inversion
+    # # corrected CI limit
+    # eta = sval.ci
+    # termD = (eta * a + b) / (eta * c + d)
+    # termE = k * sqrt( (eta^2 * c + d) / (eta * c + d)^2 )
+    # expect_equal( termD - termE,
+    #               q )
+    # # WORKS!!!
+    
+  } # end fixed = TRUE
+  
+  
+  ##### Robust Independent and Robust Clustered #####
+  if ( model == "robust" ) {
+    
+    ##### Worst-Case Meta to See if We Should Search at All
+    
+    if (k.nonaffirmative > 1){
+      # first fit worst-case meta to see if we should even attempt grid search
+      # initialize a dumb (unclustered and uncorrected) version of tau^2
+      # which is only used for constructing weights
+      meta.re = rma.uni( yi = yi,
+                         vi = vi)
+      t2hat.naive = meta.re$tau2
+      
+      # fit model exactly as in corrected_meta
+      meta.worst =  robu( yi ~ 1,
+                          studynum = clustervar,
+                          data = dat[ A == FALSE, ],
+                          userweights = 1 / (vi + t2hat.naive),
+                          var.eff.size = vi,
+                          small = small )
+      
+      est.worst = as.numeric(meta.worst$b.r)
+      lo.worst = meta.worst$reg_table$CI.L
+    }
+    
+    # robumeta above can't handle meta-analyzing only 1 nonaffirmative study
+    if (k.nonaffirmative == 1) {
+      est.worst = dat$yi[ A == FALSE ]
+      lo.worst = dat$yi[ A == FALSE ] - qnorm(0.975) * sqrt(dat$vi[ A == FALSE ])
+    }
+    
+    ##### Get S-value for estimate
+    if ( est.worst > q ) {
+      sval.est = "Not possible"
+    } else {
+      
+      # define the function we need to minimize
+      # i.e., distance between corrected estimate and the target value of q
+      func = function(.eta) {
+        # EDITED TO CALL CORRECTED_META_2
+        est.corr = corrected_meta_2( yi = yi,
+                                   vi = vi,
+                                   reportedSignif = reportedSignif,
+                                   eta = .eta,
+                                   model = model,
+                                   clustervar = clustervar,
+                                   selection.tails = 1,
+                                   favor.positive = TRUE,  # always TRUE because we've already flipped signs if needed
+                                   alpha.select = alpha.select,
+                                   CI.level = CI.level,
+                                   small = small )$est
+        return( abs(est.corr - q))
+      }
+      
+      opt = optimize( f = func,
+                      interval = c(1, eta.grid.hi),
+                      maximum = FALSE )
+      sval.est = opt$minimum
+      
+      # discrepancy between the corrected estimate and the s-value
+      diff = opt$objective
+      
+      # if the optimal value is very close to the upper range of grid search
+      #  AND we're still not very close to the target q,
+      #  that means the optimal value was above eta.grid.hi
+      if ( abs(sval.est - eta.grid.hi) < 0.0001 & diff > 0.0001 ) sval.est = paste(">", eta.grid.hi)
+    }
+    
+    # do something similar for CI
+    if ( lo.worst > q ) {
+      sval.ci = "Not possible"
+      
+    } else {
+      # define the function we need to minimize
+      # i.e., distance between corrected estimate and the target value of q
+      func = function(.eta) {
+        # EDITED TO CALL CORRECTED_META_2
+        lo.corr = corrected_meta( yi = yi,
+                                  vi = vi,
+                                  reportedSignif = reportedSignif,
+                                  eta = .eta,
+                                  model = model,
+                                  clustervar = clustervar,
+                                  selection.tails = 1,
+                                  favor.positive = TRUE, # always TRUE because we've already flipped signs if needed
+                                  alpha.select = alpha.select,
+                                  CI.level = CI.level,
+                                  small = small )$lo
+        return( abs(lo.corr - q))
+      }
+      
+      opt = optimize( f = func,
+                      interval = c(1, eta.grid.hi),
+                      maximum = FALSE )
+      sval.ci = opt$minimum
+      
+      # discrepancy between the corrected estimate and the s-value
+      diff = opt$objective
+      
+      # if the optimal value is very close to the upper range of grid search
+      #  AND we're still not very close to the target q,
+      #  that means the optimal value was above eta.grid.hi
+      if ( abs(sval.ci - eta.grid.hi) < 0.0001 & diff > 0.0001 ) sval.ci = paste(">", eta.grid.hi)
+    }
+    
+  }
+  
+  # s-values less than 1 indicate complete robustness
+  # is.numeric is in case we have a "< XXX" string instead of a number
+  if ( is.numeric(sval.est) & !is.na(sval.est) & sval.est < 1) sval.est = "Not possible"
+  if ( is.numeric(sval.ci) & !is.na(sval.ci) & sval.ci < 1) sval.ci = "Not possible"
+  
+  # m0 was fit BEFORE flipping signs
+  # but q has now been flipped in the latter case in "or" statement below
+  if ( (m0$est > 0 & m0$lo < q) | (m0$est < 0 & m0$hi > -q) ) {
+    # important: Shiny website assumes that this exact string ("--") for CI can be interpreted as
+    #  the naive CI's already containing q
+    sval.ci = "--"
+    message("sval.ci is not applicable because the naive confidence interval already contains q")
+  }
+  
+  # meta.worst might not exist if, for example, there is only 1 nonaffirmative study
+  #  or obviously if the user did not ask for it
+  # in those cases, set it to NULL so that return structure can stay the same
+  if ( return.worst.meta == FALSE | !exists("meta.worst") ) meta.worst = NULL
+  
+  
+  # if user wanted meta.worst, but we don't have it
+  if ( return.worst.meta == TRUE & is.null(meta.worst) ) message("Not returning a worst-case meta-analysis because there were fewer than 2 nonaffirmative studies.")
+  
+  # # meta.worst might not exist if, for example, there is only 1 nonaffirmative study
+  # if ( return.worst.meta == TRUE & exists("meta.worst") ) {
+  
+  return( list( stats = data.frame( sval.est,
+                                    sval.ci = sval.ci,
+                                    k.affirmative,
+                                    k.nonaffirmative,
+                                    signs.recoded = flipped ),
+                meta.worst = meta.worst ) )
+  # } else {
+  #
+  #
+  #
+  #   return( data.frame( sval.est,
+  #                       sval.ci = sval.ci,
+  #                       k.affirmative,
+  #                       k.nonaffirmative,
+  #                       signs.recoded = flipped ) )
+  # }
+  
+  
+}
+
