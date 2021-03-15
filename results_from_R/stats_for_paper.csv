@@ -363,3 +363,15 @@ modWithinS avg for meta,0.66,9
 modWithinS avg lo for meta,0.21,9
 modWithinS avg hi for meta,1.11,9
 modWithinS avg pval for meta,9e-03,9
+Perc pvals <0.025,43,9
+Perc pvals >0.975,2,9
+Corr MA reportedSignif est,0.39,9
+Corr MA reportedSignif lo,0,9
+Corr MA reportedSignif hi,0.79,9
+Corr MA reportedSignif pval,0.051982,9
+Perc reportedSignif when pvalSignif was 0,52,9
+Perc reportedSignif when pvalSignif was 1,83,9
+Worst reportedSignif mu ,0.12,9
+Worst reportedSignif mu lo,-0.27,9
+Worst reportedSignif mu hi,0.52,9
+Worst reportedSignif mu pval,0.11,9

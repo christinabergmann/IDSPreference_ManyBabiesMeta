@@ -1056,10 +1056,39 @@ if ( redo.plots == TRUE ) {
   plot(p.funnel)
   
   
-  my_ggsave("mb_signif_funnel.png",
+  my_ggsave("signif_funnel.png",
             width = 5,
             height = 4)
 }
+
+
+
+# ~ Diagnostics for one-tailed publication bias assumption ------------------------------------------------------------------
+
+# p-value plot
+if ( redo.plots == TRUE ) {
+  
+  pval_plot( yi = dma$yi,
+             vi = dma$vi )
+  
+  my_ggsave("meta_pval_plot.png",
+            width = 5,
+            height = 4)
+}
+
+# percent of one-tailed p-values below 0.025 and above 0.975
+#bm
+
+# one-tailed p-vals
+pvalOne = 1 - pnorm( dma$yi / sqrt(dma$vi) )
+
+update_result_csv( name = "Perc pvals <0.025",
+                   value = round( 100*mean(pvalOne < 0.025) ) )
+
+update_result_csv( name = "Perc pvals >0.975",
+                   value = round( 100*mean(pvalOne > 0.975) ) )
+
+
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 #                       3. SUBSET MODELS AND PLOTS (POST HOC)            
@@ -1670,28 +1699,104 @@ ggplot(d, aes(mean_age, calibNaive, color=sourcePretty)) +
 
 # ~ Publication bias with reported (not calculated) significance  ------------------------------------------------------------------
 
-#bm
+# keep only MA studies that reported whether results were significant
+dma2 = dma %>% filter( !is.na(reportedSignif) )
 
-dma3 %>%
+# proportions reported significant, stratified by whether calculated 
+#  p-value was < 0.05
+( t = dma2 %>%
   group_by(pvalSignif) %>%
   summarise( n(),
-             mean(reportedSignif) )
+             mean(reportedSignif) ) )
+
+update_result_csv( name = paste( "Perc reportedSignif when pvalSignif was", t$pvalSignif ),
+                   value = round( 100*t$`mean(reportedSignif)`, 0) )
 
 # huh! not a very strong correlation between 
 #  calculated and reported significance
 cor.test(dma3$reportedSignif, dma3$pvalSignif)
 
 # new affirmative indicator
-dma3$affirm2 = (dma3$reportedSignif == 1) & dma3$
+dma2$affirm2 = (dma2$reportedSignif == 1) & (dma2$yi > 0)
 
-
-
+# this worst-case estimate is a bit smaller than the one in main analysis
 ( meta.worst2 = robu( yi ~ 1, 
                      data = dma2[ dma2$affirm2 == FALSE, ], 
                      studynum = study_id,
                      var.eff.size = vi,
                      modelweights = "HIER",
                      small = TRUE) )
+
+mu.worst = meta.worst2$b.r
+t2.worst = meta.worst2$mod_info$tau.sq
+mu.lo.worst = meta.worst2$reg_table$CI.L
+mu.hi.worst = meta.worst2$reg_table$CI.U
+mu.se.worst = meta.worst2$reg_table$SE
+pval.worst = meta.worst2$reg_table$prob
+
+
+# sanity check
+corrected_meta_2(yi = dma2$yi,
+               vi = dma2$vi,
+               reportedSignif = dma2$reportedSignif,
+               eta = 1000,
+               clustervar = dma2$study_id,
+               favor.positive = TRUE,
+               model = "robust")
+
+
+statCI_result_csv( "Worst reportedSignif mu",
+                   c(meta.worst2$b.r,
+                     meta.worst2$reg_table$CI.L,
+                     meta.worst2$reg_table$CI.U) )
+
+
+update_result_csv( name = "Worst reportedSignif mu pval",
+                   value = round(pval.worst, 3) )
+
+
+
+# ~ S-values -----
+# turns out similarly to main results
+# s-values to reduce to null
+( Sval0 = svalue( yi = dma2$yi,
+                  vi = dma2$vi,
+                  q = 0,
+                  clustervar = dma2$study_id,
+                  favor.positive = TRUE,
+                  model = "robust" ) )
+
+
+
+# ~ Meta-Analysis with Eta = 4.70 (Post Hoc) ------------------------------------------------------------------
+# turns out very similarly to main results
+eta = 4.70
+
+
+metaCorr2 = corrected_meta_2( yi = dma2$yi,
+                           vi = dma2$vi,
+                           reportedSignif = dma2$reportedSignif,
+                           eta = eta,
+                           clustervar = dma2$study_id,
+                           model = "robust",
+                           favor.positive = TRUE )
+
+# again quite close to replication mean
+
+update_result_csv( name = "Corr MA reportedSignif est",
+                   value = round( metaCorr2$est, 2) )
+
+update_result_csv( name = "Corr MA reportedSignif lo",
+                   value = round( metaCorr2$lo, 2) )
+
+update_result_csv( name = "Corr MA reportedSignif hi",
+                   value = round( metaCorr2$hi, 2) )
+
+update_result_csv( name = "Corr MA reportedSignif pval",
+                   value = format.pval( metaCorr2$pval, eps = pval.cutoff) )
+
+
+
 
 
 

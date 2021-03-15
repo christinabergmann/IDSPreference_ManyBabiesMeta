@@ -800,22 +800,7 @@ corrected_meta_2 = function( yi,
     flipped = TRUE
     yif = -yi
   }
-  
-  # OLD VERSION: decides whether to flip signs based on naive meta-analysis
-  # # check and flip if naive point estimate is negative
-  # # do standard meta
-  # m0 = rma.uni(yi, vi)
-  #
-  # # reverse signs if needed to have pooled point estimate > 0
-  # if ( m0$b < 0 ) {
-  #   # keep track so that we can flip back at the end
-  #   flipped = TRUE
-  #   yif = -yi
-  # } else {
-  #   flipped = FALSE
-  #   yif = yi
-  # }
-  
+
   # 2-sided p-values for each study even if 1-tailed selection
   pvals = 2 * ( 1 - pnorm( abs(yif) / sqrt(vi) ) )
   
