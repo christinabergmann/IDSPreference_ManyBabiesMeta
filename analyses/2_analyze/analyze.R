@@ -263,7 +263,7 @@ if ( exists("resCSV") ) {
 
 
 
-# ~ Both sources: naive and moderated regressions ------------------------------------------------------------------ 
+# ~ Both sources: Naive and moderated regressions ------------------------------------------------------------------ 
 
 # cannot skip this section because needs naiveRes and modRes later
 
@@ -413,6 +413,21 @@ if ( exists("resCSV") ) {
                  modelweights = "HIER",
                  small = TRUE)
   
+  # for checking all the coeff estimates as a vector
+  suffix = c("X.Intercept.", "isMetaTRUE", "mean_agec", "test_langb.nonnative", "test_langc.artificial", "methodb.hpp", "methodc.other")
+  
+  expect_equal( resCSV$value[ resCSV$name %in% paste( "MOD1 est", suffix, sep = " ") ],
+                as.character( round(temp$b.r, 2) ) )
+  
+  expect_equal( resCSV$value[ resCSV$name %in% paste( "MOD1 lo", suffix, sep = " ") ],
+                as.character( round(temp$reg_table$CI.L, 2) ) )
+  
+  expect_equal( resCSV$value[ resCSV$name %in% paste( "MOD1 hi", suffix, sep = " ") ],
+                as.character( round(temp$reg_table$CI.L, 2) ) )
+  
+  expect_equal( resCSV$value[ resCSV$name %in% paste( "MOD1 pval", suffix, sep = " ") ],
+                format.pval(temp$reg_table$prob, eps = pval.cutoff) )  
+  # oh yeahhhhhh
 }
 
 
@@ -420,7 +435,7 @@ if ( exists("resCSV") ) {
 
 
 # ~ Get Marginal Calibrated Estimates for Plot ------------------------------------------------------------------
-# SAVE calibR, calibM because needed for plot
+
 calibR = calib_ests(yi = dr$yi, sei = sqrt(dr$vi) )
 mean(calibR>0.2)
 mean(calibR)
