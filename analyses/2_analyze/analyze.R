@@ -910,7 +910,6 @@ print( xtable(res3), include.rownames = FALSE)
 
 section = 4
 
-# @MOVE THIS
 # sanity check: should be similar to naive meta-regression model
 #  but not necessarily equal
 expect_equal( as.numeric(naive.MA.only$b.r), round(naiveRes$est.ma, digits), tol = 0.03 )

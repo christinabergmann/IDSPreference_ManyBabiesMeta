@@ -63,14 +63,15 @@ if(prereg){
 } else {
   if ( ic.dataset == FALSE & age.matched == FALSE ) d = read_csv("mb_ma_combined.csv")
   if ( ic.dataset == TRUE & age.matched == FALSE ) d = read_csv("mb_ma_combined_0.75.csv")
-  if ( ic.dataset == FALSE & age.matched == TRUE ) d = read_csv("mb_ma_combined_0.125_age_matched.csv")
+  if ( ic.dataset == FALSE & age.matchesd == TRUE ) d = read_csv("mb_ma_combined_0.125_age_matched.csv")
   if ( ic.dataset == TRUE & age.matched == TRUE ) stop("Case not handled")
 }
 
 
+
 ############################## RECODE MODERATORS ############################## 
 
-# list of moderators
+# list of moderators (not yet created)
 mods = c( "mean_agec",
           "test_lang",  # whether stimuli were in native language
           "method",
@@ -106,9 +107,15 @@ d$isRep = (d$study_type == "MB")
 
 # center continuous moderators
 # age in months
-d$mean_agec = d$mean_age/12 - mean( d$mean_age[ d$isMeta == TRUE ]/12, na.rm = TRUE)
 
 
+# age is coded in days
+daysPerMonth = 30.44
+d$mean_agec = d$mean_age/daysPerMonth - mean( d$mean_age[ d$isMeta == TRUE ]/daysPerMonth, na.rm = TRUE)
+
+# sanity check: mean age by source
+d %>% group_by(study_type) %>%
+  summarise(mean(mean_age/30.44))
 
 # Now fix method names
 d = d  %>% mutate(method = ifelse(method %in% c("singlescreen", "eyetracking"), "cf", 
