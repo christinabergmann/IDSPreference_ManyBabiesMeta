@@ -32,6 +32,12 @@
 
 # 0. PRELIMINARIES ------------------------------------------------------------------
 
+
+# This script uses renv to preserve the R environment specs (e.g., package versions.)
+library(renv)
+# run this if you want to reproduce results using the R environment we had:
+# renv::restore()
+
 library(tidyverse) 
 library(knitr)
 library(here)
@@ -47,11 +53,10 @@ library(testthat)
 library(ggplot2)
 library(metafor)
 library(MatchIt)
-library(renv)
 
-# keep track of package versions we used
-# run this ONLY if you want to update the package versions!
-# snapshot()
+# run this only if you want to update the R environment specs
+# renv::snapshot()
+
 
 data.dir = here("data")
 # where to save results
@@ -78,11 +83,11 @@ boot.from.scratch = FALSE
 # make plots from scratch?
 redo.plots = FALSE
 
-if (redo.mod.selection == FALSE) {
-  # read in the surviving moderators
-  setwd(results.dir)
-  modsS = read.csv("surviving_mods.csv")[,2]
-}
+# if (redo.mod.selection == FALSE) {
+#   # read in the surviving moderators
+#   setwd(results.dir)
+#   modsS = read.csv("surviving_mods.csv")[,2]
+# }
 
 # wipe results csvs if needed
 if ( start.res.from.scratch == TRUE ) wr()
@@ -403,7 +408,6 @@ if ( exists("resCSV") ) {
   format.pval(temp$reg_table$prob[1], eps = pval.cutoff)
   resCSV$value[ resCSV$name == "NAIVE avg pval for meta" ]
   
-  #bm: stopped here with sanity checks :)
   # moderated model
   # for this one, maybe just spot-check some of the moderators?
   temp = robu( yi ~ isMeta + mean_agec + test_lang + method, 
@@ -437,11 +441,11 @@ if ( exists("resCSV") ) {
 # ~ Get Marginal Calibrated Estimates for Plot ------------------------------------------------------------------
 
 calibR = calib_ests(yi = dr$yi, sei = sqrt(dr$vi) )
-mean(calibR>0.2)
+mean(calibR>0.2)  # quick check
 mean(calibR)
 
 calibMA = calib_ests(yi = dma$yi, sei = sqrt(dma$vi) )
-mean(calibMA>0.2)
+mean(calibMA>0.2)  # quick check
 mean(calibMA)
 
 d$calibNaive = NA
@@ -449,10 +453,66 @@ d$calibNaive[ d$isMeta == FALSE ] = calibR
 d$calibNaive[ d$isMeta == TRUE ] = calibMA
 
 
+
+# ~~ Sanity checks on conditional Phats ------------------------------------------------------------------
+
+# spot-check the conditional Phats
+
+# check Perc0.2M in naive model
+temp = robu( yi ~ 1, 
+             data = dma, 
+             studynum = as.factor(study_id),
+             var.eff.size = vi,
+             modelweights = "HIER",
+             small = TRUE)
+expect_equal( round( 100 * mean(calibMA > 0.2) ),
+              res2$est[ res2$model == "naive" & res2$stat == "Perc0.2M"] )
+
+
+# check Perc0.2R in naive model
+temp = robu( yi ~ 1, 
+             data = dr, 
+             studynum = as.factor(study_id),
+             var.eff.size = vi,
+             modelweights = "HIER",
+             small = TRUE)
+expect_equal( round( 100 * mean(calibR > 0.2) ),
+              res2$est[ res2$model == "naive" & res2$stat == "Perc0.2R"] )
+
+
+# check Perc0.2M in moderated model
+temp = robu( yi ~ mean_agec + test_lang + method, 
+             data = dma, 
+             studynum = as.factor(study_id),
+             var.eff.size = vi,
+             modelweights = "HIER",
+             small = TRUE)
+
+# conditional_calib_ests fn already has unit tests in analyze_helper.R :)
+calib = conditional_calib_ests(.model = temp)$calib.shift
+expect_equal( round( 100 * mean(calib > 0.2) ),
+              res2$est[ res2$model == "mod" & res2$stat == "Perc0.2M"] )
+
+
+# check Perc0.2R in moderated model
+temp = robu( yi ~ mean_agec + test_lang + method, 
+             data = dr, 
+             studynum = as.factor(study_id),
+             var.eff.size = vi,
+             modelweights = "HIER",
+             small = TRUE)
+
+# conditional_calib_ests fn already has unit tests in analyze_helper.R :)
+calib = conditional_calib_ests(.model = temp)$calib.shift
+expect_equal( round( 100 * mean(calib > 0.2) ),
+              res2$est[ res2$model == "mod" & res2$stat == "Perc0.2R"] )
+
+
+
+
 # ~ Get Conditional Calibrated Estimates for Plot ------------------------------------------------------------------
 # fit the final, moderated models to each subset
 # to see what the heterogeneity looks like in each case
-# @move this?
 ( cond.MA.only = fit_subset_meta( .dat = dma,
                                   .mods = modsS[ !modsS == "isMeta" ],
                                   .label = "MA subset mods" ) )
@@ -463,6 +523,7 @@ d$calibNaive[ d$isMeta == TRUE ] = calibMA
 
 
 # get conditional calibrated estimates
+# this fn already has unit tests in analyze_helper.Rs
 d$calibCond[ d$isMeta == FALSE ] = conditional_calib_ests(cond.reps.only)$calib.shift
 d$calibCond[ d$isMeta == TRUE ] = conditional_calib_ests(cond.MA.only)$calib.shift
 
@@ -470,9 +531,7 @@ d$calibCond[ d$isMeta == TRUE ] = conditional_calib_ests(cond.MA.only)$calib.shi
 #  but MA heterogeneity estimate actually slightly increases
 
 
-
 if ( redo.plots == TRUE ) {
-  
   
   ##### Marginal Calibrated Estimates
   # choose axis scaling
@@ -569,16 +628,20 @@ if ( redo.plots == TRUE ) {
   
 }
 
+
 # 3. NAIVE AND MODERATED MODEL INFERENCE------------------------------------------------------------------
 
-# get inference for conditional Phats and their difference FOR the moderated model
+# MM audited this section 2021-3-22
 
-# for each resample, fits both naive model and moderated model
-# via fit_mr, gets 7 stats of interest for each model
-# returns results of naive model, moderated model, AND their difference
-# in a 21-length vector
+# get inference for conditional Phats and their difference for the moderated model
 
-# order of fit_mr's 9 returned stats:
+# structure of the code below:
+# - for each resample, fits both naive model and moderated model
+# - via fit_mr, gets 9 stats of interest for each model
+# - returns results of naive model, moderated model, AND their difference
+#    in a (3*9)-length vector
+
+# here is the order of fit_mr's 9 returned stats:
 # c( est.ma,
 #    est.rep,
 #    est.ma - est.rep,
@@ -602,11 +665,7 @@ if ( boot.from.scratch == TRUE ) {
                      # draw resample with replacement
                      # ignore the indices passed by boot because we're
                      #  doing clustered bootstrapping, oh yeah
-                     
-                     # # this works fine
-                     # b = original[indices,]
-                     # mean(rnorm(20))
-                     
+
                      b = cluster_bt(.dat = original,
                                     .clustervar = "study_id")
                      
@@ -621,7 +680,7 @@ if ( boot.from.scratch == TRUE ) {
                        c(.naiveRes, .modRes, .diff)
                        
                      }, error = function(err){
-                       # increase number of NA's if needed to match .simple.return = TRUE structure of fit_mr
+                       # number of NA's here needs to match the match .simple.return = TRUE structure of fit_mr
                        # x 3 separate calls to fit_mr
                        return( rep(NA, 9 * 3) )
                      })
@@ -636,9 +695,8 @@ if ( boot.from.scratch == TRUE ) {
 if ( boot.from.scratch == FALSE ){
   # read in existing bootstraps
   setwd(results.dir)
-  load("saved_bootstraps.RData")
+  base::load("saved_bootstraps.RData")
 }
-
 
 
 # ~ Process the Resamples ------------------------------------------------------------------
@@ -647,7 +705,7 @@ if ( boot.from.scratch == FALSE ){
 ( boot.reps.successful = sum( !is.na( boot.res$t[,1] ) ) )
 
 
-# get stats on original data
+# prep for BCa interval construction: get stats on original data in same format as returned by boot()
 # "2" suffix is because we already have naiveRes and modRes from the model selection
 #   part, but those objects use the full return structure rather than the boot-friendly one
 naiveRes2 = fit_mr( .dat = d, .mods = "isMeta" )
@@ -655,15 +713,14 @@ modRes2 = fit_mr( .dat = d, .mods = modsS )
 diff = naiveRes2 - modRes2
 ( t0 = c(naiveRes2, modRes2, diff) )
 
-# NB: because of the way we hacked the "statistic" argument of boot()
-#  above st it actually creates a resample, the below will NOT match
-#  the actual estimates from original dataset
+# **NB: because of the way we hacked the "statistic" argument of boot()
+#  above st it actually creates a resample rather than only calculating a statistics,
+#  the below will NOT match the actual estimates from original dataset
 # the bootstrap "bias" estimates will also be wrong for this reason
 # boot.res$t0
 
 # sanity check: agreement between fit_mr's two
 #  return structures
-#@make sure make notes about reason for needing both return structures
 expect_equal( naiveRes$est.ma, naiveRes2[1] )
 expect_equal( naiveRes$est.rep, naiveRes2[2] )
 expect_equal( naiveRes$avgDiff, naiveRes2[3] )
@@ -706,7 +763,7 @@ varNames = c( "AvgM",
               "Phat0.2R",
               "Phat0.2Diff" )
 
-# return structure of fit_mr:
+# return structure of fit_mr for reference:
 # c( est.ma,
 #    est.rep,
 #    est.ma - est.rep,
@@ -729,7 +786,7 @@ res = res %>% add_column( model = rep( c("naive", "mod", "modelDiff" ), each = l
 # ~~ Clean Up CIs ------------------------------------------------------------------
 # sanity check: look for point estimates that aren't in their CIs
 res %>% filter( est > hi | est < lo )
-# this one makes sense b/c estimate was at ceiling
+# there is only one, and it makes sense b/c estimate was at ceiling
 
 # set such CIs to NA
 res$lo[ res$est < res$lo | res$est > res$hi ] = NA
@@ -741,8 +798,8 @@ res$hi[ is.na(res$lo) ] = NA
 
 # **all of the CIs in this df are bootstrapped
 
-# ### COMPARE BOOT VS. MODEL-BASED CIs FOR COEFF ESTIMATES:
-# # model-based ones are consistently a lot wider
+# # sanity check: compare model-based CIs (for coeff estimates) to boot ones
+# # model-based ones are consistently a lot wider, actually
 # res[ res$model == "naive" & res$stat == "AvgM", c("lo", "hi") ]; c( naiveRes$est.ma.lo, naiveRes$est.ma.hi )
 # 
 # res[ res$model == "naive" & res$stat == "AvgR", c("lo", "hi") ]; c( naiveRes$est.rep.lo, naiveRes$est.ma.hi )
@@ -763,11 +820,6 @@ res$hi[ is.na(res$lo) ] = NA
 # # mean of bootstraps is definitely lower than the sample one, which could indicate bias
 # # in MRM, we did see relative bias of 5% on average for conditional expectation
 # # so this amount of bias is actually plausible
-# 
-# # *for this reason, perhaps it actually makes more sense to use the boot CIs here
-# # also for comparability within the table
-# ### END CI COMPARISON
-
 
 
 # **for coefficient estimates (i.e., not Phats), use the model-based CIs instead 
@@ -795,10 +847,14 @@ library(data.table)
 fwrite( res, "table_model_diffs_unrounded.csv" )
 
 # ~~~ Rounded numeric table (for piping numbers into manuscript) ------------------------------------------------------------------
+
 res2 = res
+
+# list of numeric variables
 numVars = c("est", "lo", "hi")
 res2[ , numVars ] = round( res2[ , numVars ], 2 )
-# also turn Phats into percentages
+
+# turn Phats into percentages
 inds = grepl( pattern = "Phat", x = res2$stat )
 res2[ inds, numVars ] = 100*res2[ inds, numVars ]
 res2$stat[ inds ] = str_replace( string = res2$stat[ inds ],
@@ -848,27 +904,7 @@ fwrite( res3, "table_model_diffs_rounded_pretty.csv" )
 print( xtable(res3), include.rownames = FALSE)
 
 
-# ~~ Sanity checks ------------------------------------------------------------------
-
-#@also sanity-check the simple models using calls to quick_phat above
-
-# get_and_write_phat( .dat = dma,
-#                     .q = 0,
-#                     label = "Phat0MA")
-# 
-# get_and_write_phat( .dat = dma,
-#                     .q = 0.2,
-#                     label = "Phat0.2MA")
-# 
-# get_and_write_phat( .dat = dr,
-#                     .q = 0,
-#                     label = "Phat0R")
-# 
-# get_and_write_phat( .dat = dr,
-#                     .q = 0.2,
-#                     label = "Phat0.2R")
-
-
+#bm: stopped here with sanity checks :)
 
 # 4. PUBLICATION BIAS (SOME PREREG'D AND SOME POST HOC) ------------------------------------------------------------------
 

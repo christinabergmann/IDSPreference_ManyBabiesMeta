@@ -116,7 +116,7 @@ vr = function(){
 #  - write certain desired stats directly to results csv (optionally)
 
 # .simple.return: should fn return only the stats to be bootstrapped (as a numeric vector)
-#  or a more informative dataframe?
+#  or a more informative dataframe that's better for human use?
 
 # **Phats for MA and reps are based on SUBSET models
 # .dat is an argument only to allow for bootstrapping
@@ -297,6 +297,7 @@ fit_mr = function( .dat,
     }
 
     # replications only
+    # if there are moderators, get conditional calibrated estimates:
     if ( length(.mods) > 1 ) {
       mR = robu( eval( parse( text = string3 ) ), 
                  data = .dat %>% filter(isMeta == FALSE), 
@@ -306,6 +307,8 @@ fit_mr = function( .dat,
                  small = TRUE)
       
       calibR = conditional_calib_ests(mR)$calib.shift
+      
+      # if no moderators, get marginal calibrated estimates
     } else {
       calibR = calib_ests( yi = .dat$yi[ .dat$isMeta == FALSE ],
                            sei = .dat$sei[ .dat$isMeta == FALSE ] ) 
@@ -316,6 +319,7 @@ fit_mr = function( .dat,
     
 
     # meta-analysis only
+    # if there are moderators, get conditional calibrated estimates:
     if ( length(.mods) > 1 ) {
       mM = robu( eval( parse( text = string3 ) ), 
                  data = .dat %>% filter(isMeta == TRUE), 
@@ -325,6 +329,8 @@ fit_mr = function( .dat,
                  small = TRUE )
       
       calibM = conditional_calib_ests(mM)$calib.shift
+      
+      # if no moderators, get marginal calibrated estimates
     } else {
       calibM = calib_ests( yi = .dat$yi[ .dat$isMeta == TRUE ],
                            sei = .dat$sei[ .dat$isMeta == TRUE ] ) 
@@ -359,7 +365,8 @@ fit_mr = function( .dat,
       
     }
     
-    
+    # be careful about changing this return structure
+    #  various parts of the bootstrapping in analyze.R expect this exact structure
     if ( .simple.return == TRUE ){
       # return as a numeric vector for compatibility with boot()
       return( c( est.ma,
@@ -476,34 +483,34 @@ fit_subset_meta = function( .dat,
 }
 
 
-
-# marginal Phat (no moderators)
-get_and_write_phat = function( .dat,
-                               .q,
-                               label ) {
-  
-  
-  Phat = prop_stronger( q = .q,
-                        tail = "above",
-                        dat = .dat,
-                        yi.name = "yi",
-                        vi.name = "vi",
-                        cluster.name = "study_id" )
-  
-  update_result_csv( name = paste( label, "est" ),
-                     value = round( 100 * Phat$est ) )
-  
-  update_result_csv( name = paste( label, "lo" ),
-                     value = round( 100 * Phat$lo ) )
-  
-  update_result_csv( name = paste( label, "hi" ),
-                     value = round( 100 * Phat$hi ) )
-  
-}
+# # @not in use?
+# # marginal Phat (no moderators)
+# get_and_write_phat = function( .dat,
+#                                .q,
+#                                label ) {
+#   
+#   
+#   Phat = prop_stronger( q = .q,
+#                         tail = "above",
+#                         dat = .dat,
+#                         yi.name = "yi",
+#                         vi.name = "vi",
+#                         cluster.name = "study_id" )
+#   
+#   update_result_csv( name = paste( label, "est" ),
+#                      value = round( 100 * Phat$est ) )
+#   
+#   update_result_csv( name = paste( label, "lo" ),
+#                      value = round( 100 * Phat$lo ) )
+#   
+#   update_result_csv( name = paste( label, "hi" ),
+#                      value = round( 100 * Phat$hi ) )
+#   
+# }
 
 
 # @AD HOC FOR THE MODERATORS ACTUALLY PRESENT IN EACH MODEL
-# conditions on all moderators being set to modes in
+# conditions on all moderators being set to modes in MA
 conditional_calib_ests = function(.model){
   # get data from robu object
   dat = .model$data
