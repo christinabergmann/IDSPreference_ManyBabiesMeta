@@ -341,15 +341,11 @@ while ( gotError == TRUE ) {
   
 }
 
-# look at the surviving moderators
-mod.sets[[2]]
+# above call will automatically print an xtable for the final mod1Res
+# that table is in paper
 
-# write the list of moderators  so we don't have to do this again
-setwd(results.dir)
-write.csv(mod.sets[[2]], file = "surviving_mods.csv")
-
-# for later use
-modsS = mod.sets[[2]]
+# look at the surviving moderators and save for later use
+( modsS = mod.sets[[2]] )
 
 ##### Sanity checks
 # sanity check: refit one of these models manually
@@ -460,63 +456,6 @@ mean(calibMA)
 d$calibNaive = NA
 d$calibNaive[ d$isMeta == FALSE ] = calibR
 d$calibNaive[ d$isMeta == TRUE ] = calibMA
-
-
-
-# ~~ Sanity checks on conditional Phats ------------------------------------------------------------------
-
-# spot-check the conditional Phats
-
-# check Perc0.2M in naive model
-temp = robu( yi ~ 1, 
-             data = dma, 
-             studynum = as.factor(study_id),
-             var.eff.size = vi,
-             modelweights = "HIER",
-             small = TRUE)
-expect_equal( round( 100 * mean(calibMA > 0.2) ),
-              res2$est[ res2$model == "naive" & res2$stat == "Perc0.2M"] )
-
-
-# check Perc0.2R in naive model
-temp = robu( yi ~ 1, 
-             data = dr, 
-             studynum = as.factor(study_id),
-             var.eff.size = vi,
-             modelweights = "HIER",
-             small = TRUE)
-expect_equal( round( 100 * mean(calibR > 0.2) ),
-              res2$est[ res2$model == "naive" & res2$stat == "Perc0.2R"] )
-
-
-# check Perc0.2M in moderated model
-temp = robu( yi ~ mean_agec_mos + test_lang + method, 
-             data = dma, 
-             studynum = as.factor(study_id),
-             var.eff.size = vi,
-             modelweights = "HIER",
-             small = TRUE)
-
-# conditional_calib_ests fn already has unit tests in analyze_helper.R :)
-calib = conditional_calib_ests(.model = temp)$calib.shift
-expect_equal( round( 100 * mean(calib > 0.2) ),
-              res2$est[ res2$model == "mod" & res2$stat == "Perc0.2M"] )
-
-
-# check Perc0.2R in moderated model
-temp = robu( yi ~ mean_agec_mos + test_lang + method, 
-             data = dr, 
-             studynum = as.factor(study_id),
-             var.eff.size = vi,
-             modelweights = "HIER",
-             small = TRUE)
-
-# conditional_calib_ests fn already has unit tests in analyze_helper.R :)
-calib = conditional_calib_ests(.model = temp)$calib.shift
-expect_equal( round( 100 * mean(calib > 0.2) ),
-              res2$est[ res2$model == "mod" & res2$stat == "Perc0.2R"] )
-
-
 
 
 # ~ Get Conditional Calibrated Estimates for Plot ------------------------------------------------------------------
@@ -698,7 +637,7 @@ if ( boot.from.scratch == TRUE ) {
   
   # save bootstraps
   setwd(results.dir)
-  save(boot.res, file = "saved_bootstraps.RData")
+  base::save(boot.res, file = "saved_bootstraps.RData")
 }
 
 if ( boot.from.scratch == FALSE ){
@@ -706,6 +645,7 @@ if ( boot.from.scratch == FALSE ){
   setwd(results.dir)
   base::load("saved_bootstraps.RData")
 }
+
 
 
 # ~ Process the Resamples ------------------------------------------------------------------
@@ -912,6 +852,64 @@ fwrite( res3, "table_model_diffs_rounded_pretty.csv" )
 print( xtable(res3), include.rownames = FALSE)
 
 
+# ~~ Sanity checks on conditional Phats ------------------------------------------------------------------
+
+# don't move this section
+# depends on having object res2 above
+# spot-check the conditional Phats
+
+# check Perc0.2M in naive model
+temp = robu( yi ~ 1, 
+             data = dma, 
+             studynum = as.factor(study_id),
+             var.eff.size = vi,
+             modelweights = "HIER",
+             small = TRUE)
+expect_equal( round( 100 * mean(calibMA > 0.2) ),
+              res2$est[ res2$model == "naive" & res2$stat == "Perc0.2M"] )
+
+
+# check Perc0.2R in naive model
+temp = robu( yi ~ 1, 
+             data = dr, 
+             studynum = as.factor(study_id),
+             var.eff.size = vi,
+             modelweights = "HIER",
+             small = TRUE)
+expect_equal( round( 100 * mean(calibR > 0.2) ),
+              res2$est[ res2$model == "naive" & res2$stat == "Perc0.2R"] )
+
+
+# check Perc0.2M in moderated model
+temp = robu( yi ~ mean_agec_mos + test_lang + method, 
+             data = dma, 
+             studynum = as.factor(study_id),
+             var.eff.size = vi,
+             modelweights = "HIER",
+             small = TRUE)
+
+# conditional_calib_ests fn already has unit tests in analyze_helper.R :)
+calib = conditional_calib_ests(.model = temp)$calib.shift
+expect_equal( round( 100 * mean(calib > 0.2) ),
+              res2$est[ res2$model == "mod" & res2$stat == "Perc0.2M"] )
+
+
+# check Perc0.2R in moderated model
+temp = robu( yi ~ mean_agec_mos + test_lang + method, 
+             data = dr, 
+             studynum = as.factor(study_id),
+             var.eff.size = vi,
+             modelweights = "HIER",
+             small = TRUE)
+
+# conditional_calib_ests fn already has unit tests in analyze_helper.R :)
+calib = conditional_calib_ests(.model = temp)$calib.shift
+expect_equal( round( 100 * mean(calib > 0.2) ),
+              res2$est[ res2$model == "mod" & res2$stat == "Perc0.2R"] )
+
+
+
+
 # 4. PUBLICATION BIAS (SOME PREREG'D AND SOME POST HOC) ------------------------------------------------------------------
 
 section = 4
@@ -953,257 +951,6 @@ update_result_csv( name = "weightr mu pval",
                    value = format_stat( 2 * ( 1 - pnorm( abs(m1[[2]]$par[2]) / ses[2] ) ), cutoffs = c(0.10, pval.cutoff) ) )
 
 
-
-# ~ Worst-Case Meta-Analysis------------------------------------------------------------------
-
-# meta-analyze only the nonaffirmatives
-# 2-sided pval
-( meta.worst = robu( yi ~ 1, 
-                     data = dma[ dma$affirm == FALSE, ], 
-                     studynum = study_id,
-                     var.eff.size = vi,
-                     modelweights = "HIER",
-                     small = TRUE) )
-mu.worst = meta.worst$b.r
-t2.worst = meta.worst$mod_info$tau.sq
-mu.lo.worst = meta.worst$reg_table$CI.L
-mu.hi.worst = meta.worst$reg_table$CI.U
-mu.se.worst = meta.worst$reg_table$SE
-pval.worst = meta.worst$reg_table$prob
-
-
-# sanity check: eta -> infinity essentially
-corrected_meta(yi = dma$yi,
-               vi = dma$vi,
-               eta = 1000,
-               clustervar = dma$study_id,
-               favor.positive = TRUE,
-               model = "robust")
-
-
-statCI_result_csv( "Worst mu",
-                   c(meta.worst$b.r,
-                     meta.worst$reg_table$CI.L,
-                     meta.worst$reg_table$CI.U) )
-
-
-update_result_csv( name = "Worst mu pval",
-                   value = round(pval.worst, 3) )
-
-
-# ~ S-values ------------------------------------------------------------------
-# s-values to reduce to null
-( Sval0 = svalue( yi = dma$yi,
-                  vi = dma$vi,
-                  q = 0,
-                  clustervar = dma$study_id,
-                  favor.positive = TRUE,
-                  model = "robust" ) )
-
-
-# ~ Meta-Analysis with Eta = 4.70 (Post Hoc) ------------------------------------------------------------------
-# code modified from PublicationBias::significance_funnel innards
-eta = 4.70
-pvals = dma$pval
-A = dma$affirm
-yi = dma$yi
-vi = dma$vi
-clustervar = dma$study_id
-dat = dma
-small = TRUE
-
-metaCorr = corrected_meta( yi = yi,
-                           vi = vi, 
-                           eta = eta,
-                           clustervar = clustervar,
-                           model = "robust",
-                           favor.positive = TRUE )
-
-# **wow! quite close to replication mean
-
-
-update_result_csv( name = "Corr MA est",
-                   value = round( metaCorr$est, 2) )
-
-update_result_csv( name = "Corr MA lo",
-                   value = round( metaCorr$lo, 2) )
-
-update_result_csv( name = "Corr MA hi",
-                   value = round( metaCorr$hi, 2) )
-
-update_result_csv( name = "Corr MA pval",
-                   value = format.pval( metaCorr$pval, eps = pval.cutoff) )
-
-
-# not possible for both point estimate and CI
-
-# NB: Despite this, the worst-case estimate (meta.worst) has CI crossing null. 
-# This is because, as explained in ?svalue:
-# "Note that [for the worst-case meta-analysis], custom inverse-variance weights are used, which are the inverse of the sum of the study's variance and a heterogeneity estimate from a naive random-effects meta-analysis (Mathur & VanderWeele, 2020). This is done for consistency with the results of corrected_meta, which is used to determine sval.est and sval.ci. Therefore, the worst-case meta-analysis results may differ slightly from what you would obtain if you simply fit robumeta::robu on the nonaffirmative studies with the default weights."
-
-# s-values to reduce effect size to match replications
-( SvalR = svalue( yi = dma$yi,
-                  vi = dma$vi,
-                  q = naive.reps.only$b.r,
-                  clustervar = dma$study_id,
-                  favor.positive = TRUE,
-                  model = "robust" ) )
-
-update_result_csv( name = "sval est to reps",
-                   value = round( SvalR$sval.est, 2 ),
-                   print = FALSE )
-update_result_csv( name = "sval CI to reps",
-                   value = round( SvalR$sval.ci, 2 ),
-                   print = FALSE )
-
-
-# ~ Significance Funnel ------------------------------------------------------------------
-
-if ( redo.plots == TRUE ) {
-  # modified from package
-  yi = d$yi
-  vi = d$vi
-  xmin = min(yi)
-  xmax = max(yi)
-  ymin = 0  # so that pooled points are shown
-  ymax = max( sqrt(vi) )
-  xlab = "Point estimate (SMD)"
-  ylab = "Estimated standard error"
-  favor.positive = TRUE
-  alpha.select = 0.05
-  plot.pooled = TRUE
-  
-  # pooled points to plot
-  est.MA = naive.MA.only$b.r  # naive est in MA
-  est.R = naive.reps.only$b.r  # naive est in reps
-  est.SAPBE = metaCorr$est  # not actually worst-case, but rather SAPB-E estimate
-  est.W = mu.worst
-  
-  d$sei = sqrt(vi)
-  
-  # calculate p-values
-  d$pval = 2 * ( 1 - pnorm( abs(yi) / sqrt(vi) ) )
-  
-  # # which direction of effects are favored?
-  # # if we have the pooled point estimate, but not the favored direction,
-  # #  assume favored direction matches sign of pooled estimate (but issue warning)
-  # if ( !is.na(est.all) & is.na(favor.positive) ) {
-  #   favor.positive = (est.all > 0)
-  #   warning("favor.positive not provided, so assuming publication bias favors estimates whose sign matches est.all")
-  # }
-  # if ( is.na(est.all) & is.na(favor.positive) ) {
-  #   stop("Need to specify favor.positive")
-  # }
-  
-  # affirmative vs. nonaffirmative indicator
-  d$affirm = rep(NA, nrow(d))
-  
-  if ( favor.positive == TRUE ) {
-    d$affirm[ (d$yi > 0) & (d$pval < alpha.select) ] = "Affirmative"
-    d$affirm[ (d$yi < 0) | (d$pval >= alpha.select) ] = "Non-affirmative"
-  }
-  if ( favor.positive == FALSE ) {
-    d$affirm[ (d$yi < 0) & (d$pval < alpha.select) ] = "Affirmative"
-    d$affirm[ (d$yi > 0) | (d$pval >= alpha.select) ] = "Non-affirmative"
-  }
-  
-  # reorder levels for plotting joy
-  d$affirm = factor( d$affirm, c("Non-affirmative", "Affirmative") )
-  
-  # stop if no studies in either group
-  if ( sum( d$affirm == "Non-affirmative" ) == 0 ) {
-    stop("There are no non-affirmative studies. The plot would look silly.")
-  }
-  
-  if ( sum( d$affirm == "Affirmative" ) == 0 ) {
-    stop("There are no affirmative studies. The plot would look silly.")
-  }
-  
-  
-  # set up pooled estimates for plotting
-  pooled.pts = data.frame( yi = c(est.MA, est.R, est.SAPBE, est.W),
-                           sei = c(0,0,0,0) )
-  
-  # for a given SE (y-value), return the "just significant" point estimate value (x-coordinate)
-  just_signif_est = function( .sei ) .sei * qnorm(1 - alpha.select/2)
-  
-  # calculate slope and intercept of the "just affirmative" line
-  # i.e., 1.96 = (just affirmative estimate) / se
-  if (favor.positive == TRUE) sl = 1/qnorm(1 - alpha.select/2)
-  if (favor.positive == FALSE) sl = -1/qnorm(1 - alpha.select/2)
-  int = 0
-  
-  # sanity check
-  expect_equal( alpha.select, 2 * ( 1 - pnorm( abs(1) / sl ) ) )
-  
-  # make the plot
-  p.funnel = ggplot( data = d, aes( x = yi,
-                                    y = sei,
-                                    color = isMeta ) )
-  
-  if ( plot.pooled == TRUE ) {
-    
-    # plot the pooled points
-    # outer part of diamonds
-    p.funnel = p.funnel + geom_point(
-      data = pooled.pts,
-      aes( x = yi, y = sei ),
-      size = 4,
-      shape = 5,
-      fill = NA,
-      color = c("red", "darkgray", NA, NA)
-    ) +
-      
-      # inner part of diamonds
-      geom_point(
-        data = pooled.pts,
-        aes( x = yi, y = sei ),
-        size = 4,
-        shape = 18,
-        color =  c("red", "darkgray", "red", "orange"),
-        alpha = 1
-      ) +
-      
-      # just for visual separation of pooled ests
-      geom_hline( yintercept = 0 ) +
-      
-      # diagonal "just significant" line
-      geom_abline(slope=sl, intercept = int, color = "gray")
-  }
-  
-  p.funnel = p.funnel +
-    
-    # # semi-transparent points with solid circles around them
-    # geom_point( size = 3, alpha=.4) +
-    # geom_point( size = 3, shape = 1) +
-    
-    geom_point(size = 3, shape = 1) +
-    
-    scale_color_manual(values = colors) +
-    #scale_shape_manual(values = c(1,2)) +
-    
-    xlab(xlab) +
-    ylab(ylab) +
-    
-    scale_x_continuous( limits = c(xmin, xmax), breaks = seq(-0.5, 3, .5) ) +
-    scale_y_continuous( limits = c(ymin, ymax), breaks = seq(0, .6, .1) ) +
-    
-    theme_classic() +
-    #theme(legend.title=element_blank())
-    theme(legend.position = "none")
-  
-  plot(p.funnel)
-  
-  
-  my_ggsave("signif_funnel.png",
-            width = 5,
-            height = 4)
-}
-
-# for plot legend:
-# order of outer diamond colors: c("red", "darkgray", NA, NA)
-# order of inner diamond colors: c("red", "darkgray", "red", "orange")
-# order of pooled pts: c(est.MA, est.R, est.SAPBE, est.W)
 
 
 
@@ -1274,7 +1021,7 @@ robu( yi ~ isMeta*mean_agec_mos + test_lang + isMeta*(method=="b.hpp"),
       modelweights = "HIER",
       small = TRUE)
 
-# # save:
+
 # 5. TABLE AND FOREST PLOT OF SUBSET ESTIMATES ------------------------------------------------------------------
 
 # for each categorical moderator, fit subset meta-analysis
@@ -1290,6 +1037,7 @@ for ( i in 1:length(modsCat) ) {
   
   for ( l in .levels ) {
     
+    # subset to chosen level of moderator and fit marginal meta-analysis
     .metaMA = fit_subset_meta( .dat = dma[ dma[,.mod] == l, ],
                                .mods = "1",
                                .label = NA,
@@ -1319,6 +1067,19 @@ setwd( results.dir )
 setwd( "tables_to_prettify" )
 write.csv( res, "subsets_by_moderator.csv")
 
+
+# sanity check: spot-check one subset
+temp = fit_subset_meta( .dat = dr[ dr$method == "b.hpp", ],
+                 .mods = "1",
+                 .label = NA,
+                 .simple.return = TRUE ) 
+
+temp2 = res %>% filter( mod == "method" & level == "b.hpp" & source == "Replications" )
+
+expect_equal( temp$intercept, temp2$est )
+expect_equal( temp$intercept.lo, temp2$lo )
+expect_equal( temp$intercept.hi, temp2$hi )
+expect_equal( nrow( dr[ dr$method == "b.hpp", ] ), temp2$k )
 
 
 # ~ Plot it like it's hot ------------------------------------------------------------------
@@ -1383,13 +1144,10 @@ section = 6
 age_densities(d)
 
 
-# ~~ Make matches - CEM ------------------------------------------------------------------
+# ~~ Make matches - coarsened exact matching (CEM) ------------------------------------------------------------------
+
+# start from all candidate moderators, not just the survivors from multivariable meta-regression
 mods3 = mods2[ !mods2 %in% c("isMeta") ]
-
-string = paste( "isMeta ~ ",
-                paste( mods3, collapse=" + "),
-                collapse = "")
-
 
 # # quintiles
 # ageCuts = quantile( d$mean_agec_mos,
@@ -1397,24 +1155,25 @@ string = paste( "isMeta ~ ",
 # # how big are the differences between bins (months)?
 # diff(ageCuts)
 
-# 12-month bins
-( ageCuts = seq( min(d$mean_agec_mos), max(d$mean_agec_mos), 12 ) )
+# 6-month age bins
+( ageCuts = seq( min(d$mean_agec_mos), max(d$mean_agec_mos), 6 ) )
 
 # exact matching on all categorical variables and coarsened exact matching, based on ageCuts above,
 # for age
 # MatchIt::matchit docs: "if a categorical variable does not appear in grouping, it will not be coarsened, so exact matching will take place on it"
 # regarding subclasses: "setting method = "cem" performs coarsened exact matching. With coarsened exact matching, covariates are coarsened into bins, and a complete cross of the coarsened covariates is used to form subclasses defined by each combination of the coarsened covariate levels. Any subclass that doesn't contain both treated and control units is discarded, leaving only subclasses containing treatment and control units that are exactly equal on the coarsened covariates."
+string = paste( "isMeta ~ ",
+                paste( mods3, collapse=" + "),
+                collapse = "")
+
 x = matchit( formula = eval( parse( text = string ) ),
              data = d,
              method = "cem",
              cutpoints = list( mean_agec_mos =  ageCuts) )
 x
 
-# 49 matches if not including mean_agec_mos (but still only 3 from MA)
-# 14 if using mean_agec_mos with exact quintile matching
-# 19 if using age tertiles
-# 4 if using 6-8 month bins
-# 17 if using 12-month bins
+# 11 if using 6-month bins (8 MLR and 3 MA)
+# 4 if using up to 3-month bins
 summary(x)
 
 
@@ -1432,9 +1191,8 @@ summary(x)
 #              method = "optimal" )
 # x
 
-# how close are the matches on age?
+### How close are the matches on age?
 # obviously the other variables are exactly matched
-
 
 # look at match diagnostics (only interesting for age)
 #  and number of matches in MA and MLR
@@ -1447,6 +1205,7 @@ age_densities(dmt)  # definitely looks better
 
 
 # how many subclasses?
+# NAs are for unmatched observations
 summary(x$subclass)
 
 # look at characteristics of each subclass
@@ -1466,21 +1225,21 @@ CreateTableOne(vars = mods2,
 
 # ~ Analyze the CEM-matched dataset ------------------------------------------------------------------
 
-# simple
-t1 = dmt %>% group_by(isMeta) %>%
+# simple comparison of sources' average point estimates after matching
+( t1 = dmt %>% group_by(isMeta) %>%
   summarise( k = n(),
              mean(yi),
-             mAgec = mean(mean_agec_mos) )
-# wow - really exacerbates the difference
+             mAgec = mean(mean_agec_mos) ) )
+# wow - matching seems to exacerbate the between-source discrepancy
 
 # look within subclasses
-t2 = dmt %>% group_by(subclass, isMeta) %>%
+( t2 = dmt %>% group_by(subclass, isMeta) %>%
   summarise( k = n(),
              mean(yi),
-             mAgec = mean(mean_agec_mos) )
+             mAgec = mean(mean_agec_mos) ) )
 
 
-
+# the real analysis
 matchRes = fit_mr( .dat = dmt,
                    .label = "matched",
                    .mods = "isMeta",
@@ -1498,32 +1257,31 @@ update_result_csv( name = "matched k from MA",
 update_result_csv( name = "matched k from R",
                    value = sum( t2$k[ t2$isMeta == FALSE ] ) )
 
-update_result_csv( name = "matched age diff",
+update_result_csv( name = "matched age diff mos",
                    value = diff( t1$mAgec ) )
 
-update_result_csv( name = "pre-matching age diff",
+update_result_csv( name = "pre-matching age diff mos",
                    value = mean( dr$mean_agec_mos ) - mean( dma$mean_agec_mos ) )
 
 
 update_result_csv( name = paste( "matched subclass", t2$subclass, "isMeta", t2$isMeta, "k", sep = " " ),
                    value = t2$k )
 
-update_result_csv( name = "pre-matching mean_age",
-                   value = mean( d$mean_age ) )
+update_result_csv( name = "pre-matching mean_age mos",
+                   value = mean( d$mean_age / 30.44 ) )
 
-update_result_csv( name = "matched mean_age subclass 1",
-                   value = mean( dmt$mean_age[ dmt$subclass == 1 ] ) )
+update_result_csv( name = "matched mean_age mos subclass 1",
+                   value = mean( dmt$mean_age[ dmt$subclass == 1 ] / 30.44 ) )
 
-update_result_csv( name = "matched mean_age subclass 2",
-                   value = mean( dmt$mean_age[ dmt$subclass == 2 ] ) )
+update_result_csv( name = "matched mean_age mos subclass 2",
+                   value = mean( dmt$mean_age[ dmt$subclass == 2 ] / 30.44 ) )
 
 
 
 # ~ IPW ------------------------------------------------------------------
 
 
-# fit PS model
-# logit{ P(isMeta = 1) } = Xb + eps
+# fit PS model: logit{ P(isMeta = 1) } = XB
 
 string = paste( "isMeta ~ ",
                 paste( mods3, collapse=" + "),
@@ -1533,14 +1291,18 @@ PSmod = glm( eval( parse( text = string ) ),
              family = binomial(link = "logit"),
              data = d )
 
+# as expected, younger mean age is strongest predictor of being in MA vs. MLR
+# can heuristically sanity-check these against Table 1 breakdown of moderators by source
+summary(PSmod)
+
 # add propensity scores to dataset
 d$propScore = predict(PSmod, type = "response")
 d$PSweight = 1/d$propScore
-
+summary(d$propScore)
 
 
 # ~~ Look at covariate overlap  ------------------------------------------------------------------
-# very poor overlap, which is why we get so few matches
+# not surprisingly, there is very poor overlap, which is why we get so few matches
 ggplot( data = d[ d$isMeta == TRUE, ],
         aes(x = propScore,
             fill = isMeta ) ) +
@@ -1575,10 +1337,10 @@ IPW.robu = robu( yi ~ isMeta,
                  modelweights = "HIER",
                  small = small )
 
-est = as.numeric(IPW.robu$b.r)[2]  # isMeta coeff only
-lo = IPW.robu$reg_table$CI.L[2]
-hi = IPW.robu$reg_table$CI.U[2]
-pval.est = IPW.robu$reg_table$prob[2]
+est = as.numeric(IPW.robu$b.r)
+lo = IPW.robu$reg_table$CI.L
+hi = IPW.robu$reg_table$CI.U
+pval.est = IPW.robu$reg_table$prob
 
 
 update_result_csv( name = paste( "IPW robu est", IPW.robu$labels ),
@@ -1594,7 +1356,7 @@ update_result_csv( name = paste( "IPW robu pval", IPW.robu$labels ),
                    value = pval.est )
 
 
-
+#bm 
 
 # 7. FOREST PLOT ------------------------------------------------------------------
 
@@ -1604,6 +1366,9 @@ update_result_csv( name = paste( "IPW robu pval", IPW.robu$labels ),
 # relies on having the matched dataset for coloring those points
 
 if ( redo.plots == TRUE ) {
+  
+  # should we color-code studies in the matched set?
+  color.subclasses = TRUE
   
   # ~ Make plotting dataframe ------------------------------------------------------------------
   
@@ -1672,21 +1437,7 @@ if ( redo.plots == TRUE ) {
   # 2 is open triangle
   shapes = c(19,17)
   if ( color.subclasses == TRUE ) shapes = c(19,17,19)
-  # have breaks approximately evenly spaced on log scale
-  #  but round for prettiness
-  #breaks = unique( round( 10^seq(-3, 3, .2), 1 ) )
-  
-  
-  # 
-  # # re-level group.pretty so legend order matches display order
-  # #  (i.e., from high to low pooled estimate)
-  # agg2p$group.pretty = factor( agg2p$group.pretty,
-  #                              levels =  rev(c( "Metalab",
-  #                                               "Top psychology",
-  #                                               "Top medical",
-  #                                               "PLOS One" )  ))
-  
-  
+
   # ~ Make the Plot ------------------------------------------------------------------
   
   # now color-coding by whether it's the pooled estimate or not
@@ -1760,6 +1511,9 @@ if ( redo.plots == TRUE ) {
 
 
 # 8. WITH MODIFIED SUBJECT INCLUSION CRITERIA ------------------------------------------------------------------
+
+#bm: sanity checks stopped here
+# you should sanity-check quick_sens_analysis next
 
 section = 8
 setwd(data.dir)

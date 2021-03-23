@@ -613,11 +613,12 @@ conditional_calib_ests = function(.model){
 # # yesss
 
 
-# do a quick sensitivity analysis and write results to csv:
+# do a quick sensitivity analysis and write the following results to csv:
 #  - average effect size in replication subset
+#  - average effect size in MA subset
 #  - fit_mr stats from naive model
 #  - fit_mr stats from moderated model
-# expects section variable to be defined
+# expects section variable to be defined globally
 quick_sens_analysis = function( .dat,
                                 .suffix ) {
   # # test only
