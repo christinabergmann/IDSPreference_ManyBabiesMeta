@@ -32,14 +32,17 @@
 
 # 0. PRELIMINARIES ------------------------------------------------------------------
 
+#@redo snapshot
 
 # This script uses renv to preserve the R environment specs (e.g., package versions.)
 library(renv)
 # run this if you want to reproduce results using the R environment we had:
+# library(here); setwd(here)
 # renv::restore()
 
 library(tidyverse) 
 library(knitr)
+library(data.table)
 library(here)
 library(tableone)
 library(corrr)
@@ -55,6 +58,7 @@ library(metafor)
 library(MatchIt)
 
 # run this only if you want to update the R environment specs
+# library(here); setwd(here())
 # renv::snapshot()
 
 
@@ -79,7 +83,7 @@ start.res.from.scratch = FALSE
 # should we use the grateful package to scan and cite packages?
 cite.packages.anew = FALSE
 # should we bootstrap from scratch or read in old resamples?
-boot.from.scratch = FALSE
+boot.from.scratch = TRUE
 # make plots from scratch?
 redo.plots = FALSE
 
@@ -108,7 +112,7 @@ options(scipen=999)
 # moderator names
 # as used in table
 mods = c( "study_type",
-          "mean_agec",
+          "mean_agec_mos",
           "test_lang",  # whether stimuli were in native language; almost constant in meta
           "native_lang", #Won't be used in main analyses
           "method",
@@ -125,7 +129,7 @@ mods = c( "study_type",
 #  and does not have native_lang
 #  also used in matching
 mods2 = c( "isMeta",  # code this way since we expect meta to have larger effect sizes
-           "mean_agec",
+           "mean_agec_mos",
            "test_lang",  # whether stimuli were in native language; almost constant in meta
            "method",
            
@@ -153,7 +157,6 @@ dric = dic %>% filter(isMeta == FALSE)
 # dataset with IPD age-matching in MLR
 dage = suppressMessages( suppressWarnings( read_csv("mb_ma_combined_prepped_0.125_age_matched.csv") ) )
 drage = dage %>% filter(isMeta == FALSE)
-
 
 
 
@@ -199,12 +202,12 @@ xtable( print(t, noSpaces = TRUE, printToggle = FALSE) )
 
 # temporarily recode all categorical moderators as dummies
 # dataset already has dummies, but this is easier than subsetting the right names
-cat.mods = mods[ !mods == "mean_agec" ]
+cat.mods = mods[ !mods == "mean_agec_mos" ]
 temp = dummy_cols( d[,cat.mods],
                    select_columns = cat.mods,
                    remove_selected_columns = TRUE,
                    ignore_na =  TRUE )  
-temp$mean_agec = d$mean_agec 
+temp$mean_agec_mos = d$mean_agec_mos 
 names(temp)
 
 # make correlation matrix
@@ -294,6 +297,12 @@ naiveRes = fit_mr( .dat = d,
                    .write.to.csv = TRUE,
                    .write.table = TRUE,
                    .simple.return = FALSE )
+
+# sanity check: should be similar to naive meta-regression model
+#  but not necessarily equal
+expect_equal( as.numeric(naive.MA.only$b.r), round(naiveRes$est.ma, digits), tol = 0.03 )
+expect_equal( as.numeric(naive.MA.only$reg_table$CI.L), round(naiveRes$est.ma.lo, digits), tol = 0.03 )
+expect_equal( as.numeric(naive.MA.only$reg_table$CI.U), round(naiveRes$est.ma.hi, digits), tol = 0.03 )
 
 
 # fit the meta-regression with all covariates 
@@ -410,7 +419,7 @@ if ( exists("resCSV") ) {
   
   # moderated model
   # for this one, maybe just spot-check some of the moderators?
-  temp = robu( yi ~ isMeta + mean_agec + test_lang + method, 
+  temp = robu( yi ~ isMeta + mean_agec_mos + test_lang + method, 
                  data = d, 
                  studynum = as.factor(study_id),
                  var.eff.size = vi,
@@ -418,7 +427,7 @@ if ( exists("resCSV") ) {
                  small = TRUE)
   
   # for checking all the coeff estimates as a vector
-  suffix = c("X.Intercept.", "isMetaTRUE", "mean_agec", "test_langb.nonnative", "test_langc.artificial", "methodb.hpp", "methodc.other")
+  suffix = c("X.Intercept.", "isMetaTRUE", "mean_agec_mos", "test_langb.nonnative", "test_langc.artificial", "methodb.hpp", "methodc.other")
   
   expect_equal( resCSV$value[ resCSV$name %in% paste( "MOD1 est", suffix, sep = " ") ],
                 as.character( round(temp$b.r, 2) ) )
@@ -427,7 +436,7 @@ if ( exists("resCSV") ) {
                 as.character( round(temp$reg_table$CI.L, 2) ) )
   
   expect_equal( resCSV$value[ resCSV$name %in% paste( "MOD1 hi", suffix, sep = " ") ],
-                as.character( round(temp$reg_table$CI.L, 2) ) )
+                as.character( round(temp$reg_table$CI.U, 2) ) )
   
   expect_equal( resCSV$value[ resCSV$name %in% paste( "MOD1 pval", suffix, sep = " ") ],
                 format.pval(temp$reg_table$prob, eps = pval.cutoff) )  
@@ -481,7 +490,7 @@ expect_equal( round( 100 * mean(calibR > 0.2) ),
 
 
 # check Perc0.2M in moderated model
-temp = robu( yi ~ mean_agec + test_lang + method, 
+temp = robu( yi ~ mean_agec_mos + test_lang + method, 
              data = dma, 
              studynum = as.factor(study_id),
              var.eff.size = vi,
@@ -495,7 +504,7 @@ expect_equal( round( 100 * mean(calib > 0.2) ),
 
 
 # check Perc0.2R in moderated model
-temp = robu( yi ~ mean_agec + test_lang + method, 
+temp = robu( yi ~ mean_agec_mos + test_lang + method, 
              data = dr, 
              studynum = as.factor(study_id),
              var.eff.size = vi,
@@ -843,7 +852,6 @@ res[ res$model == "mod" & res$stat == "AvgDiff", c("lo", "hi") ] = c( mod1Res$av
 # ~~~ Unrounded numeric table (just for reproducibility) ------------------------------------------------------------------
 setwd(results.dir)
 setwd("table_model_diffs")
-library(data.table)
 fwrite( res, "table_model_diffs_unrounded.csv" )
 
 # ~~~ Rounded numeric table (for piping numbers into manuscript) ------------------------------------------------------------------
@@ -904,17 +912,10 @@ fwrite( res3, "table_model_diffs_rounded_pretty.csv" )
 print( xtable(res3), include.rownames = FALSE)
 
 
-#bm: stopped here with sanity checks :)
-
 # 4. PUBLICATION BIAS (SOME PREREG'D AND SOME POST HOC) ------------------------------------------------------------------
 
 section = 4
 
-# sanity check: should be similar to naive meta-regression model
-#  but not necessarily equal
-expect_equal( as.numeric(naive.MA.only$b.r), round(naiveRes$est.ma, digits), tol = 0.03 )
-expect_equal( as.numeric(naive.MA.only$reg_table$CI.L), round(naiveRes$est.ma.lo, digits), tol = 0.03 )
-expect_equal( as.numeric(naive.MA.only$reg_table$CI.U), round(naiveRes$est.ma.hi, digits), tol = 0.03 )
 
 # ~ Affirmative and Nonaffirmative Counts ------------------------------------------------------------------
 
@@ -953,7 +954,6 @@ update_result_csv( name = "weightr mu pval",
 
 
 
-
 # ~ Worst-Case Meta-Analysis------------------------------------------------------------------
 
 # meta-analyze only the nonaffirmatives
@@ -972,7 +972,7 @@ mu.se.worst = meta.worst$reg_table$SE
 pval.worst = meta.worst$reg_table$prob
 
 
-# sanity check
+# sanity check: eta -> infinity essentially
 corrected_meta(yi = dma$yi,
                vi = dma$vi,
                eta = 1000,
@@ -999,7 +999,6 @@ update_result_csv( name = "Worst mu pval",
                   clustervar = dma$study_id,
                   favor.positive = TRUE,
                   model = "robust" ) )
-
 
 
 # ~ Meta-Analysis with Eta = 4.70 (Post Hoc) ------------------------------------------------------------------
@@ -1036,18 +1035,11 @@ update_result_csv( name = "Corr MA pval",
                    value = format.pval( metaCorr$pval, eps = pval.cutoff) )
 
 
-# # N.P. for both point estimate and CI
-# update_result_csv( name = "sval est to 1",
-#                    section = 2,
-#                    value = res$sval.est,
-#                    print = FALSE )
-# update_result_csv( name = "sval CI to 1",
-#                    section = 2,
-#                    value = res$sval.ci,
-#                    print = FALSE )
+# not possible for both point estimate and CI
 
-#@not possible even though worst-case estimate has CI crossing null
-# must be the weight thing again
+# NB: Despite this, the worst-case estimate (meta.worst) has CI crossing null. 
+# This is because, as explained in ?svalue:
+# "Note that [for the worst-case meta-analysis], custom inverse-variance weights are used, which are the inverse of the sum of the study's variance and a heterogeneity estimate from a naive random-effects meta-analysis (Mathur & VanderWeele, 2020). This is done for consistency with the results of corrected_meta, which is used to determine sval.est and sval.ci. Therefore, the worst-case meta-analysis results may differ slightly from what you would obtain if you simply fit robumeta::robu on the nonaffirmative studies with the default weights."
 
 # s-values to reduce effect size to match replications
 ( SvalR = svalue( yi = dma$yi,
@@ -1057,7 +1049,6 @@ update_result_csv( name = "Corr MA pval",
                   favor.positive = TRUE,
                   model = "robust" ) )
 
-# N.P. for estimate
 update_result_csv( name = "sval est to reps",
                    value = round( SvalR$sval.est, 2 ),
                    print = FALSE )
@@ -1088,22 +1079,21 @@ if ( redo.plots == TRUE ) {
   est.SAPBE = metaCorr$est  # not actually worst-case, but rather SAPB-E estimate
   est.W = mu.worst
   
-  
   d$sei = sqrt(vi)
   
   # calculate p-values
   d$pval = 2 * ( 1 - pnorm( abs(yi) / sqrt(vi) ) )
   
-  # which direction of effects are favored?
-  # if we have the pooled point estimate, but not the favored direction,
-  #  assume favored direction matches sign of pooled estimate (but issue warning)
-  if ( !is.na(est.all) & is.na(favor.positive) ) {
-    favor.positive = (est.all > 0)
-    warning("favor.positive not provided, so assuming publication bias favors estimates whose sign matches est.all")
-  }
-  if ( is.na(est.all) & is.na(favor.positive) ) {
-    stop("Need to specify favor.positive")
-  }
+  # # which direction of effects are favored?
+  # # if we have the pooled point estimate, but not the favored direction,
+  # #  assume favored direction matches sign of pooled estimate (but issue warning)
+  # if ( !is.na(est.all) & is.na(favor.positive) ) {
+  #   favor.positive = (est.all > 0)
+  #   warning("favor.positive not provided, so assuming publication bias favors estimates whose sign matches est.all")
+  # }
+  # if ( is.na(est.all) & is.na(favor.positive) ) {
+  #   stop("Need to specify favor.positive")
+  # }
   
   # affirmative vs. nonaffirmative indicator
   d$affirm = rep(NA, nrow(d))
@@ -1134,7 +1124,7 @@ if ( redo.plots == TRUE ) {
   pooled.pts = data.frame( yi = c(est.MA, est.R, est.SAPBE, est.W),
                            sei = c(0,0,0,0) )
   
-  # for a given SE (y-value), return the "just significant" point estimate value (x-value)
+  # for a given SE (y-value), return the "just significant" point estimate value (x-coordinate)
   just_signif_est = function( .sei ) .sei * qnorm(1 - alpha.select/2)
   
   # calculate slope and intercept of the "just affirmative" line
@@ -1142,9 +1132,9 @@ if ( redo.plots == TRUE ) {
   if (favor.positive == TRUE) sl = 1/qnorm(1 - alpha.select/2)
   if (favor.positive == FALSE) sl = -1/qnorm(1 - alpha.select/2)
   int = 0
-  # # sanity check: should be exactly alpha.select
-  # 2 * ( 1 - pnorm( abs(1) / sl ) )
   
+  # sanity check
+  expect_equal( alpha.select, 2 * ( 1 - pnorm( abs(1) / sl ) ) )
   
   # make the plot
   p.funnel = ggplot( data = d, aes( x = yi,
@@ -1178,7 +1168,7 @@ if ( redo.plots == TRUE ) {
       geom_hline( yintercept = 0 ) +
       
       # diagonal "just significant" line
-      geom_abline(slope=sl,intercept = int, color = "gray")
+      geom_abline(slope=sl, intercept = int, color = "gray")
   }
   
   p.funnel = p.funnel +
@@ -1210,9 +1200,14 @@ if ( redo.plots == TRUE ) {
             height = 4)
 }
 
+# for plot legend:
+# order of outer diamond colors: c("red", "darkgray", NA, NA)
+# order of inner diamond colors: c("red", "darkgray", "red", "orange")
+# order of pooled pts: c(est.MA, est.R, est.SAPBE, est.W)
 
 
-# ~ Diagnostics for one-tailed publication bias assumption ------------------------------------------------------------------
+
+# ~ Diagnostics for assumption that publication bias is one-tailed  ------------------------------------------------------------------
 
 # p-value plot
 if ( redo.plots == TRUE ) {
@@ -1244,44 +1239,27 @@ update_result_csv( name = "Perc pvals >0.975",
 
 section = 3
 
-robu( yi ~ mean_agec + test_lang + method,
-      data = dma,
-      studynum = as.factor(study_id),
-      var.eff.size = vi,
-      modelweights = "HIER",
-      small = TRUE)
-
-robu( yi ~ mean_agec + test_lang + method,
-      data = dr,
-      studynum = as.factor(study_id),
-      var.eff.size = vi,
-      modelweights = "HIER",
-      small = TRUE)
-
-
-
+# look at direction of moderator associations in MLR vs. MA
 # *a key difference: HPP (vs. CF) is associated with LARGER ES in replications, but SMALLER ES in meta-analysis
 
 # fit pruned model within MA and MLR separately
 #  to look heuristically at interactions
-# this xtable is in paper
+# these xtables are in paper
 fit_mr( .dat = dma,
         .label = "mod1_MA_only",
-        .mods = c("mean_agec", "test_lang", "method"),
+        .mods = c("mean_agec_mos", "test_lang", "method"),
         #.write.to.csv = TRUE,
         .write.table = TRUE )
 
-# this xtable is in paper
 fit_mr( .dat = dr,
         .label = "mod1_MLR_only",
-        .mods = c("mean_agec", "test_lang", "method"),
+        .mods = c("mean_agec_mos", "test_lang", "method"),
         #.write.to.csv = TRUE,
         .write.table = TRUE )
-
 
 
 # sanity check: refit models manually
-robu( yi ~ isMeta + mean_agec + test_lang + (method=="b.hpp"), 
+robu( yi ~ isMeta + mean_agec_mos + test_lang + (method=="b.hpp"), 
       data = d, 
       studynum = as.factor(study_id),
       var.eff.size = vi,
@@ -1289,7 +1267,7 @@ robu( yi ~ isMeta + mean_agec + test_lang + (method=="b.hpp"),
       small = TRUE)
 
 # adding interactions doesn't improve fit
-robu( yi ~ isMeta*mean_agec + test_lang + isMeta*(method=="b.hpp"), 
+robu( yi ~ isMeta*mean_agec_mos + test_lang + isMeta*(method=="b.hpp"), 
       data = d, 
       studynum = as.factor(study_id),
       var.eff.size = vi,
@@ -1303,7 +1281,7 @@ robu( yi ~ isMeta*mean_agec + test_lang + isMeta*(method=="b.hpp"),
 
 
 # ~ Fit subset model to each level of each categorical model ------------------------------------------------------------------
-modsCat = mods2[ !mods2 %in% c("isMeta", "mean_agec" ) ]
+modsCat = mods2[ !mods2 %in% c("isMeta", "mean_agec_mos" ) ]
 
 for ( i in 1:length(modsCat) ) {
   
@@ -1414,13 +1392,13 @@ string = paste( "isMeta ~ ",
 
 
 # # quintiles
-# ageCuts = quantile( d$mean_agec,
+# ageCuts = quantile( d$mean_agec_mos,
 #                     probs = seq(0, 1, 1/4) )
 # # how big are the differences between bins (months)?
 # diff(ageCuts)
 
 # 12-month bins
-( ageCuts = seq( min(d$mean_agec), max(d$mean_agec), 12 ) )
+( ageCuts = seq( min(d$mean_agec_mos), max(d$mean_agec_mos), 12 ) )
 
 # exact matching on all categorical variables and coarsened exact matching, based on ageCuts above,
 # for age
@@ -1429,11 +1407,11 @@ string = paste( "isMeta ~ ",
 x = matchit( formula = eval( parse( text = string ) ),
              data = d,
              method = "cem",
-             cutpoints = list( mean_agec =  ageCuts) )
+             cutpoints = list( mean_agec_mos =  ageCuts) )
 x
 
-# 49 matches if not including mean_agec (but still only 3 from MA)
-# 14 if using mean_agec with exact quintile matching
+# 49 matches if not including mean_agec_mos (but still only 3 from MA)
+# 14 if using mean_agec_mos with exact quintile matching
 # 19 if using age tertiles
 # 4 if using 6-8 month bins
 # 17 if using 12-month bins
@@ -1492,14 +1470,14 @@ CreateTableOne(vars = mods2,
 t1 = dmt %>% group_by(isMeta) %>%
   summarise( k = n(),
              mean(yi),
-             mAgec = mean(mean_agec) )
+             mAgec = mean(mean_agec_mos) )
 # wow - really exacerbates the difference
 
 # look within subclasses
 t2 = dmt %>% group_by(subclass, isMeta) %>%
   summarise( k = n(),
              mean(yi),
-             mAgec = mean(mean_agec) )
+             mAgec = mean(mean_agec_mos) )
 
 
 
@@ -1524,7 +1502,7 @@ update_result_csv( name = "matched age diff",
                    value = diff( t1$mAgec ) )
 
 update_result_csv( name = "pre-matching age diff",
-                   value = mean( dr$mean_agec ) - mean( dma$mean_agec ) )
+                   value = mean( dr$mean_agec_mos ) - mean( dma$mean_agec_mos ) )
 
 
 update_result_csv( name = paste( "matched subclass", t2$subclass, "isMeta", t2$isMeta, "k", sep = " " ),
@@ -1779,6 +1757,8 @@ if ( redo.plots == TRUE ) {
   
 }
 
+
+
 # 8. WITH MODIFIED SUBJECT INCLUSION CRITERIA ------------------------------------------------------------------
 
 section = 8
@@ -1794,8 +1774,8 @@ setwd(data.dir)
 
 # some basic stats about age-matched data
 # this should be very close to 0 now
-update_result_csv( name = "mean mean_agec drage",
-                   value = mean(drage$mean_agec) )
+update_result_csv( name = "mean mean_agec_mos drage",
+                   value = mean(drage$mean_agec_mos) )
 
 # raw age
 update_result_csv( name = "mean mean_age drage",

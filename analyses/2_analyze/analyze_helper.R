@@ -533,8 +533,8 @@ conditional_calib_ests = function(.model){
   for ( i in 1:length(otherBhatVars) ) {
     
     b = otherBhatVars[i]
-    if ( b == "mean_agec" ) {
-      linpred = linpred + dat$mean_agec * otherBhat[i]
+    if ( b == "mean_agec_mos" ) {
+      linpred = linpred + dat$mean_agec_mos * otherBhat[i]
       
     } else if (b == "test_langb.nonnative" ) {
       linpred = linpred + ( dat$test_lang == "b.nonnative" ) * otherBhat[i]
@@ -579,7 +579,7 @@ conditional_calib_ests = function(.model){
 # dat = dr
 # t2 = mod$mod_info$tau.sq
 # 
-# myLinpred = mod$b.r[1] + mod$b.r[2] * dat$mean_agec +
+# myLinpred = mod$b.r[1] + mod$b.r[2] * dat$mean_agec_mos +
 #   mod$b.r[3] * ( dat$test_lang == "b.nonnative" ) +
 #   mod$b.r[4] * ( dat$method == "b.hpp" )
 # 
@@ -598,7 +598,7 @@ conditional_calib_ests = function(.model){
 # dat = dma
 # t2 = mod$mod_info$tau.sq
 # 
-# myLinpred = mod$b.r[1] + mod$b.r[2] * dat$mean_agec +
+# myLinpred = mod$b.r[1] + mod$b.r[2] * dat$mean_agec_mos +
 #   mod$b.r[3] * ( dat$test_lang == "b.nonnative" ) +
 #   mod$b.r[4] * ( dat$test_lang == "c.artificial" ) +
 #   mod$b.r[5] * ( dat$method == "b.hpp" ) + 
@@ -734,13 +734,13 @@ safe_boot_ci = function(x, boot.res, type) {
 # density plot of age stratified by source
 age_densities = function(.dat) {
   # choose axis scaling
-  #summary(.dat$mean_agec)
+  #summary(.dat$mean_agec_mos)
   xmin = -24
   xmax = 30
   tickJump = 6  # space between tick marks
   
   ggplot( data = .dat,
-          aes( x = mean_agec,
+          aes( x = mean_agec_mos,
                fill = studyTypePretty,
                color = studyTypePretty ) ) +
     

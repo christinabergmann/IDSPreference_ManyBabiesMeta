@@ -63,7 +63,7 @@ if(prereg){
 } else {
   if ( ic.dataset == FALSE & age.matched == FALSE ) d = read_csv("mb_ma_combined.csv")
   if ( ic.dataset == TRUE & age.matched == FALSE ) d = read_csv("mb_ma_combined_0.75.csv")
-  if ( ic.dataset == FALSE & age.matchesd == TRUE ) d = read_csv("mb_ma_combined_0.125_age_matched.csv")
+  if ( ic.dataset == FALSE & age.matched == TRUE ) d = read_csv("mb_ma_combined_0.125_age_matched.csv")
   if ( ic.dataset == TRUE & age.matched == TRUE ) stop("Case not handled")
 }
 
@@ -72,7 +72,7 @@ if(prereg){
 ############################## RECODE MODERATORS ############################## 
 
 # list of moderators (not yet created)
-mods = c( "mean_agec",
+mods = c( "mean_agec_mos",
           "test_lang",  # whether stimuli were in native language
           "method",
           
@@ -90,7 +90,7 @@ mods = c( "mean_agec",
 #"human_coded", # ~~~ not in the dataset
 
 # which are continuous?
-contMods = "mean_agec"
+contMods = "mean_agec_mos"
 
 
 # fix inconsistent capitalization
@@ -109,13 +109,14 @@ d$isRep = (d$study_type == "MB")
 # age in months
 
 
-# age is coded in days
+# make mean_agec_mos in MONTHS
+# mean_age is coded in days
 daysPerMonth = 30.44
-d$mean_agec = d$mean_age/daysPerMonth - mean( d$mean_age[ d$isMeta == TRUE ]/daysPerMonth, na.rm = TRUE)
+d$mean_agec_mos = d$mean_age/daysPerMonth - mean( d$mean_age[ d$isMeta == TRUE ]/daysPerMonth, na.rm = TRUE)
 
 # sanity check: mean age by source
 d %>% group_by(study_type) %>%
-  summarise(mean(mean_age/30.44))
+  summarise(mean(mean_agec_mos))
 
 # Now fix method names
 d = d  %>% mutate(method = ifelse(method %in% c("singlescreen", "eyetracking"), "cf", 
@@ -126,7 +127,7 @@ d = d %>% mutate(dependent_measure = ifelse(dependent_measure == "facial_express
 
 
 # distribution of moderators in RRR and MA
-# mean of mean_agec should be 0 in the MA but nonzero in MB
+# mean of mean_agec_mos should be 0 in the MA but nonzero in MB
 CreateTableOne(vars = mods, 
                strata = "study_type",
                data = d)
@@ -166,7 +167,7 @@ d$yi = d$d_calc
 d$vi = d$d_var_calc
 d$sei = sqrt(d$vi)
 
-# CI limits
+# CI limits (for plotting)
 d$lo = d$yi - qnorm(0.975) * sqrt(d$vi)
 d$hi = d$yi + qnorm(0.975) * sqrt(d$vi)
 
