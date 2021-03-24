@@ -30,7 +30,7 @@ if (age.matched == TRUE) {
   # without further restriction, mean age in MB is 284 days
   summary(mb_data_tidy$age_days)
   
-  # try to subset the MB subjects to get a mean of 144 days 
+  # subset the MB subjects to get a mean of 144 days 
   # as in the MA
   # to do this, take only the youngest MB subjects
   # this one matches almost exactly (mean 144)
@@ -38,6 +38,7 @@ if (age.matched == TRUE) {
   mean( mb_data_tidy$age_days )
   # this retains only 11% of the data (2,314 subjects)
   
+  # retitle the dataset
   MB_OUT_PATH <- here(paste("data/mb_data_tidy_", n_trial_pairs_criterion/8, "_age_matched.csv", sep = ""))
 }
 

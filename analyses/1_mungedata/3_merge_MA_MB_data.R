@@ -3,12 +3,8 @@
 library(tidyverse)
 library(here)
 
-# for replications, should we make the sensitivity-analysis dataset with more
-#  stringent inclusion (set to TRUE), or the main-analysis dataset?
-ic.dataset = FALSE
-
-# for replications, should we look at the much smaller, age-matched dataset instead?
-age.matched = FALSE
+# expects global vars set by master: ic.dataset, age.matched
+#bm: stopped here with restructure
 
 MA_DATA_PATH <- here("data/ma_data_tidy.csv")
 
