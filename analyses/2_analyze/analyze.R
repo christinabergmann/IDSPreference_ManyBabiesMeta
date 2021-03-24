@@ -1,11 +1,25 @@
 
 # META-NOTES ------------------------------------------------------------------ 
 
-# ~ To do  ------------------------------------------------------------------
 
+# ~ Usage notes  ------------------------------------------------------------------
 
-# - Update section variable after code structure is done
+# - Key points about the assumptions and interpretation of various fn outputs are marked with "**" in this file and in analyze_helper.R. If you make changes to fns themselves or to how variables are coded, make sure you read those to make sure things won't break.
+
+# - Code writes graphics, tables, and stats_for_paper.csv straight to relative directories (results.dir) and also to a fixed directory on MBM's machine
+#  (overleaf.dir) that pipes into the LaTeX manuscript.
+
+# - Code also writes numerical results to stats_for_paper.csv in a format that can be piped into LaTeX. To see the results as you run the code, use vr(). You can wipe that file using wr().
+
+# - Names of important model objects:
+# - naive.MA.only and naive.reps.only: meta-analyses within subsets; no moderators
+# - cond.MA.only and cond.reps.only: meta-analyses within subsets; 
+#   conditions moderators to averages in meta-analysis
+
 # - Remember not to use asterisks in file names bc they cause syncing trouble for CB.
+
+
+# ~ To do  ------------------------------------------------------------------
 
 
 # ~ Ask CB, et al ------------------------------------------------------------------
@@ -17,19 +31,6 @@
 # - Can we add codebook for data? What are n_1, n_2, and n? Why is n the average rather than the sum of those two? For example, study_id Kaplan1995a has a fractional n.
 
 
-
-# ~ Usage notes  ------------------------------------------------------------------
-
-# - Code write graphics straight to relative directories and to a fixed directory
-#  on MBM's machine that pipes into the LaTeX manuscript.
-
-# - Code also writes numerical results to stats_for_paper.csv in a format that can be piped into LaTeX. To see the results as you run the code, use vr(). You can wipe that file using wr().
-
-
-# - Names of important model objects:
-# - naive.MA.only and naive.reps.only: meta-analyses within subsets; no moderators
-
-# Search for "**" in analyze_helper and here if changing stuff
 
 # 0. PRELIMINARIES ------------------------------------------------------------------
 
@@ -1677,7 +1678,6 @@ update_result_csv( name = "Worst reportedSignif mu pval",
                   clustervar = dma2$study_id,
                   favor.positive = TRUE,
                   model = "robust" ) )
-
 
 
 # ~ Meta-Analysis with Eta = 4.70 (Post Hoc) ------------------------------------------------------------------
