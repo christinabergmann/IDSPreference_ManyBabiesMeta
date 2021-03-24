@@ -29,10 +29,9 @@
 # - Names of important model objects:
 # - naive.MA.only and naive.reps.only: meta-analyses within subsets; no moderators
 
+# Search for "**" in analyze_helper and here if changing stuff
 
 # 0. PRELIMINARIES ------------------------------------------------------------------
-
-#@redo snapshot
 
 # This script uses renv to preserve the R environment specs (e.g., package versions.)
 library(renv)
@@ -1068,18 +1067,28 @@ setwd( "tables_to_prettify" )
 write.csv( res, "subsets_by_moderator.csv")
 
 
-# sanity check: spot-check one subset
-temp = fit_subset_meta( .dat = dr[ dr$method == "b.hpp", ],
-                 .mods = "1",
-                 .label = NA,
-                 .simple.return = TRUE ) 
+### Sanity check: check one subset
+temp = robu( yi ~ 1, 
+             data = dr[ dr$method == "b.hpp", ], 
+             studynum = as.factor(study_id),
+             var.eff.size = vi,
+             modelweights = "HIER",
+             small = TRUE)
 
-temp2 = res %>% filter( mod == "method" & level == "b.hpp" & source == "Replications" )
+# results from calling fit_subset_meta
+resRow = res %>% filter( mod == "method" & level == "b.hpp" & source == "Replications" )
 
-expect_equal( temp$intercept, temp2$est )
-expect_equal( temp$intercept.lo, temp2$lo )
-expect_equal( temp$intercept.hi, temp2$hi )
-expect_equal( nrow( dr[ dr$method == "b.hpp", ] ), temp2$k )
+expect_equal( resRow$est,
+              temp$b.r[1] )
+
+expect_equal( resRow$lo,
+              temp$reg_table$CI.L )
+
+expect_equal( resRow$hi,
+              temp$reg_table$CI.U )
+
+expect_equal( resRow$k,
+              sum( dr$method == "b.hpp" ) )
 
 
 # ~ Plot it like it's hot ------------------------------------------------------------------

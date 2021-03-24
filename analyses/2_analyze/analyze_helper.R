@@ -1,6 +1,7 @@
 
 ################################ MISCELLANEOUS ################################
 
+# save ggplot to results.dir and overleaf.dir for piping joy
 my_ggsave = function(name,
                      width,
                      height,
@@ -18,7 +19,7 @@ my_ggsave = function(name,
           height = height)
 }
 
-# wrapper for update_result_csv to easily at stat and confidence interval
+# wrapper for update_result_csv to easily write stat and confidence interval
 statCI_result_csv = function(name,
                              vec){
   
@@ -90,6 +91,7 @@ update_result_csv = function( name,
 
 
 # stands for "wipe results"
+# removes file stats_for_paper.csv
 wr = function(){
   setwd(results.dir)
   if( "stats_for_paper.csv" %in% list.files() ) system("rm stats_for_paper.csv")
@@ -98,6 +100,7 @@ wr = function(){
 }
 
 # stands for "view results"
+# displays contents of stats_for_paper.csv
 vr = function(){
   setwd(results.dir)
   View( read.csv("stats_for_paper.csv") )
@@ -107,29 +110,42 @@ vr = function(){
 
 ################################ FIT META-REGRESSION AND SAVE RESULTS ################################
 
-# for a given set of moderators:
-#  - fit meta-regression
-#  - get estimate for meta-analysis and for replications
-#  - estimate the 3 differences of interest (source coef, difference in Phats)
+# For a given set of moderators (.mods):
+#  - fits meta-regression
+#  - gets estimate for meta-analysis and for replications
+#  - estimates the 3 differences of interest (source coef, difference in Phats)
 #  and optionally return them
-#  - write a table with all the meta-regression estimates (optionally)
-#  - write certain desired stats directly to results csv (optionally)
+#  - writes a table with all the meta-regression estimates (optionally)
+#  - writes certain desired stats directly to results csv (optionally)
 
-# .simple.return: should fn return only the stats to be bootstrapped (as a numeric vector)
-#  or a more informative dataframe that's better for human use?
+# Arguments:
+# - .dat: dataset (used as an argument only to allow for bootstrapping,
+#    because fn already  internally makes MA and MLR subsets)
+
+# - .label: name of analysis for labeling files and results that will be written
+
+# - .mods: moderators to adjust (use only "isMeta" for naive) 
+
+# - .write.table: do you want a csv file of regression coeffs to be written to results.dir?
+
+# - .write.to.scv: do you want estimates written to stats_for_paper.csv?
+
+# - .simple.return: should fn return only the stats to be bootstrapped
+#   (as an unlabeled numeric vector) or a more informative dataframe that's better for human use?
 
 # **Phats for MA and reps are based on SUBSET models
-# .dat is an argument only to allow for bootstrapping
-# .mods SHOULD include isMeta
-# in returned stats, differences are always meta-analysis - replications
+# **In returned stats, differences are always meta-analysis - replications
+
+# Sanity checks for this fn are in analyze.R
+
 fit_mr = function( .dat,
-                   .label = NA,  # name of the analysis
+                   .label = NA,  
                    .mods, 
                    .write.table = FALSE,
                    .write.to.csv = FALSE,
                    .simple.return = TRUE ) {
   
-  # #@TEST ONLY
+  # TEST ONLY:
   # .dat = d
   # .mods = modsS
   # .label = "naive"
@@ -197,9 +213,6 @@ fit_mr = function( .dat,
     update_result_csv( name = paste( .label, "pval", meta$labels ),
                        value = pvals2 )
   }
-  
-  
-  
   
   # also save selected results to a df to be returned
   if ( hasBoth == TRUE & .simple.return == FALSE ) .res = data.frame( est.rep = est.rep,
@@ -295,7 +308,7 @@ fit_mr = function( .dat,
       # handle naive model
       string3 = "yi ~ 1"
     }
-
+    
     # replications only
     # if there are moderators, get conditional calibrated estimates:
     if ( length(.mods) > 1 ) {
@@ -313,11 +326,11 @@ fit_mr = function( .dat,
       calibR = calib_ests( yi = .dat$yi[ .dat$isMeta == FALSE ],
                            sei = .dat$sei[ .dat$isMeta == FALSE ] ) 
     }
-
+    
     Phat0.rep = mean( calibR > 0 )
     Phat0.2.rep = mean( calibR > 0.2 )
     
-
+    
     # meta-analysis only
     # if there are moderators, get conditional calibrated estimates:
     if ( length(.mods) > 1 ) {
@@ -335,21 +348,12 @@ fit_mr = function( .dat,
       calibM = calib_ests( yi = .dat$yi[ .dat$isMeta == TRUE ],
                            sei = .dat$sei[ .dat$isMeta == TRUE ] ) 
     }
-   
+    
     Phat0.ma = mean( calibM > 0 )
     Phat0.2.ma = mean( calibM > 0.2 )
     
     Phat0.diff = Phat0.ma - Phat0.rep
     Phat0.2.diff = Phat0.2.ma - Phat0.2.rep
-    
-    
-    ##### 5. Write Results #####
-    # row = data.frame( avgDiff = est.ma - est.rep,
-    #                   Phat0Diff = runif(n=1, -1,1), # ***obviously fake
-    #                   Phat0.2Diff = runif(n=1, -1,1) ) # ***obviously fake
-    # return(row)
-    
-    
     
     if ( .simple.return == FALSE ) {
       .res$avgDiff = meta$b.r[ meta$labels == "isMetaTRUE"]
@@ -384,26 +388,17 @@ fit_mr = function( .dat,
     } else return(.res)
   }
   
-  
 }
 
 
-
-
-# this fn survived a sanity check in analyze.R
+# fit meta-analysis to arbitrary subset, .dat
+# see fit_mr for args
+# if you want no moderators at all, use .mods = "1"
+# this fn has sanity checks in analyze.R
 fit_subset_meta = function( .dat,
-                            .label = NA,  # name of the analysis for the results csv
+                            .label = NA,  
                             .mods,
                             .simple.return = FALSE) {
-  
-  # # TEST ONLY
-  # .dat = dma
-  # #.mods = mod.sets[[2]]  # @can't do this within just reps or just MA
-  # .mods = "1"
-  # .label = "Reps subset naive"
-  # .write.table = FALSE
-  # .write.to.csv = FALSE
-  # .simple.return = FALSE
   
   # catch case where subset is empty
   if ( nrow(.dat) == 0 ) {
@@ -483,34 +478,12 @@ fit_subset_meta = function( .dat,
 }
 
 
-# # @not in use?
-# # marginal Phat (no moderators)
-# get_and_write_phat = function( .dat,
-#                                .q,
-#                                label ) {
-#   
-#   
-#   Phat = prop_stronger( q = .q,
-#                         tail = "above",
-#                         dat = .dat,
-#                         yi.name = "yi",
-#                         vi.name = "vi",
-#                         cluster.name = "study_id" )
-#   
-#   update_result_csv( name = paste( label, "est" ),
-#                      value = round( 100 * Phat$est ) )
-#   
-#   update_result_csv( name = paste( label, "lo" ),
-#                      value = round( 100 * Phat$lo ) )
-#   
-#   update_result_csv( name = paste( label, "hi" ),
-#                      value = round( 100 * Phat$hi ) )
-#   
-# }
+# **IMPORTANT: this fn hard-codes the moderators to be conditioned
+#   and their level names and orders
 
-
-# @AD HOC FOR THE MODERATORS ACTUALLY PRESENT IN EACH MODEL
-# conditions on all moderators being set to modes in MA
+# give conditional calibrated estimates when setting all moderators
+#  to their means/modes in MA
+# sanity checks below
 conditional_calib_ests = function(.model){
   # get data from robu object
   dat = .model$data
@@ -522,8 +495,6 @@ conditional_calib_ests = function(.model){
   # would need to be modified for other datasets
   otherBhat = bhat[-1]  # non-intercept terms
   otherBhatVars = .model$labels[-1]
-  
-  # @specific to this set of moderators
   
   # for each bhat, check if it's actually in the model
   # important because some subsets (e.g., boot resamples) could be 
@@ -563,13 +534,6 @@ conditional_calib_ests = function(.model){
   #var(calib.shift); t2
   
   return( data.frame( calib.shift, linpred ) )
-  
-  # # threshold, shifted to set effect modifiers to 0
-  # # would need to be modified for other datasets
-  # q.shift = q - ( bhat[2]*z[1] + bhat[3]*z[2] )  
-  # # note: below assumes we are considering effects ABOVE the threshold
-  # Phat = mean( calib.shift > c(q.shift) )
-  
 }
 
 
@@ -619,6 +583,7 @@ conditional_calib_ests = function(.model){
 #  - fit_mr stats from naive model
 #  - fit_mr stats from moderated model
 # expects a few variables to be defined globally: section, modsS
+# has minimal sanity check in analyze.R
 quick_sens_analysis = function( .dat,
                                 .suffix ) {
   # # test only
@@ -773,16 +738,16 @@ age_densities = function(.dat) {
 #  but redefine affirmative indicator to use the variable reportedSignif
 #  search "EDITED" to find differences from R package
 corrected_meta_2 = function( yi,
-                           vi,
-                           reportedSignif,  # EDITED
-                           eta,
-                           clustervar = 1:length(yi),
-                           model,
-                           selection.tails = 1,
-                           favor.positive,
-                           alpha.select = 0.05,
-                           CI.level = 0.95,
-                           small = TRUE ) {
+                             vi,
+                             reportedSignif,  # EDITED
+                             eta,
+                             clustervar = 1:length(yi),
+                             model,
+                             selection.tails = 1,
+                             favor.positive,
+                             alpha.select = 0.05,
+                             CI.level = 0.95,
+                             small = TRUE ) {
   
   # stop if eta doesn't make sense
   if ( eta < 1 ) stop( "Eta must be at least 1.")
@@ -809,7 +774,7 @@ corrected_meta_2 = function( yi,
     flipped = TRUE
     yif = -yi
   }
-
+  
   # 2-sided p-values for each study even if 1-tailed selection
   pvals = 2 * ( 1 - pnorm( abs(yif) / sqrt(vi) ) )
   
@@ -916,18 +881,18 @@ corrected_meta_2 = function( yi,
 
 
 svalue_2 = function( yi,
-                   vi,
-                   reportedSignif, # EDITED
-                   q,
-                   clustervar = 1:length(yi),
-                   model,
-                   alpha.select = 0.05,
-                   eta.grid.hi = 200,
-                   favor.positive,
-                   CI.level = 0.95,
-                   small = TRUE,
-                   return.worst.meta = FALSE ) {
-
+                     vi,
+                     reportedSignif, # EDITED
+                     q,
+                     clustervar = 1:length(yi),
+                     model,
+                     alpha.select = 0.05,
+                     eta.grid.hi = 200,
+                     favor.positive,
+                     CI.level = 0.95,
+                     small = TRUE,
+                     return.worst.meta = FALSE ) {
+  
   
   # stop if eta doesn't make sense
   if ( eta.grid.hi < 1 ) stop( "eta.grid.hi must be at least 1.")
@@ -963,15 +928,6 @@ svalue_2 = function( yi,
                                               ". q must be greater than this value (i.e., closer to zero).",
                                               sep = "" ) )
   
-  # # reverse signs if needed to have pooled point estimate > 0
-  # if ( m0$est < 0 ) {
-  #   # keep track so that we can flip back at the end
-  #   flipped = TRUE
-  #   yi = -yi
-  #   q = -q
-  # } else {
-  #   flipped = FALSE
-  # }
   ##### Flip Estimate Signs If Needed #####
   
   # if favor.positive == TRUE, then we don't need to fit a naive meta-analysis or do anything
@@ -1123,16 +1079,16 @@ svalue_2 = function( yi,
       func = function(.eta) {
         # EDITED TO CALL CORRECTED_META_2
         est.corr = corrected_meta_2( yi = yi,
-                                   vi = vi,
-                                   reportedSignif = reportedSignif,
-                                   eta = .eta,
-                                   model = model,
-                                   clustervar = clustervar,
-                                   selection.tails = 1,
-                                   favor.positive = TRUE,  # always TRUE because we've already flipped signs if needed
-                                   alpha.select = alpha.select,
-                                   CI.level = CI.level,
-                                   small = small )$est
+                                     vi = vi,
+                                     reportedSignif = reportedSignif,
+                                     eta = .eta,
+                                     model = model,
+                                     clustervar = clustervar,
+                                     selection.tails = 1,
+                                     favor.positive = TRUE,  # always TRUE because we've already flipped signs if needed
+                                     alpha.select = alpha.select,
+                                     CI.level = CI.level,
+                                     small = small )$est
         return( abs(est.corr - q))
       }
       
@@ -1221,17 +1177,6 @@ svalue_2 = function( yi,
                                     k.nonaffirmative,
                                     signs.recoded = flipped ),
                 meta.worst = meta.worst ) )
-  # } else {
-  #
-  #
-  #
-  #   return( data.frame( sval.est,
-  #                       sval.ci = sval.ci,
-  #                       k.affirmative,
-  #                       k.nonaffirmative,
-  #                       signs.recoded = flipped ) )
-  # }
-  
   
 }
 
