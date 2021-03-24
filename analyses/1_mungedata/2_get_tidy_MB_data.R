@@ -2,12 +2,7 @@
 library(tidyverse)
 library(here)
 
-# for changing the inclusion criterion
-n_trial_pairs_criterion = 1
-# There are 8 pairs in total, so 4 pairs = 50%, 6 pairs = 75%
-
-# for replications, should we look at the much smaller, age-matched dataset instead?
-age.matched = TRUE
+# script expects these global vars from master: n_trial_pairs_criterion, age.matched
 
 MB1_PATH <- "https://raw.githubusercontent.com/manybabies/mb1-analysis-public/master/processed_data/03_data_diff_main.csv"
 MB_OUT_PATH <- here(paste("data/mb_data_tidy_", n_trial_pairs_criterion/8, ".csv", sep = ""))
