@@ -33,10 +33,11 @@ ma_data_tidy <- ma_data_raw %>%
 #  select(id, d_calc, d_var_calc, es_method) %>% 
 #  ungroup()
 
+
 # get study characteristics
 study_moderators <- ma_data_tidy %>%
         group_by(id) %>%
-        mutate(n = mean(c(n_1, n_2), na.rm = TRUE),
+        mutate(n = sum(c(n_1, n_2), na.rm = TRUE),
               mean_age = mean(c(mean_age_1, mean_age_2), na.rm = TRUE),
               month = round(mean_age/MONTH_IN_DAYS,2),
               age_group =  case_when(month >= 0 & month <= 3.5 ~ "0-3 mo",
