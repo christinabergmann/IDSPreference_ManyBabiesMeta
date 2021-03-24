@@ -618,7 +618,7 @@ conditional_calib_ests = function(.model){
 #  - average effect size in MA subset
 #  - fit_mr stats from naive model
 #  - fit_mr stats from moderated model
-# expects section variable to be defined globally
+# expects a few variables to be defined globally: section, modsS
 quick_sens_analysis = function( .dat,
                                 .suffix ) {
   # # test only

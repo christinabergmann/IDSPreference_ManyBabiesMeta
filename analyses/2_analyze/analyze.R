@@ -1356,7 +1356,6 @@ update_result_csv( name = paste( "IPW robu pval", IPW.robu$labels ),
                    value = pval.est )
 
 
-#bm 
 
 # 7. FOREST PLOT ------------------------------------------------------------------
 
@@ -1521,6 +1520,19 @@ setwd(data.dir)
 quick_sens_analysis( .dat = dic,
                      .suffix = "IC" )
 
+
+# sanity check: check just the dataset dimension counts
+# other than that, quick_sens_analysis is just a straightforward set of calls to fit_mr
+# resCSV is assigned as a global var by fns that call update_result_csv
+if ( exists("resCSV") ) {
+  
+  expect_equal( resCSV$value[ resCSV$name == "Reps subset naiveIC k" ],
+                as.character( nrow( dic[ dic$isMeta == FALSE, ] ) ) )
+  
+  expect_equal( resCSV$value[ resCSV$name == "Reps subset naiveIC n subj" ],
+                as.character( round( sum( dic[ dic$isMeta == FALSE, "n" ], 0 ) ) ) )
+}
+
 # 9. WITH IPD AGE-MATCHING IN MLR ------------------------------------------------------------------
 
 section = 9
@@ -1531,13 +1543,13 @@ setwd(data.dir)
 update_result_csv( name = "mean mean_agec_mos drage",
                    value = mean(drage$mean_agec_mos) )
 
-# raw age
-update_result_csv( name = "mean mean_age drage",
-                   value = round( mean(drage$mean_age), 0 ) )
+# raw age (transformed to months)
+update_result_csv( name = "mean mean_age mos drage",
+                   value = round( mean(drage$mean_age / 30.44), 1 ) )
 
-# raw age in MA for comparison
-update_result_csv( name = "mean mean_age dma",
-                   value = round( mean(dma$mean_age), 0 ) )
+# raw age in MA for comparison (months)
+update_result_csv( name = "mean mean_age mos dma",
+                   value = round( mean(dma$mean_age / 30.44), 1 ) )
 
 
 quick_sens_analysis( .dat = dage,
@@ -1548,7 +1560,10 @@ quick_sens_analysis( .dat = dage,
 
 # ~ Exclude between-subjects designs  ------------------------------------------------------------------
 
-table(d$participant_design, d$sourcePretty, useNA = "ifany")
+# look at design types
+table(d$participant_design,
+      d$sourcePretty,
+      useNA = "ifany")
 
 update_result_csv( name = "k between-S studies",
                    value = sum(d$participant_design == "between") )
@@ -1560,8 +1575,9 @@ quick_sens_analysis( .dat = d[ d$participant_design != "between", ],
 
 # ~ Look at age linearity assumption  ------------------------------------------------------------------
 
-# this is not yet in manuscript
+# not in manuscript
 # omit SEs because they'll be wrong
+# use calibrated estimates to somewhat account for studies' precisions
 ggplot(d, aes(mean_age, calibNaive, color=sourcePretty)) +
   geom_point() +
   geom_smooth(se=FALSE) +
@@ -1570,12 +1586,16 @@ ggplot(d, aes(mean_age, calibNaive, color=sourcePretty)) +
 
 # apparent nonlinearity in replications seems largely driven by the outlying replication
 #  study with largest mean age
+# try excluding that one
+temp = d %>% filter( !(isMeta == TRUE & mean_age > 300 ) )
+expect_equal(nrow(temp), nrow(d) - 1)
 
-# ggplot(d, aes(mean_age, d_calc, color=isMeta)) +
-#   geom_point() +
-#   geom_smooth(se=F) +
-#   theme_classic() +
-#   facet_wrap(method~test_lang)
+ggplot(temp, aes(mean_age, calibNaive, color=sourcePretty)) +
+  geom_point() +
+  geom_smooth(se=FALSE) +
+  scale_color_manual(values=colors) +
+  theme_classic()
+
 
 
 
@@ -1583,9 +1603,10 @@ ggplot(d, aes(mean_age, calibNaive, color=sourcePretty)) +
 
 # keep only MA studies that reported whether results were significant
 dma2 = dma %>% filter( !is.na(reportedSignif) )
+nrow(dma2)
 
-# proportions reported significant, stratified by whether calculated 
-#  p-value was < 0.05
+# proportions of estimates reported significant,
+#  stratified by whether calculated p-value was < 0.05
 ( t = dma2 %>%
     group_by(pvalSignif) %>%
     summarise( n(),
@@ -1596,7 +1617,7 @@ update_result_csv( name = paste( "Perc reportedSignif when pvalSignif was", t$pv
 
 # huh! not a very strong correlation between 
 #  calculated and reported significance
-cor.test(dma3$reportedSignif, dma3$pvalSignif)
+cor.test(dma2$reportedSignif, dma2$pvalSignif)
 
 # new affirmative indicator
 dma2$affirm2 = (dma2$reportedSignif == 1) & (dma2$yi > 0)
@@ -1664,7 +1685,7 @@ metaCorr2 = corrected_meta_2( yi = dma2$yi,
                               favor.positive = TRUE )
 
 # again quite close to replication mean
-
+# not reported in manuscript except to say that results were similar
 update_result_csv( name = "Corr MA reportedSignif est",
                    value = round( metaCorr2$est, 2) )
 
@@ -1676,65 +1697,4 @@ update_result_csv( name = "Corr MA reportedSignif hi",
 
 update_result_csv( name = "Corr MA reportedSignif pval",
                    value = format.pval( metaCorr2$pval, eps = pval.cutoff) )
-
-
-
-
-
-
-
-# (Obsolete?) SUBSET MODELS ------------------------------------------------------------------ 
-# 
-# # ~ Sanity check: Subsets that resemble each other  ------------------------------------------------------------------
-# 
-# # MCF: "Could you do something like a "modal subsample" where you pull native language HPP (or CF?) results and plot those across MA/MB1, possibly with age included?"
-# fit_subset_meta( .dat = dma %>% filter( method == "b.hpp" & test_lang == "a.native" ),
-#                  .mods = "1",
-#                  .label = NA )
-# 
-# fit_subset_meta( .dat = dr %>% filter( method == "b.hpp" & test_lang == "a.native" ),
-#                  .mods = "1",
-#                  .label = NA )
-# 
-# # interesting!!! these agree pretty well (replications actually a little bigger, 0.58 vs 0.51)
-# # bm
-# 
-# 
-# # **complements of above - do not agree well at all (difference 0.43, more like in meta-regression below)
-# # 0.29 replications vs. 0.72 MA
-# fit_subset_meta( .dat = dma %>% filter( method != "b.hpp" | test_lang != "a.native" ),
-#                  .mods = "1",
-#                  .label = NA )
-# 
-# fit_subset_meta( .dat = dr %>% filter( method != "b.hpp" | test_lang != "a.native" ),
-#                  .mods = "1",
-#                  .label = NA )
-# 
-# 
-# # continues to agree very well if we look just at HPP subset
-# fit_subset_meta( .dat = dma %>% filter( method == "b.hpp" ),
-#                  .mods = "1",
-#                  .label = NA )
-# 
-# fit_subset_meta( .dat = dr %>% filter( method == "b.hpp" ),
-#                  .mods = "1",
-#                  .label = NA )
-# 
-# 
-# # surviving mods were mean age, language, and method
-# # compare to meta-regression
-# 
-# # first one is estimated difference of 0.24 
-# fit_mr( .dat = d,
-#         .mods = c("isMeta", "method", "test_lang"),
-#         .simple.return = FALSE)
-# 
-# # recode method and language as binary
-# d$method.hpp = d$method == "b.hpp"
-# d$test_lang.native = d$test_lang == "a.native"
-# 
-# fit_mr( .dat = d,
-#         .mods = c("isMeta", "method.hpp", "test_lang.native"),
-#         .simple.return = FALSE)
-# 
 
