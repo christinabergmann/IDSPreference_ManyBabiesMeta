@@ -34,7 +34,7 @@ if ( ic.dataset == TRUE & age.matched == TRUE ) {
 mb_data_raw <- read_csv(MB_DATA_PATH)
 ma_data_raw <- read_csv(MA_DATA_PATH)
 
-
+# tidy up MB data
 mb_data_tidy <- mb_data_raw %>%
   rename(study_id = lab,
          d_calc = d_z,
@@ -58,6 +58,7 @@ mb_data_tidy <- mb_data_raw %>%
   mutate(same_infant = as.character(same_infant))
 
 
+# tidy up MA data
 ma_data_tidy <- ma_data_raw %>%
   rename(d_calc = d,
          d_var_calc = d_var) %>%
@@ -70,11 +71,15 @@ ma_data_tidy <- ma_data_raw %>%
                                  TRUE ~ infant_type))
 
 
+# merge them
 tidy_df <- bind_rows(mb_data_tidy, ma_data_tidy) %>%
   select(study_type, study_id, expt_num, short_cite,  mean_age, age_group,
          n, d_calc, d_var_calc, native_lang, prop_nae, infant_type,
          main_question_ids_preference, same_infant, method, dependent_measure,  presentation, response_mode, effect_significance_reported,
-         everything())
+         everything()) %>%
+  # for counting UNIQUE participants given that in MA, some participants contribute to multiple estimates
+  # unique combos of study_id, expt_num, same_infant represent unique subjects
+  mutate( unique_infants = !duplicated( paste(study_id, expt_num, same_infant) ) )
 
 
 write_csv(tidy_df, OUTFILE)
