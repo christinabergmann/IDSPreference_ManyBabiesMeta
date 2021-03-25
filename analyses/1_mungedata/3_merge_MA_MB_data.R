@@ -9,8 +9,8 @@ library(here)
 MA_DATA_PATH <- here("data/ma_data_tidy.csv")
 
 if ( ic.dataset == FALSE & age.matched == FALSE ) {
-  MB_DATA_PATH <- here("data/mb_data_tidy.csv")
-  OUTFILE <- here("data/mb_ma_combined.csv")
+  MB_DATA_PATH <- here("data/mb_data_tidy_0.125.csv")
+  OUTFILE <- here("data/mb_ma_combined_0.125.csv")
 }
 
 if ( ic.dataset == TRUE & age.matched == FALSE ) {
@@ -23,6 +23,7 @@ if ( ic.dataset == FALSE & age.matched == TRUE ) {
   OUTFILE <- here("data/mb_ma_combined_0.125_age_matched.csv")
 }
 
+# do not apply both sensitivity criteria at once
 if ( ic.dataset == TRUE & age.matched == TRUE ) {
   stop("Case not handled")
 }
