@@ -7,18 +7,12 @@ library(knitr)
 library(here)
 library(tableone)
 
+# expects global vars set by master prep script: ic.dataset, age.matched
+
 # to reproduce main analyses, set to FALSE
 # If working on the preregistration, set this to T, otherwise F to use the veridical dataset without scrambling.
 prereg = FALSE
 
-# to reproduce main analyses, set to FALSE
-# for replications, should we make the sensitivity-analysis dataset with more
-#  stringent inclusion (set to TRUE), or the main-analysis dataset?
-ic.dataset = FALSE
-
-# to reproduce main analyses, set to FALSE
-# for replications, should we look at the much smaller, age-matched dataset instead?
-age.matched = FALSE
 
 data.dir = here("data")
 # where to save results
@@ -61,7 +55,7 @@ if(prereg){
   d = full_dataset_shuffled
   
 } else {
-  if ( ic.dataset == FALSE & age.matched == FALSE ) d = read_csv("mb_ma_combined.csv")
+  if ( ic.dataset == FALSE & age.matched == FALSE ) d = read_csv("mb_ma_combined_0.125.csv")
   if ( ic.dataset == TRUE & age.matched == FALSE ) d = read_csv("mb_ma_combined_0.75.csv")
   if ( ic.dataset == FALSE & age.matched == TRUE ) d = read_csv("mb_ma_combined_0.125_age_matched.csv")
   if ( ic.dataset == TRUE & age.matched == TRUE ) stop("Case not handled")
@@ -202,7 +196,7 @@ setwd(data.dir)
 if ( prereg == TRUE ) write.csv(d, "mb_ma_combined_scrambled_prepped.csv")
 
 if ( prereg == FALSE ) {
-  if ( ic.dataset == FALSE & age.matched == FALSE ) write.csv(d, "mb_ma_combined_prepped.csv")
+  if ( ic.dataset == FALSE & age.matched == FALSE ) write.csv(d, "mb_ma_combined_prepped_0.125.csv")
   if ( ic.dataset == TRUE & age.matched == FALSE ) write.csv(d, "mb_ma_combined_prepped_0.75.csv")
   if ( ic.dataset == FALSE & age.matched == TRUE ) write.csv(d, "mb_ma_combined_prepped_0.125_age_matched.csv")
   

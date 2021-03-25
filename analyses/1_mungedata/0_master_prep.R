@@ -50,39 +50,36 @@ for ( .c in criteria.vec ) {
   }
 }
 
-# STEP 3: Merge MA and MB Data --------------------------------------------------------
+# STEP 3-4: Merge MA and MB Data and Prep for Analysis --------------------------------------------------------
 
-#bm: now need to run 3_merge_MA_MB.R, which had the following args:s
-
-# for replications, should we make the sensitivity-analysis dataset with more
+# .ic: for replications, should we make the sensitivity-analysis dataset with more
 #  stringent inclusion (set to TRUE), or the main-analysis dataset?
-ic.dataset.vec = FALSE
-
-# for replications, should we look at the much smaller, age-matched dataset instead?
-
-
-
-  
 for ( .ic in c(FALSE, TRUE) ) {
   
   ic.dataset = .ic
   
   # for main analysis, run as both age-matched and not matched
-  if ( .c == 1 ) {
+  if ( .ic == FALSE ) {
     for ( .a in c(FALSE, TRUE) ) {
       # for replications, should we look at the much smaller, age-matched dataset?
       age.matched = .a
       setwd( here("analyses/1_mungedata") )
-      suppressMessages( source("2_get_tidy_MB_data.R") )
+      suppressMessages( source("3_merge_MA_MB_data.R") )
+      suppressMessages( source("4_prep_for_analysis.R") )
     }
   }
   
   # for sensitivity analyses with other inclusion criteria, 
   #  don't also do age-matching
-  if ( .c != 1 ) {
+  if ( .ic == TRUE ) {
     age.matched = FALSE
     setwd( here("analyses/1_mungedata") )
-    suppressMessages( source("2_get_tidy_MB_data.R") )
+    suppressMessages( source("3_merge_MA_MB_data.R") )
+    suppressMessages( source("4_prep_for_analysis.R") )
   }
 }
+
+
+# STEP 4: Prep for Analysis --------------------------------------------------------
+
 

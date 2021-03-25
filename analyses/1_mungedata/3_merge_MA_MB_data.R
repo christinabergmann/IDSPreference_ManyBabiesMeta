@@ -4,7 +4,6 @@ library(tidyverse)
 library(here)
 
 # expects global vars set by master: ic.dataset, age.matched
-#bm: stopped here with restructure
 
 MA_DATA_PATH <- here("data/ma_data_tidy.csv")
 
