@@ -11,7 +11,7 @@
 * Dataset used for age-matched sensitivity analyses: `mb_ma_combined_prepped_0.125_age_matched`
 
 
-### Nuances
+### Fine print
 * Fractional suffixes on dataset names (e.g., "0.125") correspond to inclusion criteria. The "0.75" dataset (i.e., with the more stringent subject inclusion criterion) has fewer estimates than the main dataset (equivalent to the "0.125" dataset) because some age groups were dropped completely if N<10. 
 
 

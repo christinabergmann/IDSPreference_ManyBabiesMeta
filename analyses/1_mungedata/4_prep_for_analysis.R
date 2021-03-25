@@ -1,6 +1,6 @@
 
   
-############################## PRELIMINARIES ############################## 
+# PRELIMINARIES --------------------------------------------------------
 
 library(tidyverse) 
 library(knitr)
@@ -63,7 +63,7 @@ if(prereg){
 
 
 
-############################## RECODE MODERATORS ############################## 
+# RECODE MODERATORS --------------------------------------------------------
 
 # list of moderators (not yet created)
 mods = c( "mean_agec_mos",
@@ -148,7 +148,7 @@ CreateTableOne(vars = mods,
 
 
 
-############################## MAKE OTHER VARIABLES ############################## 
+# MAKE OTHER VARIABLES --------------------------------------------------------
 
 # unique ID
 # don't use expt_num here because it's only defined for MA studies
@@ -189,7 +189,7 @@ if ( ic.dataset == FALSE & age.matched == FALSE ) {
 }
 
 
-############################## SAVE DATASET ############################## 
+# SAVE DATASET --------------------------------------------------------
 
 setwd(data.dir)
 
