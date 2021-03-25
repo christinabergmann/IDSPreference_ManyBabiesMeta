@@ -1,7 +1,6 @@
 
-  
-# PRELIMINARIES --------------------------------------------------------
 
+# PRELIMINARIES --------------------------------------------------------
 library(tidyverse) 
 library(knitr)
 library(here)
@@ -21,16 +20,13 @@ results.dir = here("results_from_R")
 overleaf.dir = "~/Dropbox/Apps/Overleaf/MB-Meta/R_objects"
 code.dir = here("analyses/1_mungedata")
 
-
+# helper fns
 setwd(code.dir)
 source("prep_helper.R")
 
 
 # should we use the grateful package to scan and cite packages?
 cite.packages.anew = FALSE
-
-# helper code
-# source( here("analyses/2_analyze/analyze_helper.R") )
 
 # read in dataset
 setwd(data.dir)
@@ -67,7 +63,7 @@ if(prereg){
 
 # list of moderators (not yet created)
 mods = c( "mean_agec_mos",
-          "test_lang",  # whether stimuli were in native language
+          "test_lang",  
           "method",
           
           # constant in RRR:
@@ -75,21 +71,15 @@ mods = c( "mean_agec_mos",
           "own_mother",
           "presentation",
           "dependent_measure",
-          "main_question_ids_preference"#,
-          
-          # varied in RRR:
-          #"stimulus_set", # ~~~ not in the dataset 
-          #"trial_control" # ~~~ not in the dataset
-          ) 
-#"human_coded", # ~~~ not in the dataset
+          "main_question_ids_preference") 
 
-# which are continuous?
+
+# just continuous mods
 contMods = "mean_agec_mos"
 
-
-# fix inconsistent capitalization
+# fix inconsistent capitalization within certain variables
 d = d %>% mutate_at( .vars = c("method", "speech_type", "speaker", "presentation"),
-                 .funs = tolower )
+                     .funs = tolower )
 
 # collapse categories of speaker
 d$own_mother = (d$speaker == "child’s mother")
@@ -98,12 +88,7 @@ d$own_mother = (d$speaker == "child’s mother")
 d$isMeta = (d$study_type == "MA")
 d$isRep = (d$study_type == "MB")
 
-
-# center continuous moderators
-# age in months
-
-
-# make mean_agec_mos in MONTHS
+# make mean_agec_mos in MONTHS, centered by MA mean
 # mean_age is coded in days
 daysPerMonth = 30.44
 d$mean_agec_mos = d$mean_age/daysPerMonth - mean( d$mean_age[ d$isMeta == TRUE ]/daysPerMonth, na.rm = TRUE)
@@ -111,6 +96,7 @@ d$mean_agec_mos = d$mean_age/daysPerMonth - mean( d$mean_age[ d$isMeta == TRUE ]
 # sanity check: mean age by source
 d %>% group_by(study_type) %>%
   summarise(mean(mean_agec_mos))
+expect_equal( mean( d$mean_agec_mos[d$isMeta == TRUE] ), 0, tol = 0.001 )
 
 # Now fix method names
 d = d  %>% mutate(method = ifelse(method %in% c("singlescreen", "eyetracking"), "cf", 
@@ -120,17 +106,46 @@ d = d  %>% mutate(method = ifelse(method %in% c("singlescreen", "eyetracking"), 
 d = d %>% mutate(dependent_measure = ifelse(dependent_measure == "facial_expression", "affect", "preference"))
 
 
-# distribution of moderators in RRR and MA
-# mean of mean_agec_mos should be 0 in the MA but nonzero in MB
+# sanity check: distribution of moderators in RRR and MA
 CreateTableOne(vars = mods, 
                strata = "study_type",
                data = d)
 
+
+# ~ Recode moderators based on MA's average value --------------------------------------------------------
+
+
 # recode all moderators so reference levels are mode in meta-analysis
 #  (recode via alphabetization)
-d = d %>% mutate_at( .vars = mods[ !mods == contMods ],
-                     .funs = function(.v) code_mode_as_ref(vec = .v,
-                                                           isMeta = d$isMeta) ) #Needed to hack this
+d2 = d %>% mutate_at( .vars = mods[ !mods == contMods ],
+                      .funs = function(.v) code_mode_as_ref(vec = .v,
+                                                            isMeta = d$isMeta) ) #Needed to hack this
+
+# sanity checks on code_mode_as_ref
+catMods = mods[ !mods %in% contMods ]
+
+( t = d2 %>%
+    group_by(isMeta) %>%
+    summarise_at( .vars = catMods,
+                  # this fn gives mode of factor var
+                  function(x) {
+                    .t = table(x)
+                    names(.t)[ which.max(.t) ]
+                  } ) )
+
+
+  table(d2$test_lang[d2$isMeta == FALSE])
+
+# MA's mode should always be the "a.XXX" level
+expect_equal( grepl( x = t[ t$isMeta == TRUE, -1 ],
+                     pattern = "a." ),
+              TRUE )
+# for MB, compare by eye to table of moderators before recoding 
+CreateTableOne(vars = mods, 
+               strata = "study_type",
+               data = d)
+# end sanity checks
+d = d2
 
 
 # also recode as dummy variables for meta-regression joy
