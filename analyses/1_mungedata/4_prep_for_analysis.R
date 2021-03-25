@@ -66,7 +66,7 @@ mods = c( "mean_agec_mos",
           "test_lang",  
           "method",
           
-          # constant in RRR:
+          # constant in MB:
           "speech_type",
           "own_mother",
           "presentation",
@@ -106,7 +106,7 @@ d = d  %>% mutate(method = ifelse(method %in% c("singlescreen", "eyetracking"), 
 d = d %>% mutate(dependent_measure = ifelse(dependent_measure == "facial_expression", "affect", "preference"))
 
 
-# sanity check: distribution of moderators in RRR and MA
+# sanity check: distribution of moderators in MB and MA
 CreateTableOne(vars = mods, 
                strata = "study_type",
                data = d)

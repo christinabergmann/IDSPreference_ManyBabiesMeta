@@ -18,6 +18,8 @@
 
 # - Remember not to use asterisks in file names bc they cause syncing trouble for CB.
 
+# - Acronyms: "MB" or "MLR" refer to the replications. "MA" refers to meta-analysis.
+
 
 # ~ To do  ------------------------------------------------------------------
 
@@ -154,7 +156,7 @@ dr = d %>% filter(isMeta == FALSE)
 dic = suppressMessages( suppressWarnings( read_csv("mb_ma_combined_prepped_0.75.csv") ) )
 dric = dic %>% filter(isMeta == FALSE)
 
-# dataset with IPD age-matching in MLR
+# dataset with IPD age-matching in MB
 dage = suppressMessages( suppressWarnings( read_csv("mb_ma_combined_prepped_0.125_age_matched.csv") ) )
 drage = dage %>% filter(isMeta == FALSE)
 
@@ -230,7 +232,7 @@ write.csv(corrs, "moderator_cormat.csv")
 
 section = 2
 
-# ~ Subset meta-analyses for MA an MLR ------------------------------------------------------------------
+# ~ Subset meta-analyses for MA an MB ------------------------------------------------------------------
 # this fn also writes stats to results csv
 ( naive.MA.only = fit_subset_meta( .dat = dma,
                                    .mods = "1",
@@ -475,7 +477,7 @@ d$calibNaive[ d$isMeta == TRUE ] = calibMA
 d$calibCond[ d$isMeta == FALSE ] = conditional_calib_ests(cond.reps.only)$calib.shift
 d$calibCond[ d$isMeta == TRUE ] = conditional_calib_ests(cond.MA.only)$calib.shift
 
-# ***important: MLR heterogeneity estimate is 0 after conditioning on mods
+# ***important: MB heterogeneity estimate is 0 after conditioning on mods
 #  but MA heterogeneity estimate actually slightly increases
 
 
@@ -986,10 +988,10 @@ update_result_csv( name = "Perc pvals >0.975",
 
 section = 3
 
-# look at direction of moderator associations in MLR vs. MA
+# look at direction of moderator associations in MB vs. MA
 # *a key difference: HPP (vs. CF) is associated with LARGER ES in replications, but SMALLER ES in meta-analysis
 
-# fit pruned model within MA and MLR separately
+# fit pruned model within MA and MB separately
 #  to look heuristically at interactions
 # these xtables are in paper
 fit_mr( .dat = dma,
