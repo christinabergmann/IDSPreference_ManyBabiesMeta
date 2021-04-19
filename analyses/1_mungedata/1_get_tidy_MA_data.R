@@ -5,7 +5,7 @@ library(janitor)
 source(here("analyses/1_mungedata/compute_es_IDS.R"))
 
 MONTH_IN_DAYS <- 365.25/12
-MA1_PATH <- here("data/Dunst.csv")
+MA1_PATH <- here("data/Dunst_original_es.csv")
 MA_OUT_PATH <- here("data/ma_data_tidy.csv")
 
 TARGET_VARS <- c("study_id", "short_cite", "expt_num", "original_ma", "main_question_ids_preference", 
@@ -21,8 +21,7 @@ ma_data_raw <- read_csv(file = MA1_PATH) %>%
 
 ma_data_tidy <- ma_data_raw %>%
   select(all_of(TARGET_VARS)) %>%
-  mutate(id = 1:n()) %>%
-  filter(original_ma == "yes")
+  mutate(id = 1:n()) 
 
 # calculate effect sizes - not needed as we use the ones from Dunst et al.
 #ma_data_tidy_with_es <-  ma_data_tidy %>%
