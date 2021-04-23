@@ -58,6 +58,7 @@ library(testthat)
 library(ggplot2)
 library(metafor)
 library(MatchIt)
+library(table1)
 
 # run this only if you want to update the R environment specs
 # library(here); setwd(here())
@@ -193,11 +194,36 @@ update_result_csv( name = paste( "median n", t$study_type, sep = " "),
 # ~ Moderators ------------------------------------------------------------------
 
 # distribution of moderators in RRR and MA
-t = CreateTableOne(vars = mods, 
-                   strata = "study_type",
-                   data = d)
+# t = CreateTableOne(vars = mods, 
+#                    strata = "study_type",
+#                    data = d)
 
-xtable( print(t, noSpaces = TRUE, printToggle = FALSE) )
+#xtable( print(t, noSpaces = TRUE, printToggle = FALSE) )
+
+# Helpful for table https://cran.r-project.org/web/packages/table1/vignettes/table1-examples.html
+
+# clean up variable names and values for nicer presentation in Table 1
+t <- d %>%
+  select(study_type, mods) %>%
+  mutate(study_type = as.factor(study_type)) %>%
+  mutate(`centered age (months)` = mean_agec_mos) %>%
+  mutate(`test language` = factor(test_lang, labels = c("native", "non-native", "artificial"))) %>%
+  mutate(`native language` = factor(native_lang)) %>%
+  mutate(method = factor(method, labels = c("central fixation", "headturn preference procedure", "other"))) %>%
+  mutate(`speech type` = factor(speech_type, labels = c("simulated", "naturalistic", "filtered", "synthesized"))) %>%
+  mutate(`own mother` = factor( own_mother, labels = c("no", "yes"))) %>%
+  mutate(presentation = factor(presentation, labels = c("tape recording", "video recording"))) %>%
+  mutate(`main question was about IDS prerence` = factor(main_question_ids_preference, labels = c("yes", "no"))) %>%
+  select(study_type, `centered age (months)`, `test language`, `native language`, method, `speech type`, `own mother`, presentation, `main question was about IDS prerence`)
+
+
+my.render.cont <- function(x) {
+  with(stats.apply.rounding(stats.default(round(x,2)), digits=3), c("",
+                                                                    "Mean (SD)"=sprintf("%s (&plusmn; %s)", MEAN, SD)))
+}
+
+table1(~ `centered age (months)` + `test language` + `native language` + method + `speech type` + `own mother` + presentation + `main question was about IDS prerence`| study_type, data = t, overall = F, render.continuous=my.render.cont)
+
 
 
 # ~~ Moderator Correlation Matrix ------------------------------------------------------------------
