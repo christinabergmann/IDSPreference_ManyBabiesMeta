@@ -13,7 +13,7 @@ setwd( here("analyses/1_mungedata") )
 
 # 2 versions: using original or corrected Dunst data
 for ( .u in c(FALSE, TRUE) ) {
-  use.corrected.Dunst = .u
+  use.corrected.dunst = .u
   source("1_get_tidy_MA_data.R")
 }
 

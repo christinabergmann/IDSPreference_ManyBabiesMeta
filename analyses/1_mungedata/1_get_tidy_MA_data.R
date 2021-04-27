@@ -6,12 +6,12 @@ source(here("analyses/1_mungedata/compute_es_IDS.R"))
 
 MONTH_IN_DAYS <- 365.25/12
 
-if ( use.corrected.Dunst == FALSE ) {
+if ( use.corrected.dunst == FALSE ) {
   MA1_PATH <- here("data/from_data_team/Dunst_original_es.csv")
   MA_OUT_PATH <- here("data/prepped_with_original_dunst/ma_data_tidy.csv")
 }
 
-if ( use.corrected.Dunst == TRUE ) {
+if ( use.corrected.dunst == TRUE ) {
   MA1_PATH <- here("data/from_data_team/Dunst_corrected_es.csv")
   MA_OUT_PATH <- here("data/prepped_with_corrected_dunst/ma_data_tidy.csv")
 }

@@ -63,12 +63,22 @@ library(MatchIt)
 # library(here); setwd(here())
 # renv::snapshot()
 
+if ( use.corrected.dunst == FALSE ) {
+  data.dir = here("data/prepped_with_original_dunst")
+  # where to save results
+  results.dir = here("results_from_R/results_with_original_dunst")
+  overleaf.dir = "~/Dropbox/Apps/Overleaf/MB-Meta/R_objects"
+}
 
-data.dir = here("data")
-# where to save results
-results.dir = here("results_from_R")
-# results.dir = "~/Dropbox/Personal computer/Independent studies/2020/Christina's ManyBabiesMeta (MB-Meta)/IDSPreference_ManyBabiesMeta/results_from_R"
-overleaf.dir = "~/Dropbox/Apps/Overleaf/MB-Meta/R_objects"
+if ( use.corrected.dunst == TRUE ) {
+  data.dir = here("data/prepped_with_corrected_dunst")
+  # where to save results
+  results.dir = here("results_from_R/results_with_corrected_dunst")
+  overleaf.dir = "~/Dropbox/Apps/Overleaf/MB-Meta/R_objects/corrected_dunst"
+}
+
+
+
 code.dir = here("analyses/2_analyze")
 
 # helper fns
@@ -144,7 +154,7 @@ mods2 = c( "isMeta",  # code this way since we expect meta to have larger effect
 
 # ~ Read Datasets ------------------------------------------------------------------
 setwd(data.dir)
-d = suppressMessages( suppressWarnings( read_csv("mb_ma_combined_prepped.csv") ) )
+d = suppressMessages( suppressWarnings( read_csv("mb_ma_combined_prepped_0.125.csv") ) )
 
 # dataset with just the meta-analysis
 dma = d %>% filter(isMeta == TRUE)
