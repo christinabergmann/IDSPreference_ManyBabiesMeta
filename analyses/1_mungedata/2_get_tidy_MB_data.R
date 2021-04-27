@@ -5,7 +5,18 @@ library(here)
 # script expects these global vars from master: n_trial_pairs_criterion, age.matched
 
 MB1_PATH <- "https://raw.githubusercontent.com/manybabies/mb1-analysis-public/master/processed_data/03_data_diff_main.csv"
-MB_OUT_PATH <- here(paste("data/mb_data_tidy_", n_trial_pairs_criterion/8, ".csv", sep = ""))
+
+if ( use.corrected.dunst == FALSE ){
+  data.dir = here("data/prepped_with_original_dunst")
+  MB_OUT_PATH = here(paste("data/prepped_with_original_dunst/mb_data_tidy_", n_trial_pairs_criterion/8, ".csv", sep = ""))
+}
+
+if ( use.corrected.dunst == TRUE ){
+  data.dir = here("data/prepped_with_corrected_dunst")
+  MB_OUT_PATH = here(paste("data/prepped_with_corrected_dunst/mb_data_tidy_", n_trial_pairs_criterion/8, ".csv", sep = ""))
+}
+
+
 
 TARGET_VARS <- c("lab", "subid_unique", "trial_num", "method", "age_days", "age_group",
                  "lang_group", "lang1", "lang1_exposure",
@@ -23,7 +34,7 @@ if (age.matched == TRUE) {
   # in main analysis, MB subjects were on average 12 months older than MA subjects
   
   # check mean age in MA: 144 days
-  setwd(here("data"))
+  setwd(data.dir)
   dma = read_csv("ma_data_tidy.csv")
   summary(dma$mean_age)
   
@@ -39,7 +50,7 @@ if (age.matched == TRUE) {
   # this retains only 11% of the data (2,314 subjects)
   
   # retitle the dataset
-  MB_OUT_PATH <- here(paste("data/mb_data_tidy_", n_trial_pairs_criterion/8, "_age_matched.csv", sep = ""))
+  MB_OUT_PATH <- paste(data.dir, "/mb_data_tidy_", n_trial_pairs_criterion/8, "_age_matched.csv", sep = "")
 }
 
 
@@ -116,6 +127,9 @@ methodological_vars <- read_csv(here("data/mb_methodological_variables.csv"))
 mb_data <- full_join(mb_data, methodological_vars) %>%
   filter(n>9) # Match ManyBabies1 dataset by adding this inclusion criterion
 
+
 write_csv(mb_data, MB_OUT_PATH)
+
+
 
 

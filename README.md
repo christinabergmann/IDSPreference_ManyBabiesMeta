@@ -1,6 +1,8 @@
 
 # Datasets
 
+* `from_data_team` has the Dunst datasets that Maya received from the data-collection team. The corresponding MB datasets are on [Git]("https://raw.githubusercontent.com/manybabies/mb1-analysis-public/master/processed_data/03_data_diff_main.csv") and are automatically pulled in by the script `2_get_tidy_MB_data.R`.
+
 ### Key points
 * Meta-analysis codebook: https://github.com/christinabergmann/IDSPreference_ManyBabiesMeta/blob/master/data/codebook.xlsx
 
