@@ -9,15 +9,15 @@ setwd( here("analyses/1_mungedata") )
 
 # STEP 1: Get Tidy MA Data --------------------------------------------------------
 # only needs to be run once regardless of which datasets are to be created
+
+# 2 versions: using original or corrected Dunst data
+
+use.corrected.Dunst = TRUE
+
+
 source("1_get_tidy_MA_data.R")
 
-# number of trials that must be passed
-# There are 8 pairs in total, so 4 pairs = 50%, 6 pairs = 75%
-# main analysis is 1 = 0.125*8
 
-# only .125 and .75 are used in analyses
-criteria.vec = c(.125, .25, .5, .75)*8
-  
 
 # STEP 2: Get Tidy MB Data --------------------------------------------------------
 
@@ -25,7 +25,13 @@ criteria.vec = c(.125, .25, .5, .75)*8
 # and within the main-analysis inclusion criterion, makes both
 #  age-matched and non-matched datasets
 
-# note that only criteria 1 and 6 
+# number of trials that must be passed
+# There are 8 pairs in total, so 4 pairs = 50%, 6 pairs = 75%
+# main analysis is 1 = 0.125*8
+
+# only .125 and .75 are used in analyses
+criteria.vec = c(.125, .25, .5, .75)*8
+
 
 for ( .c in criteria.vec ) {
   

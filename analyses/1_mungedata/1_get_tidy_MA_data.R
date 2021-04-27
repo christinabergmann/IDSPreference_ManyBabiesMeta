@@ -5,8 +5,16 @@ library(janitor)
 source(here("analyses/1_mungedata/compute_es_IDS.R"))
 
 MONTH_IN_DAYS <- 365.25/12
-MA1_PATH <- here("data/Dunst_original_es.csv")
-MA_OUT_PATH <- here("data/ma_data_tidy.csv")
+
+if ( use.corrected.Dunst == FALSE ) {
+  MA1_PATH <- here("data/from_data_team/Dunst_original_es.csv")
+  MA_OUT_PATH <- here("data/prepped_with_original_dunst/ma_data_tidy.csv")
+}
+
+if ( use.corrected.Dunst == TRUE ) {
+  MA1_PATH <- here("data/from_data_team/Dunst_corrected_es.csv")
+  MA_OUT_PATH <- here("data/prepped_with_corrected_dunst/ma_data_tidy.csv")
+}
 
 TARGET_VARS <- c("study_id", "short_cite", "expt_num", "original_ma", "main_question_ids_preference", 
                  "response_mode", "exposure_phase", "method", "dependent_measure", "participant_design",
