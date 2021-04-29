@@ -1,4 +1,3 @@
-# The final ManyBabies1 dataset from the public github repository, plus the processing pipeline from the paper
 library(tidyverse)
 library(here)
 library(janitor)
@@ -7,12 +6,12 @@ source(here("analyses/1_mungedata/compute_es_IDS.R"))
 MONTH_IN_DAYS <- 365.25/12
 
 if ( use.corrected.dunst == FALSE ) {
-  MA1_PATH <- here("data/from_data_team/Dunst_original_es.csv")
+  MA1_PATH <- here("data/from_data_team/Dunst_original.csv")
   MA_OUT_PATH <- here("data/prepped_with_original_dunst/ma_data_tidy.csv")
 }
 
 if ( use.corrected.dunst == TRUE ) {
-  MA1_PATH <- here("data/from_data_team/Dunst_corrected_es.csv")
+  MA1_PATH <- here("data/from_data_team/Dunst_corrected.csv")
   MA_OUT_PATH <- here("data/prepped_with_corrected_dunst/ma_data_tidy.csv")
 }
 
@@ -31,14 +30,21 @@ ma_data_tidy <- ma_data_raw %>%
   select(all_of(TARGET_VARS)) %>%
   mutate(id = 1:n()) 
 
-# calculate effect sizes - not needed as we use the ones from Dunst et al.
-#ma_data_tidy_with_es <-  ma_data_tidy %>%
-#  group_by(id) %>%
-#  nest() %>%
-#  mutate(es_data = map(data, compute_es)) %>%
-#  unnest() %>%
-#  select(id, d_calc, d_var_calc, es_method) %>% 
-#  ungroup()
+if ( use.corrected.dunst == TRUE ) {
+ma_data_tidy_with_es <-  ma_data_tidy %>%
+  group_by(id) %>%
+  nest() %>%
+  mutate(es_data = map(data, compute_es)) %>%
+  unnest(cols = c(data, es_data)) %>%
+  ungroup()
+
+ma_data_tidy <- ma_data_tidy_with_es %>%
+  filter(!is.na(d_calc)) %>% # we don't have all effect sizes
+  select(-c(d, d_var)) %>%
+  rename(d = d_calc, d_var = d_var_calc) # We replace the reported d column with the recalculated ones. When we couldn't recalculate d, we use the one reported in the meta-analyses. See "es_method" in the intermediate dataset.
+
+remove(ma_data_tidy_with_es)
+}
 
 
 # get study characteristics
