@@ -21,17 +21,6 @@
 # - Acronyms: "MB" or "MLR" refer to the replications. "MA" refers to meta-analysis.
 
 
-# ~ To do  ------------------------------------------------------------------
-
-
-# ~ Ask CB, et al ------------------------------------------------------------------
-
-# - In the 0.75 dataset with the more stringent inclusion criterion, am I right in thinking that there are fewer effect sizes because some age groups are dropped completely? (but the mean age in MB doesn't change much at all)
-
-# - The 0.125 dataset corresponds with main analysis, right?
-
-# - Can we add codebook for data? What are n_1, n_2, and n? Why is n the average rather than the sum of those two? For example, study_id Kaplan1995a has a fractional n.
-
 
 
 # 0. PRELIMINARIES ------------------------------------------------------------------
@@ -380,7 +369,7 @@ if ( exists("resCSV") ) {
                 as.character( round( sum(d$n), 0) ) )
                 
   expect_equal( resCSV$value[ resCSV$name == "NAIVE tau" ],
-                as.character( round( sqrt(temp$mod_info$tau.sq), 2) )
+                as.character( round( sqrt(temp$mod_info$tau.sq), 2) ) )
                 
   # intercept estimate and inference
   expect_equal( resCSV$value[ resCSV$name == "NAIVE est X.Intercept." ],
