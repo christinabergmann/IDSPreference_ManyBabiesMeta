@@ -36,12 +36,12 @@ compute_es <- function(ma_df) {
   } else if (participant_design == "within_two" & complete(x_1, x_2, n_1, SD_1, SD_2)) {
     pooled_SD <- sqrt((SD_1 ^ 2) + (SD_2 ^ 2) / 2) 
     d_calc <- (x_1 - x_2) / pooled_SD
-    d_var_calc <- (2 / n_1)  + (d_calc ^ 2 / (2 * n_1))
+    d_var_calc <- (1 / n_1)  + (d_calc ^ 2 / (2 * n_1))
     es_method  <- "classic_cohen_d_within_two"
     
   } else if (participant_design == "within_one" & complete(x_1, x_2, n_1, SD_1)) {
     d_calc <- (x_1 - x_2) / SD_1
-    d_var_calc <- (2 / n_1)  + (d_calc ^ 2 / (2 * n_1)) 
+    d_var_calc <- (1 / n_1)  + (d_calc ^ 2 / (2 * n_1)) 
     es_method  <- "classic_cohen_d_within_one"
     
   } else if (complete(d, d_var)) { 
