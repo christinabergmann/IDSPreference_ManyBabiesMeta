@@ -5,7 +5,18 @@ library(here)
 # script expects these global vars from master: n_trial_pairs_criterion, age.matched
 
 MB1_PATH <- "https://raw.githubusercontent.com/manybabies/mb1-analysis-public/master/processed_data/03_data_diff_main.csv"
-MB_OUT_PATH <- here(paste("data/mb_data_tidy_", n_trial_pairs_criterion/8, ".csv", sep = ""))
+
+if ( use.corrected.dunst == FALSE ){
+  data.dir = here("data/prepped_with_original_dunst")
+  MB_OUT_PATH = here(paste("data/prepped_with_original_dunst/mb_data_tidy_", n_trial_pairs_criterion/8, ".csv", sep = ""))
+}
+
+if ( use.corrected.dunst == TRUE ){
+  data.dir = here("data/prepped_with_corrected_dunst")
+  MB_OUT_PATH = here(paste("data/prepped_with_corrected_dunst/mb_data_tidy_", n_trial_pairs_criterion/8, ".csv", sep = ""))
+}
+
+
 
 TARGET_VARS <- c("lab", "subid_unique", "trial_num", "method", "age_days", "age_group",
                  "lang_group", "lang1", "lang1_exposure",
@@ -15,7 +26,7 @@ TARGET_VARS <- c("lab", "subid_unique", "trial_num", "method", "age_days", "age_
 mb_data_raw <- read_csv(MB1_PATH)
 
 mb_data_tidy <- mb_data_raw %>%
-  filter(!is.na(diff)) %>%
+  filter(!is.na(diff)) %>% #Removing this line means 65 instead of 62 labs
   select(all_of(TARGET_VARS))
 
 if (age.matched == TRUE) {
@@ -23,7 +34,7 @@ if (age.matched == TRUE) {
   # in main analysis, MB subjects were on average 12 months older than MA subjects
   
   # check mean age in MA: 144 days
-  setwd(here("data"))
+  setwd(data.dir)
   dma = read_csv("ma_data_tidy.csv")
   summary(dma$mean_age)
   
@@ -39,7 +50,7 @@ if (age.matched == TRUE) {
   # this retains only 11% of the data (2,314 subjects)
   
   # retitle the dataset
-  MB_OUT_PATH <- here(paste("data/mb_data_tidy_", n_trial_pairs_criterion/8, "_age_matched.csv", sep = ""))
+  MB_OUT_PATH <- paste(data.dir, "/mb_data_tidy_", n_trial_pairs_criterion/8, "_age_matched.csv", sep = "")
 }
 
 
@@ -80,16 +91,37 @@ d_var_calc <- function(n, d) {
   (2/n) + (d ^ 2 / (4 * n))
 }
 
-es_by_participant <- mb_data_tidy_fct %>%
-  group_by(lab, age_group, subid_unique) %>%
-  summarise(d = mean(diff, na.rm = TRUE), n_trial_pairs = n()) %>%
-  filter(n_trial_pairs >= n_trial_pairs_criterion)
+# ManyBabies github code version
+# Source: https://github.com/manybabies/mb1-analysis-public/blob/master/paper/mb1-paper.Rmd
+# l 537f
+# Same result: 62 labs, if we leave NA diff scores in 65 labs
+ 
+es_by_study <- mb_data_tidy_fct %>%
+  group_by(lab, age_group, method, nae, subid_unique) %>%
+  summarise(d = mean(diff, na.rm = TRUE)) %>%
+  group_by(lab, age_group, method, nae) %>%
+  summarise(d_z = mean(d, na.rm = TRUE) / sd(d, na.rm = TRUE), 
+            n = length(unique(subid_unique)), 
+            d_z_var = d_var_calc(n, d_z)) %>%
+  filter(n >= 10) %>%
+  # left_join(ages) %>%
+  filter(!is.na(d_z)) 
 
-es_by_study <- es_by_participant %>%
-  group_by(lab, age_group) %>%
-  summarise(d_z = mean(d)/ sd(d),
-            n = n(),
-            d_z_var = d_var_calc(n, d_z))
+
+# V 1 by Molly et al - it's equivalent but for comparability, I used the MB1 code
+# es_by_participant <- mb_data_tidy_fct %>%
+#   group_by(lab, age_group, subid_unique) %>%
+#   summarise(d = mean(diff, na.rm = TRUE), n_trial_pairs = n()) %>%
+#   filter(n_trial_pairs >= n_trial_pairs_criterion)
+# 
+# es_by_study <- es_by_participant %>%
+#   group_by(lab, age_group) %>%
+#   summarise(d_z = mean(d, na.rm=TRUE)/ sd(d, na.rm=TRUE),
+#             n = n(),
+#             d_z_var = d_var_calc(n, d_z)) %>%
+#   filter(n>9) %>% # Match ManyBabies1 dataset by adding this inclusion criterion
+#   filter(!is.na(d_z))
+#   
 
 # get study characteristics
 study_moderators <-  mb_data_tidy_fct %>%
@@ -113,9 +145,11 @@ mb_data <- full_join(es_by_study, study_moderators)
 #add methodological variables
 methodological_vars <- read_csv(here("data/mb_methodological_variables.csv"))
 
-mb_data <- full_join(mb_data, methodological_vars) %>%
-  filter(n>9) # Match ManyBabies1 dataset by adding this inclusion criterion
+mb_data <- full_join(mb_data, methodological_vars)
+
 
 write_csv(mb_data, MB_OUT_PATH)
+
+
 
 

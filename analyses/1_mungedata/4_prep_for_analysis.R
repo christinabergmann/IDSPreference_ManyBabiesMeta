@@ -5,6 +5,7 @@ library(tidyverse)
 library(knitr)
 library(here)
 library(tableone)
+library(fastDummies)
 
 # expects global vars set by master prep script: ic.dataset, age.matched
 
@@ -12,12 +13,20 @@ library(tableone)
 # If working on the preregistration, set this to T, otherwise F to use the veridical dataset without scrambling.
 prereg = FALSE
 
+if ( use.corrected.dunst == FALSE ){
+  data.dir = here("data/prepped_with_original_dunst")
+  results.dir = here("results_from_R/results_with_original_dunst")
+}
 
-data.dir = here("data")
+
+if ( use.corrected.dunst == TRUE ){
+  data.dir = here("data/prepped_with_corrected_dunst")
+  results.dir = here("results_from_R/results_with_corrected_dunst")
+}
+
+
 # where to save results
-results.dir = here("results_from_R")
-# results.dir = "~/Dropbox/Personal computer/Independent studies/2020/Christina's ManyBabiesMeta (MB-Meta)/IDSPreference_ManyBabiesMeta/results_from_R"
-overleaf.dir = "~/Dropbox/Apps/Overleaf/MB-Meta/R_objects"
+#overleaf.dir = "~/Dropbox/Apps/Overleaf/MB-Meta/R_objects"
 code.dir = here("analyses/1_mungedata")
 
 # helper fns
@@ -137,9 +146,9 @@ catMods = mods[ !mods %in% contMods ]
   table(d2$test_lang[d2$isMeta == FALSE])
 
 # MA's mode should always be the "a.XXX" level
-expect_equal( grepl( x = t[ t$isMeta == TRUE, -1 ],
+expect_equal( grepl( x = as.character( t[ t$isMeta == TRUE, -1 ] ),
                      pattern = "a." ),
-              TRUE )
+              rep(TRUE, length(t[ t$isMeta == TRUE, -1 ]) ) )
 # for MB, compare by eye to table of moderators before recoding 
 CreateTableOne(vars = mods, 
                strata = "study_type",

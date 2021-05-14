@@ -365,17 +365,22 @@ summary {
 </div>
 
 
-<div id="dataset" class="section level1">
-<h1>Dataset</h1>
+<div id="datasets" class="section level1">
+<h1>Datasets</h1>
+<ul>
+<li><code>from_data_team</code> has the Dunst datasets that Maya received from the data-collection team. The corresponding MB datasets are on <a href="%22https://raw.githubusercontent.com/manybabies/mb1-analysis-public/master/processed_data/03_data_diff_main.csv%22">Git</a></li>
+</ul>
 <div id="key-points" class="section level3">
 <h3>Key points</h3>
 <ul>
 <li><p>Meta-analysis codebook: <a href="https://github.com/christinabergmann/IDSPreference_ManyBabiesMeta/blob/master/data/codebook.xlsx" class="uri">https://github.com/christinabergmann/IDSPreference_ManyBabiesMeta/blob/master/data/codebook.xlsx</a></p></li>
 <li><p>Main-analysis dataset: <code>mb_ma_combined_prepped_0.125.csv</code></p></li>
+<li><p>Dataset used for sensitivity analyses with more stringent inclusion criterion: <code>mb_ma_combined_prepped_0.75.csv</code></p></li>
+<li><p>Dataset used for age-matched sensitivity analyses: <code>mb_ma_combined_prepped_0.125_age_matched</code></p></li>
 </ul>
 </div>
-<div id="nuances" class="section level3">
-<h3>Nuances</h3>
+<div id="fine-print" class="section level3">
+<h3>Fine print</h3>
 <ul>
 <li>Fractional suffixes on dataset names (e.g., “0.125”) correspond to inclusion criteria. The “0.75” dataset (i.e., with the more stringent subject inclusion criterion) has fewer estimates than the main dataset (equivalent to the “0.125” dataset) because some age groups were dropped completely if N&lt;10.</li>
 </ul>
@@ -383,13 +388,13 @@ summary {
 </div>
 <div id="code" class="section level1">
 <h1>Code</h1>
-<div id="data-prep-code" class="section level2">
-<h2>Data prep code</h2>
+<div id="data-prep-code" class="section level3">
+<h3>Data prep code</h3>
 <p>To prep the main-analysis dataset and the various datasets used for sensitivity analyses, simply run <code>0_master_prep.R</code>. This file sets different combinations of global variables regarding the inclusion criteria and whether the dataset should be age-matched and then calls a sequence of other data-prep files (<code>1_get_tidy_MA_data.R</code>, <code>2_get_tidy_MB_data.R</code>, <code>3_merge_MA_MB_data.R</code>, and <code>4_prep_for_analysis.R</code>).</p>
 </div>
-<div id="analysis-code" class="section level2">
-<h2>Analysis code</h2>
-<p>The analysis script conducts the main analyses as well as the sensitivity analyses.</p>
+<div id="analysis-code" class="section level3">
+<h3>Analysis code</h3>
+<p>The analysis script conducts the main analyses as well as the sensitivity analyses. It uses only the datasets containing “combined_prepped” in the names.</p>
 </div>
 </div>
 <div id="results-files" class="section level1">

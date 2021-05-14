@@ -3,23 +3,30 @@
 library(tidyverse)
 library(here)
 
-# expects global vars set by master: ic.dataset, age.matched
+# script expects global vars set by master: ic.dataset, age.matched
 
-MA_DATA_PATH <- here("data/ma_data_tidy.csv")
+if ( use.corrected.dunst == FALSE ) data.dir = here("data/prepped_with_original_dunst")
+if ( use.corrected.dunst == TRUE ) data.dir = here("data/prepped_with_corrected_dunst")
+setwd(data.dir)
 
+MA_DATA_PATH <- paste(data.dir, "ma_data_tidy.csv", sep = "/")
+  
+  
 if ( ic.dataset == FALSE & age.matched == FALSE ) {
-  MB_DATA_PATH <- here("data/mb_data_tidy_0.125.csv")
-  OUTFILE <- here("data/mb_ma_combined_0.125.csv")
+  MB_DATA_PATH = paste(data.dir, "mb_data_tidy_0.125.csv", sep = "/")
+  OUTFILE = paste(data.dir, "mb_ma_combined_0.125.csv", sep = "/")
+  #MB_DATA_PATH <- here("data/mb_data_tidy_0.125.csv")
+  #OUTFILE <- here("data/mb_ma_combined_0.125.csv")
 }
 
 if ( ic.dataset == TRUE & age.matched == FALSE ) {
-  MB_DATA_PATH <- here("data/mb_data_tidy_0.75.csv")
-  OUTFILE <- here("data/mb_ma_combined_0.75.csv")
+  MB_DATA_PATH = paste(data.dir, "mb_data_tidy_0.75.csv", sep = "/")
+  OUTFILE = paste(data.dir, "mb_ma_combined_0.75.csv", sep = "/")
 }
 
 if ( ic.dataset == FALSE & age.matched == TRUE ) {
-  MB_DATA_PATH <- here("data/mb_data_tidy_0.125_age_matched.csv")
-  OUTFILE <- here("data/mb_ma_combined_0.125_age_matched.csv")
+  MB_DATA_PATH = paste(data.dir, "mb_data_tidy_0.125_age_matched.csv", sep = "/")
+  OUTFILE = paste(data.dir, "mb_ma_combined_0.125_age_matched.csv", sep = "/")
 }
 
 # do not apply both sensitivity criteria at once

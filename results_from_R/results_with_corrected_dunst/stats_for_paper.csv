@@ -1,0 +1,118 @@
+name,value,section
+m ests MA,55,1
+m ests MB,104,1
+m ests total,159,1
+k studies MA,14,1
+k studies MB,62,1
+median n MA,16,1
+median n MB,16,1
+MA subset naive tau,0.3,2
+MA subset naive k,55,2
+MA subset naive n subj,1029,2
+MA subset naive est X.Intercept.,0.51,2
+MA subset naive lo X.Intercept.,0.27,2
+MA subset naive hi X.Intercept.,0.75,2
+MA subset naive pval X.Intercept.,0.00086717,2
+Reps subset naive tau,0.11,2
+Reps subset naive k,104,2
+Reps subset naive n subj,2139,2
+Reps subset naive est X.Intercept.,0.35,2
+Reps subset naive lo X.Intercept.,0.28,2
+Reps subset naive hi X.Intercept.,0.43,2
+Reps subset naive pval X.Intercept.,< 0.0001,2
+NAIVE tau,0.25,2
+NAIVE k,159,2
+NAIVE n subj,3168,2
+NAIVE est X.Intercept.,0.35,2
+NAIVE est isMetaTRUE,0.14,2
+NAIVE lo X.Intercept.,0.28,2
+NAIVE lo isMetaTRUE,-0.08,2
+NAIVE hi X.Intercept.,0.43,2
+NAIVE hi isMetaTRUE,0.37,2
+NAIVE pval X.Intercept.,< 0.0001,2
+NAIVE pval isMetaTRUE,0.19885,2
+NAIVE avg for meta,0.5,2
+NAIVE avg lo for meta,0.27,2
+NAIVE avg hi for meta,0.72,2
+NAIVE avg pval for meta,6e-04,2
+MOD1 tau,0.23,1
+MOD1 k,159,1
+MOD1 n subj,3168,1
+MOD1 est X.Intercept.,0.19,1
+MOD1 est isMetaTRUE,0.29,1
+MOD1 est mean_agec_mos,0.04,1
+MOD1 est test_langb.nonnative,-0.09,1
+MOD1 est test_langc.artificial,-0.16,1
+MOD1 est methodb.hpp,0.06,1
+MOD1 est methodc.other,0.08,1
+MOD1 lo X.Intercept.,0.04,1
+MOD1 lo isMetaTRUE,-0.05,1
+MOD1 lo mean_agec_mos,0.02,1
+MOD1 lo test_langb.nonnative,-0.21,1
+MOD1 lo test_langc.artificial,-2.6,1
+MOD1 lo methodb.hpp,-0.13,1
+MOD1 lo methodc.other,-1.86,1
+MOD1 hi X.Intercept.,0.34,1
+MOD1 hi isMetaTRUE,0.63,1
+MOD1 hi mean_agec_mos,0.07,1
+MOD1 hi test_langb.nonnative,0.03,1
+MOD1 hi test_langc.artificial,2.29,1
+MOD1 hi methodb.hpp,0.25,1
+MOD1 hi methodc.other,2.02,1
+MOD1 pval X.Intercept.,0.01478354,1
+MOD1 pval isMetaTRUE,0.08607197,1
+MOD1 pval mean_agec_mos,0.00061228,1
+MOD1 pval test_langb.nonnative,0.13998509,1
+MOD1 pval test_langc.artificial,0.57059451,1
+MOD1 pval methodb.hpp,0.52784786,1
+MOD1 pval methodc.other,0.78112680,1
+MOD1 avg for meta,0.49,1
+MOD1 avg lo for meta,0.19,1
+MOD1 avg hi for meta,0.79,1
+MOD1 avg pval for meta,4e-03,1
+MA subset mods tau,0.27,1
+MA subset mods k,55,1
+MA subset mods n subj,1029,1
+MA subset mods est X.Intercept.,0.73,1
+MA subset mods est mean_agec_mos,0.07,1
+MA subset mods est test_langb.nonnative,-0.26,1
+MA subset mods est test_langc.artificial,-0.16,1
+MA subset mods est methodb.hpp,-0.47,1
+MA subset mods est methodc.other,-0.12,1
+MA subset mods lo X.Intercept.,0.07,1
+MA subset mods lo mean_agec_mos,-0.1,1
+MA subset mods lo test_langb.nonnative,-1.59,1
+MA subset mods lo test_langc.artificial,-2.41,1
+MA subset mods lo methodb.hpp,-1.36,1
+MA subset mods lo methodc.other,-1.96,1
+MA subset mods hi X.Intercept.,1.39,1
+MA subset mods hi mean_agec_mos,0.24,1
+MA subset mods hi test_langb.nonnative,1.08,1
+MA subset mods hi test_langc.artificial,2.09,1
+MA subset mods hi methodb.hpp,0.42,1
+MA subset mods hi methodc.other,1.72,1
+MA subset mods pval X.Intercept.,0.040033,1
+MA subset mods pval mean_agec_mos,0.279437,1
+MA subset mods pval test_langb.nonnative,0.466580,1
+MA subset mods pval test_langc.artificial,0.536365,1
+MA subset mods pval methodb.hpp,0.201723,1
+MA subset mods pval methodc.other,0.714381,1
+Reps subset mods tau,0,1
+Reps subset mods k,104,1
+Reps subset mods n subj,2139,1
+Reps subset mods est X.Intercept.,0.11,1
+Reps subset mods est mean_agec_mos,0.05,1
+Reps subset mods est test_langb.nonnative,-0.08,1
+Reps subset mods est methodb.hpp,0.22,1
+Reps subset mods lo X.Intercept.,-0.04,1
+Reps subset mods lo mean_agec_mos,0.02,1
+Reps subset mods lo test_langb.nonnative,-0.19,1
+Reps subset mods lo methodb.hpp,0.12,1
+Reps subset mods hi X.Intercept.,0.25,1
+Reps subset mods hi mean_agec_mos,0.07,1
+Reps subset mods hi test_langb.nonnative,0.04,1
+Reps subset mods hi methodb.hpp,0.32,1
+Reps subset mods pval X.Intercept.,0.13529083,1
+Reps subset mods pval mean_agec_mos,0.00025827,1
+Reps subset mods pval test_langb.nonnative,0.19330973,1
+Reps subset mods pval methodb.hpp,0.00014279,1
