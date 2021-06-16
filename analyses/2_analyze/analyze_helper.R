@@ -241,6 +241,9 @@ fit_mr = function( .dat,
     
     # save results
     setwd(results.dir)
+    if(!dir.exists("tables_to_prettify")){
+      dir.create("tables_to_prettify")
+    } 
     setwd("tables_to_prettify")
     
     write.csv( temp,
