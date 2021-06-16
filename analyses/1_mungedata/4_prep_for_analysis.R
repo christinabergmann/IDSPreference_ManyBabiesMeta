@@ -91,7 +91,7 @@ d = d %>% mutate_at( .vars = c("method", "speech_type", "speaker", "presentation
                      .funs = tolower )
 
 # collapse categories of speaker
-d$own_mother = (d$speaker == "child’s mother")
+d$own_mother = (d$speaker_fam == 1)
 
 # dummies for being meta-analysis and being replication
 d$isMeta = (d$study_type == "MA")
