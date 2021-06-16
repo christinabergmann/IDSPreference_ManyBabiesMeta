@@ -246,6 +246,9 @@ corrs = temp %>%
   filter(row_number()==1)
 
 # save it
+if(!dir.exists(results.dir)){
+  dir.create(results.dir)
+} 
 setwd(results.dir)
 write.csv(corrs, "moderator_cormat.csv")
 # too long to put in paper
@@ -393,20 +396,20 @@ if ( exists("resCSV") ) {
   
   expect_equal( resCSV$value[ resCSV$name == "NAIVE n subj" ],
                 as.character( round( sum(d$n), 0) ) )
-                
+  
   expect_equal( resCSV$value[ resCSV$name == "NAIVE tau" ],
                 as.character( round( sqrt(temp$mod_info$tau.sq), 2) ) )
-                
+  
   # intercept estimate and inference
   expect_equal( resCSV$value[ resCSV$name == "NAIVE est X.Intercept." ],
-                              as.character( round(temp$b.r[1], 2) ) )
+                as.character( round(temp$b.r[1], 2) ) )
   
   expect_equal( resCSV$value[ resCSV$name == "NAIVE lo X.Intercept." ],
                 as.character( round(temp$reg_table$CI.L[1], 2) ) )
   
   expect_equal( resCSV$value[ resCSV$name == "NAIVE hi X.Intercept." ],
                 as.character( round(temp$reg_table$CI.U[1], 2) ) )
-                
+  
   expect_equal( resCSV$value[ resCSV$name == "NAIVE pval X.Intercept." ],
                 format.pval(temp$reg_table$prob[1], eps = pval.cutoff) )              
   # moderator estimate and inference
@@ -421,14 +424,14 @@ if ( exists("resCSV") ) {
   
   expect_equal( resCSV$value[ resCSV$name == "NAIVE pval isMetaTRUE" ],
                 format.pval(temp$reg_table$prob[2], eps = pval.cutoff) )                   
-                
+  
   # average for meta-analysis obtained by recoding isMeta
   temp = robu( yi ~ isRep, 
-                data = d, 
-                studynum = as.factor(study_id),
-                var.eff.size = vi,
-                modelweights = "HIER",
-                small = TRUE)
+               data = d, 
+               studynum = as.factor(study_id),
+               var.eff.size = vi,
+               modelweights = "HIER",
+               small = TRUE)
   
   expect_equal( resCSV$value[ resCSV$name == "NAIVE avg for meta" ],
                 as.character( round(temp$b.r[1], 2) ) )
@@ -443,11 +446,11 @@ if ( exists("resCSV") ) {
   # moderated model
   # for this one, maybe just spot-check some of the moderators?
   temp = robu( yi ~ isMeta + mean_agec_mos + test_lang + method, 
-                 data = d, 
-                 studynum = as.factor(study_id),
-                 var.eff.size = vi,
-                 modelweights = "HIER",
-                 small = TRUE)
+               data = d, 
+               studynum = as.factor(study_id),
+               var.eff.size = vi,
+               modelweights = "HIER",
+               small = TRUE)
   
   # for checking all the coeff estimates as a vector
   suffix = c("X.Intercept.", "isMetaTRUE", "mean_agec_mos", "test_langb.nonnative", "test_langc.artificial", "methodb.hpp", "methodc.other")
@@ -640,7 +643,7 @@ if ( boot.from.scratch == TRUE ) {
                      # draw resample with replacement
                      # ignore the indices passed by boot because we're
                      #  doing clustered bootstrapping, oh yeah
-
+                     
                      b = cluster_bt(.dat = original,
                                     .clustervar = "study_id")
                      
@@ -842,8 +845,10 @@ res2 = res2 %>% add_column( unique = paste( res2$model, res2$stat, sep = "_") )
 fwrite( res2, "table_model_diffs_rounded.csv" )
 
 # also save to Overleaf
-setwd(overleaf.dir)
-fwrite( res2, "table_model_diffs_rounded.csv" )
+if ( dir.exists(overleaf.dir) ) {
+  setwd(overleaf.dir)
+  fwrite( res2, "table_model_diffs_rounded.csv" )
+}
 
 
 # ~~~ Rounded character table (for manuscript table) ------------------------------------------------------------------
@@ -1264,16 +1269,16 @@ CreateTableOne(vars = mods2,
 
 # simple comparison of sources' average point estimates after matching
 ( t1 = dmt %>% group_by(isMeta) %>%
-  summarise( k = n(),
-             mean(yi),
-             mAgec = mean(mean_agec_mos) ) )
+    summarise( k = n(),
+               mean(yi),
+               mAgec = mean(mean_agec_mos) ) )
 # wow - matching seems to exacerbate the between-source discrepancy
 
 # look within subclasses
 ( t2 = dmt %>% group_by(subclass, isMeta) %>%
-  summarise( k = n(),
-             mean(yi),
-             mAgec = mean(mean_agec_mos) ) )
+    summarise( k = n(),
+               mean(yi),
+               mAgec = mean(mean_agec_mos) ) )
 
 
 # the real analysis
@@ -1473,7 +1478,7 @@ if ( redo.plots == TRUE ) {
   # 2 is open triangle
   shapes = c(19,17)
   if ( color.subclasses == TRUE ) shapes = c(19,17,19)
-
+  
   # ~ Make the Plot ------------------------------------------------------------------
   
   # now color-coding by whether it's the pooled estimate or not

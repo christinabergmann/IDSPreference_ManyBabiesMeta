@@ -8,15 +8,20 @@ my_ggsave = function(name,
                      .results.dir = results.dir,
                      .overleaf.dir = overleaf.dir) {
   
+  if(!dir.exists(.results.dir)){
+    dir.create(.results.dir)
+  } 
   setwd(.results.dir)
   ggsave( name,
           width = width, 
           height = height)
   
-  setwd(.overleaf.dir)
-  ggsave( name,
-          width = width, 
-          height = height)
+  if(dir.exists(.overleaf.dir)){
+    setwd(.overleaf.dir)
+    ggsave( name,
+            width = width, 
+            height = height)
+  }
 }
 
 # wrapper for update_result_csv to easily write stat and confidence interval
@@ -39,6 +44,9 @@ update_result_csv = function( name,
                               print = FALSE,
                               .results.dir = results.dir,
                               .overleaf.dir = overleaf.dir ) {
+  if(!dir.exists(.results.dir)){
+    dir.create(.results.dir)
+  } 
   setwd(.results.dir)
   
   new.rows = data.frame( name,
@@ -72,7 +80,7 @@ update_result_csv = function( name,
              quote = FALSE )
   
   # also write to Overleaf
-  if ( exists("overleaf.dir") ) {
+  if ( dir.exists(.overleaf.dir) ) {
     setwd(.overleaf.dir)
     write.csv( res, 
                "stats_for_paper.csv",
@@ -95,8 +103,10 @@ update_result_csv = function( name,
 wr = function(){
   setwd(results.dir)
   if( "stats_for_paper.csv" %in% list.files() ) system("rm stats_for_paper.csv")
-  setwd(overleaf.dir)
-  if( "stats_for_paper.csv" %in% list.files() ) system("rm stats_for_paper.csv")
+  if(dir.exists(.overleaf.dir)){
+    setwd(overleaf.dir)
+    if( "stats_for_paper.csv" %in% list.files() ) system("rm stats_for_paper.csv")
+  }
 }
 
 # stands for "view results"
