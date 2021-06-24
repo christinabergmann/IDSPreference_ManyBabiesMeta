@@ -392,7 +392,7 @@ if ( exists("resCSV") ) {
                small = TRUE)
   
   
-  #bm: I think this is the line that is breaking for Chrsitina
+  #bm: this is the line that is breaking for Chrsitina
   expect_equal( resCSV$value[ resCSV$name == "NAIVE k" ],
                 as.character( round( nrow(d), 0) ) )
   
