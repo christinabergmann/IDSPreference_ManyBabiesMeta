@@ -147,7 +147,8 @@ mods2 = c( "isMeta",  # code this way since we expect meta to have larger effect
 
 # ~ Read Datasets ------------------------------------------------------------------
 setwd(data.dir)
-d = suppressMessages( suppressWarnings( read_csv("mb_ma_combined_prepped_0.125.csv") ) )
+d = suppressMessages( suppressWarnings( read_csv("mb_ma_combined_prepped_0.125.csv") ) ) %>%
+  filter(!is.na(d_calc))
 
 # dataset with just the meta-analysis
 dma = d %>% filter(isMeta == TRUE)
@@ -157,11 +158,13 @@ dr = d %>% filter(isMeta == FALSE)
 
 # dataset with more stringent inclusion criteria in replications
 dic = suppressMessages( suppressWarnings( read_csv("mb_ma_combined_prepped_0.75.csv") ) )
-dric = dic %>% filter(isMeta == FALSE)
+dric = dic %>% filter(isMeta == FALSE)%>%
+  filter(!is.na(d_calc))
 
 # dataset with IPD age-matching in MB
 dage = suppressMessages( suppressWarnings( read_csv("mb_ma_combined_prepped_0.125_age_matched.csv") ) )
-drage = dage %>% filter(isMeta == FALSE)
+drage = dage %>% filter(isMeta == FALSE)%>%
+  filter(!is.na(d_calc))
 
 
 
@@ -391,8 +394,6 @@ if ( exists("resCSV") ) {
                modelweights = "HIER",
                small = TRUE)
   
-  
-  #bm: this is the line that is breaking for Chrsitina
   expect_equal( resCSV$value[ resCSV$name == "NAIVE k" ],
                 as.character( round( nrow(d), 0) ) )
   
