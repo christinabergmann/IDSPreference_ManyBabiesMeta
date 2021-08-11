@@ -212,7 +212,7 @@ t <- d %>%
   mutate(`test language` = factor(test_lang, labels = c("native", "non-native", "artificial"))) %>%
   mutate(`native language` = factor(native_lang)) %>%
   mutate(method = factor(method, labels = c("central fixation", "headturn preference procedure", "other"))) %>%
-  mutate(`speech type` = factor(speech_type, labels = c("simulated", "naturalistic", "filtered", "synthesized"))) %>%
+  mutate(`speech type` = factor(speech_type, labels = c("simulated", "naturalistic", "filtered/synthesized"))) %>%
   mutate(`own mother` = factor( own_mother, labels = c("no", "yes"))) %>%
   mutate(presentation = factor(presentation, labels = c("tape recording", "video recording"))) %>%
   mutate(`main question was about IDS prerence` = factor(main_question_ids_preference, labels = c("yes", "no"))) %>%
