@@ -66,6 +66,9 @@ study_moderators <- ma_data_tidy %>%
 
 ma_data <- full_join(ma_data_tidy, study_moderators) %>%
   select(-id) %>%
-  rename(prop_female = gender)
+  rename(prop_female = gender) %>% 
+  mutate(speech_type = case_when(
+    speech_type %in% c("Filtered", "Synthesized") ~ "filtered/synthesized", 
+    TRUE ~ speech_type))
 
 write_csv(ma_data, MA_OUT_PATH)
