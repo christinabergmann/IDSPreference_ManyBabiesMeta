@@ -1514,7 +1514,7 @@ if ( redo.plots == TRUE ) {
     xlab( "Point estimate (SMD)" ) +
     ylab("") +
     
-    geom_vline(xintercept = 1, lty = 2) +
+    geom_vline(xintercept = 0, lty = 2) +
     
     guides(size = FALSE ) +
     
