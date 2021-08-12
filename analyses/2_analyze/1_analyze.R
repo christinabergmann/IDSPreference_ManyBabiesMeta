@@ -109,7 +109,7 @@ excelMax = 8
 # max digits in Excel; only used for running sanity checks against the results that are auto-written to a csv file
 
 # plot colors
-colors = c("darkgray", "red")  # replications, originals
+colors = c("darkgray", "red2")  # replications, originals
 
 # stop sci notation
 options(scipen=999)
@@ -1484,8 +1484,8 @@ if ( redo.plots == TRUE ) {
   # ~ Make the Plot ------------------------------------------------------------------
   
   # now color-coding by whether it's the pooled estimate or not
-  colors2 = c("black", "red")
-  if( color.subclasses == TRUE ) colors2 = c("black", "red", "green" )
+  colors2 = c("black", "red2")
+  if( color.subclasses == TRUE ) colors2 = c("black", "red2", "green3" )
   
   # choose good axis breaks
   min(d$lo)
