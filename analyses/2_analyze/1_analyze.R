@@ -84,13 +84,13 @@ source("MetaUtility development functions.R")
 
 # ~ Code-Running Parameters ------------------------------------------------------------------
 # should we remove existing results file instead of overwriting individual entries? 
-start.res.from.scratch = FALSE
+start.res.from.scratch = TRUE
 # should we use the grateful package to scan and cite packages?
 cite.packages.anew = FALSE
 # should we bootstrap from scratch or read in old resamples?
 boot.from.scratch = TRUE
 # make plots from scratch?
-redo.plots = FALSE
+redo.plots = TRUE
 
 # if (redo.mod.selection == FALSE) {
 #   # read in the surviving moderators
@@ -157,12 +157,14 @@ dma = d %>% filter(isMeta == TRUE)
 dr = d %>% filter(isMeta == FALSE)
 
 # dataset with more stringent inclusion criteria in replications
-dic = suppressMessages( suppressWarnings( read_csv("mb_ma_combined_prepped_0.75.csv") ) )
+dic = suppressMessages( suppressWarnings( read_csv("mb_ma_combined_prepped_0.75.csv") ) ) %>%
+  filter(!is.na(d_calc))
 dric = dic %>% filter(isMeta == FALSE)%>%
   filter(!is.na(d_calc))
 
 # dataset with IPD age-matching in MB
-dage = suppressMessages( suppressWarnings( read_csv("mb_ma_combined_prepped_0.125_age_matched.csv") ) )
+dage = suppressMessages( suppressWarnings( read_csv("mb_ma_combined_prepped_0.125_age_matched.csv") ) ) %>%
+  filter(!is.na(d_calc))
 drage = dage %>% filter(isMeta == FALSE)%>%
   filter(!is.na(d_calc))
 
