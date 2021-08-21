@@ -103,7 +103,7 @@ update_result_csv = function( name,
 wr = function(){
   setwd(results.dir)
   if( "stats_for_paper.csv" %in% list.files() ) system("rm stats_for_paper.csv")
-  if(dir.exists(.overleaf.dir)){
+  if(dir.exists(overleaf.dir)){
     setwd(overleaf.dir)
     if( "stats_for_paper.csv" %in% list.files() ) system("rm stats_for_paper.csv")
   }
