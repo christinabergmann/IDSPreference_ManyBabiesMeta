@@ -84,7 +84,7 @@ source("MetaUtility development functions.R")
 
 # ~ Code-Running Parameters ------------------------------------------------------------------
 # should we remove existing results file instead of overwriting individual entries? 
-start.res.from.scratch = FALSE
+start.res.from.scratch = TRUE
 # should we use the grateful package to scan and cite packages?
 cite.packages.anew = FALSE
 # should we bootstrap from scratch or read in old resamples?
