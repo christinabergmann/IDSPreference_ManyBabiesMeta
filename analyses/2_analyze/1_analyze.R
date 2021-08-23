@@ -84,7 +84,7 @@ source("MetaUtility development functions.R")
 
 # ~ Code-Running Parameters ------------------------------------------------------------------
 # should we remove existing results file instead of overwriting individual entries? 
-start.res.from.scratch = TRUE
+start.res.from.scratch = FALSE
 # should we use the grateful package to scan and cite packages?
 cite.packages.anew = FALSE
 # should we bootstrap from scratch or read in old resamples?
@@ -353,6 +353,8 @@ gotError = TRUE  # initialize so the while-loop is entered
 # this will print an xtable with the moderator estimates for use in the paper
 while ( gotError == TRUE ) {
   
+  
+  #bm
   tryCatch({
     mod1Res = fit_mr( .dat = d,
                       .label = "MOD1",
