@@ -1384,7 +1384,7 @@ IPW.robu = robu( yi ~ isMeta,
                  userweights = PSweight / (vi + c(naive.MA.only$mod_info$tau.sq) ),
                  var.eff.size = vi,
                  modelweights = "HIER",
-                 small = small )
+                 small = TRUE )
 
 est = as.numeric(IPW.robu$b.r)
 lo = IPW.robu$reg_table$CI.L
