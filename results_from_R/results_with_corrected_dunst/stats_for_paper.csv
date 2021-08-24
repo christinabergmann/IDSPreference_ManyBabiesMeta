@@ -45,89 +45,11 @@ MOD1 est test_langb.nonnative,-0.12,1
 MOD1 est test_langc.artificial,-0.1,1
 MOD1 est methodb.hpp,0.04,1
 MOD1 est methodc.other,0.11,1
-MOD1 lo X.Intercept.,0.05,1
-MOD1 lo isMetaTRUE,-0.11,1
-MOD1 lo mean_agec_mos,0.02,1
-MOD1 lo test_langb.nonnative,-0.24,1
-MOD1 lo test_langc.artificial,-1.94,1
-MOD1 lo methodb.hpp,-0.17,1
-MOD1 lo methodc.other,-1.52,1
-MOD1 hi X.Intercept.,0.35,1
-MOD1 hi isMetaTRUE,0.56,1
-MOD1 hi mean_agec_mos,0.07,1
-MOD1 hi test_langb.nonnative,0,1
-MOD1 hi test_langc.artificial,1.74,1
-MOD1 hi methodb.hpp,0.26,1
-MOD1 hi methodc.other,1.73,1
-MOD1 pval X.Intercept.,0.01212513,1
-MOD1 pval isMetaTRUE,0.17952843,1
-MOD1 pval mean_agec_mos,0.00015677,1
-MOD1 pval test_langb.nonnative,0.04941971,1
-MOD1 pval test_langc.artificial,0.61376010,1
-MOD1 pval methodb.hpp,0.68268287,1
-MOD1 pval methodc.other,0.66673713,1
-MOD1 avg for meta,0.42,1
-MOD1 avg lo for meta,0.14,1
-MOD1 avg hi for meta,0.7,1
-MOD1 avg pval for meta,7e-03,1
-MA subset mods tau,0.27,1
-MA subset mods k,55,1
-MA subset mods n subj,1029,1
-MA subset mods est X.Intercept.,0.73,1
-MA subset mods est mean_agec_mos,0.07,1
-MA subset mods est test_langb.nonnative,-0.26,1
-MA subset mods est test_langc.artificial,-0.16,1
-MA subset mods est methodb.hpp,-0.47,1
-MA subset mods est methodc.other,-0.12,1
-MA subset mods lo X.Intercept.,0.07,1
-MA subset mods lo mean_agec_mos,-0.1,1
-MA subset mods lo test_langb.nonnative,-1.59,1
-MA subset mods lo test_langc.artificial,-2.41,1
-MA subset mods lo methodb.hpp,-1.36,1
-MA subset mods lo methodc.other,-1.96,1
-MA subset mods hi X.Intercept.,1.39,1
-MA subset mods hi mean_agec_mos,0.24,1
-MA subset mods hi test_langb.nonnative,1.08,1
-MA subset mods hi test_langc.artificial,2.09,1
-MA subset mods hi methodb.hpp,0.42,1
-MA subset mods hi methodc.other,1.72,1
-MA subset mods pval X.Intercept.,0.040033,1
-MA subset mods pval mean_agec_mos,0.279437,1
-MA subset mods pval test_langb.nonnative,0.466580,1
-MA subset mods pval test_langc.artificial,0.536365,1
-MA subset mods pval methodb.hpp,0.201723,1
-MA subset mods pval methodc.other,0.714381,1
-Reps subset mods tau,0,1
-Reps subset mods k,104,1
-Reps subset mods n subj,2139,1
-Reps subset mods est X.Intercept.,0.11,1
-Reps subset mods est mean_agec_mos,0.05,1
-Reps subset mods est test_langb.nonnative,-0.08,1
-Reps subset mods est methodb.hpp,0.22,1
-Reps subset mods lo X.Intercept.,-0.04,1
-Reps subset mods lo mean_agec_mos,0.02,1
-Reps subset mods lo test_langb.nonnative,-0.19,1
-Reps subset mods lo methodb.hpp,0.12,1
-Reps subset mods hi X.Intercept.,0.25,1
-Reps subset mods hi mean_agec_mos,0.07,1
-Reps subset mods hi test_langb.nonnative,0.04,1
-Reps subset mods hi methodb.hpp,0.32,1
-Reps subset mods pval X.Intercept.,0.13529083,1
-Reps subset mods pval mean_agec_mos,0.00025827,1
-Reps subset mods pval test_langb.nonnative,0.19330973,1
-Reps subset mods pval methodb.hpp,0.00014279,1
-MOD1 est X.Intercept.,0.2,1
-MOD1 est isMetaTRUE,0.22,1
-MOD1 est mean_agec_mos,0.04,1
-MOD1 est test_langb.nonnative,-0.12,1
-MOD1 est test_langc.artificial,-0.1,1
-MOD1 est methodb.hpp,0.04,1
-MOD1 est methodc.other,0.11,1
-MOD1 est speech_typeb.naturalistic,-0.21,1
-MOD1 est speech_typec.filtered.synthesized,-0.11,1
-MOD1 est own_motherb.yes,-0.21,1
-MOD1 est presentationb.video.recording,0.26,1
-MOD1 est dependent_measureb.affect,0.12,1
+MOD1 est speech_typeb.naturalistic,-0.04,1
+MOD1 est speech_typec.filtered.synthesized,-0.1,1
+MOD1 est own_motherb.yes,-0.4,1
+MOD1 est presentationb.video.recording,0.33,1
+MOD1 est dependent_measureb.affect,0.17,1
 MOD1 est main_question_ids_preferenceb.no,-0.37,1
 MOD1 lo X.Intercept.,0.05,1
 MOD1 lo isMetaTRUE,-0.11,1
@@ -136,11 +58,11 @@ MOD1 lo test_langb.nonnative,-0.24,1
 MOD1 lo test_langc.artificial,-1.94,1
 MOD1 lo methodb.hpp,-0.17,1
 MOD1 lo methodc.other,-1.52,1
-MOD1 lo speech_typeb.naturalistic,-1.07,1
-MOD1 lo speech_typec.filtered.synthesized,-0.61,1
-MOD1 lo own_motherb.yes,-0.73,1
-MOD1 lo presentationb.video.recording,-0.62,1
-MOD1 lo dependent_measureb.affect,-0.91,1
+MOD1 lo speech_typeb.naturalistic,-0.65,1
+MOD1 lo speech_typec.filtered.synthesized,-0.59,1
+MOD1 lo own_motherb.yes,-0.64,1
+MOD1 lo presentationb.video.recording,-0.54,1
+MOD1 lo dependent_measureb.affect,-0.42,1
 MOD1 lo main_question_ids_preferenceb.no,-1.05,1
 MOD1 hi X.Intercept.,0.35,1
 MOD1 hi isMetaTRUE,0.56,1
@@ -149,11 +71,11 @@ MOD1 hi test_langb.nonnative,0,1
 MOD1 hi test_langc.artificial,1.74,1
 MOD1 hi methodb.hpp,0.26,1
 MOD1 hi methodc.other,1.73,1
-MOD1 hi speech_typeb.naturalistic,0.64,1
+MOD1 hi speech_typeb.naturalistic,0.57,1
 MOD1 hi speech_typec.filtered.synthesized,0.4,1
-MOD1 hi own_motherb.yes,0.31,1
-MOD1 hi presentationb.video.recording,1.15,1
-MOD1 hi dependent_measureb.affect,1.16,1
+MOD1 hi own_motherb.yes,-0.16,1
+MOD1 hi presentationb.video.recording,1.19,1
+MOD1 hi dependent_measureb.affect,0.77,1
 MOD1 hi main_question_ids_preferenceb.no,0.3,1
 MOD1 pval X.Intercept.,0.01212513,1
 MOD1 pval isMetaTRUE,0.17952843,1
@@ -162,9 +84,67 @@ MOD1 pval test_langb.nonnative,0.04941971,1
 MOD1 pval test_langc.artificial,0.61376010,1
 MOD1 pval methodb.hpp,0.68268287,1
 MOD1 pval methodc.other,0.66673713,1
-MOD1 pval speech_typeb.naturalistic,0.52551621,1
-MOD1 pval speech_typec.filtered.synthesized,0.63799876,1
-MOD1 pval own_motherb.yes,0.32183520,1
-MOD1 pval presentationb.video.recording,0.38475765,1
-MOD1 pval dependent_measureb.affect,0.45522200,1
+MOD1 pval speech_typeb.naturalistic,0.87536502,1
+MOD1 pval speech_typec.filtered.synthesized,0.66953808,1
+MOD1 pval own_motherb.yes,0.01519584,1
+MOD1 pval presentationb.video.recording,0.3245152,1
+MOD1 pval dependent_measureb.affect,0.197628,1
 MOD1 pval main_question_ids_preferenceb.no,0.19355790,1
+MOD1 avg for meta,0.42,1
+MOD1 avg lo for meta,0.14,1
+MOD1 avg hi for meta,0.7,1
+MOD1 avg pval for meta,7e-03,1
+MA subset mods tau,0.39,1
+MA subset mods k,55,1
+MA subset mods n subj,1029,1
+MA subset mods est X.Intercept.,0.64,1
+MA subset mods est mean_agec_mos,0.07,1
+MA subset mods est test_langb.nonnative,-0.29,1
+MA subset mods est test_langc.artificial,-0.13,1
+MA subset mods est methodb.hpp,-0.42,1
+MA subset mods est methodc.other,-0.07,1
+MA subset mods lo X.Intercept.,-0.1,1
+MA subset mods lo mean_agec_mos,-0.13,1
+MA subset mods lo test_langb.nonnative,-1.87,1
+MA subset mods lo test_langc.artificial,-2.1,1
+MA subset mods lo methodb.hpp,-1.43,1
+MA subset mods lo methodc.other,-1.94,1
+MA subset mods hi X.Intercept.,1.38,1
+MA subset mods hi mean_agec_mos,0.27,1
+MA subset mods hi test_langb.nonnative,1.3,1
+MA subset mods hi test_langc.artificial,1.83,1
+MA subset mods hi methodb.hpp,0.58,1
+MA subset mods hi methodc.other,1.81,1
+MA subset mods pval X.Intercept.,0.068216,1
+MA subset mods pval mean_agec_mos,0.335658,1
+MA subset mods pval test_langb.nonnative,0.473202,1
+MA subset mods pval test_langc.artificial,0.565059,1
+MA subset mods pval methodb.hpp,0.282898,1
+MA subset mods pval methodc.other,0.835149,1
+Reps subset mods tau,0,1
+Reps subset mods k,114,1
+Reps subset mods n subj,2354,1
+Reps subset mods est X.Intercept.,0.11,1
+Reps subset mods est mean_agec_mos,0.05,1
+Reps subset mods est test_langb.nonnative,-0.1,1
+Reps subset mods est methodb.hpp,0.21,1
+Reps subset mods lo X.Intercept.,-0.03,1
+Reps subset mods lo mean_agec_mos,0.03,1
+Reps subset mods lo test_langb.nonnative,-0.22,1
+Reps subset mods lo methodb.hpp,0.11,1
+Reps subset mods hi X.Intercept.,0.25,1
+Reps subset mods hi mean_agec_mos,0.07,1
+Reps subset mods hi test_langb.nonnative,0.01,1
+Reps subset mods hi methodb.hpp,0.31,1
+Reps subset mods pval X.Intercept.,0.12438889,1
+Reps subset mods pval mean_agec_mos,< 0.0001,1
+Reps subset mods pval test_langb.nonnative,0.07887496,1
+Reps subset mods pval methodb.hpp,0.00020564,1
+MA k nonaffirmative,36,4
+MA k affirmative,19,4
+weightr mu ,0.49,4
+weightr mu lo,0.24,4
+weightr mu hi,0.73,4
+weightr mu pval,< 0.0001,4
+Perc pvals <0.025,35,4
+Perc pvals >0.975,2,4

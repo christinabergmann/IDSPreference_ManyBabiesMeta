@@ -1069,6 +1069,7 @@ robu( yi ~ isMeta*mean_agec_mos + test_lang + isMeta*(method=="b.hpp"),
 # ~ Fit subset model to each level of each categorical model ------------------------------------------------------------------
 modsCat = mods2[ !mods2 %in% c("isMeta", "mean_agec_mos" ) ]
 
+#bm: this part is breaking for use.corrected.dunst = TRUE
 for ( i in 1:length(modsCat) ) {
   
   .mod = modsCat[[i]] 

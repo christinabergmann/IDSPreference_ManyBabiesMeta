@@ -413,6 +413,7 @@ fit_subset_meta = function( .dat,
                             .mods,
                             .simple.return = FALSE) {
   
+
   # catch case where subset is empty
   if ( nrow(.dat) == 0 ) {
     message("Subset is empty")
@@ -429,61 +430,76 @@ fit_subset_meta = function( .dat,
   linpred.string = paste( .mods, collapse=" + ")
   string = paste( "yi ~ ", linpred.string, collapse = "")
   
-  ( meta = robu( eval( parse( text = string ) ), 
-                 data = .dat, 
-                 studynum = as.factor(study_id),
-                 var.eff.size = vi,
-                 modelweights = "HIER",
-                 small = TRUE) )
   
-  est = meta$b.r
-  t2 = meta$mod_info$tau.sq
-  mu.lo = meta$reg_table$CI.L
-  mu.hi = meta$reg_table$CI.U
-  mu.se = meta$reg_table$SE
-  pval = meta$reg_table$prob
-  V = meta$VR.r  # variance-covariance matrix
+  tryCatch({
+    ( meta = robu( eval( parse( text = string ) ), 
+                   data = .dat, 
+                   studynum = as.factor(study_id),
+                   var.eff.size = vi,
+                   modelweights = "HIER",
+                   small = TRUE) )
+    
+    est = meta$b.r
+    t2 = meta$mod_info$tau.sq
+    mu.lo = meta$reg_table$CI.L
+    mu.hi = meta$reg_table$CI.U
+    mu.se = meta$reg_table$SE
+    pval = meta$reg_table$prob
+    V = meta$VR.r  # variance-covariance matrix
+    
+    # rounded and formatted estimates for text
+    # expects pval.cutoff to be a global var
+    ests = round( est, 2 )
+    pvals2 = format.pval(pval, eps = pval.cutoff)
+    
+    # for returning
+    intercept = est[1]
+    intercept.lo = mu.lo
+    intercept.hi = mu.hi
+    
+    # save results to csv file
+    if ( !is.na(.label) ) {
+      update_result_csv( name = paste(.label, "tau"),
+                         value = round( sqrt(t2), 2 ) )
+      
+      update_result_csv( name = paste(.label, "k"),
+                         value = nrow(meta$data.full) )
+      
+      #@CHECK THIS because I'm not sure n is what I think it is
+      # temporarily rounding because it's fractional in study_id Kaplan1995a
+      update_result_csv( name = paste(.label, "n subj"),
+                         value = round( sum(.dat$n) ) )
+      
+      update_result_csv( name = paste( .label, "est", meta$labels ),
+                         value = ests )
+      
+      update_result_csv( name = paste( .label, "lo", meta$labels ),
+                         value = round(mu.lo, digits) )
+      
+      update_result_csv( name = paste( .label, "hi", meta$labels ),
+                         value = round(mu.hi, digits) )
+      
+      update_result_csv( name = paste( .label, "pval", meta$labels ),
+                         value = pvals2 )
+    }
+    
+  }, error = function(err){
+    
+    meta <<- intercept <<- intercept.lo <<- intercept.hi <<- NA
+
+    message( paste("Couldn't fit subset meta for moderator ", .mod, ", level ", l, sep="") )
+  })
   
-  # rounded and formatted estimates for text
-  # expects pval.cutoff to be a global var
-  ests = round( est, 2 )
-  pvals2 = format.pval(pval, eps = pval.cutoff)
-  
-  # save results to csv file
-  if ( !is.na(.label) ) {
-    update_result_csv( name = paste(.label, "tau"),
-                       value = round( sqrt(t2), 2 ) )
-    
-    update_result_csv( name = paste(.label, "k"),
-                       value = nrow(meta$data.full) )
-    
-    #@CHECK THIS because I'm not sure n is what I think it is
-    # temporarily rounding because it's fractional in study_id Kaplan1995a
-    update_result_csv( name = paste(.label, "n subj"),
-                       value = round( sum(.dat$n) ) )
-    
-    update_result_csv( name = paste( .label, "est", meta$labels ),
-                       value = ests )
-    
-    update_result_csv( name = paste( .label, "lo", meta$labels ),
-                       value = round(mu.lo, digits) )
-    
-    update_result_csv( name = paste( .label, "hi", meta$labels ),
-                       value = round(mu.hi, digits) )
-    
-    update_result_csv( name = paste( .label, "pval", meta$labels ),
-                       value = pvals2 )
-  }
+
   
   if ( .simple.return == FALSE ) return(meta)
   
   if ( .simple.return == TRUE ) {
-    
     # if you update this return structure, also update the placeholder at top
     #  for when subset is empty
-    return( data.frame( intercept = est[1],
-                        intercept.lo = mu.lo[1],
-                        intercept.hi = mu.hi[1],
+    return( data.frame( intercept = intercept,
+                        intercept.lo = intercept.lo,
+                        intercept.hi = intercept.hi,
                         k = nrow(.dat) ) )
   }
   
