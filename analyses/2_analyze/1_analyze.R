@@ -1151,7 +1151,7 @@ if ( redo.plots == TRUE ) {
                                "dependent_measure", "main_question_ids_preference"), 
                            labels = 
                              c("TestLang", "Method", "SpeechType", "Mother", "Presentation", 
-                               "DV", "MainQ_IDS"))
+                               "DV", "MainQ:IDS"))
   
   subsetplot$level <- factor(subsetplot$level, levels = 
                                c("b.nonnative", "a.native", "c.artificial", "a.cf", "b.hpp", 
