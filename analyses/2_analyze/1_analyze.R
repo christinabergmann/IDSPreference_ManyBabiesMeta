@@ -1141,13 +1141,34 @@ if ( redo.plots == TRUE ) {
   max(res$hi, na.rm = TRUE)
   breaks = seq(0, 1.6, 0.2)
   
+  subsetplot <- res
   
-  prettyLabels = c( main_question_ids_preference = "Primary analysis")
+  
+  #prettyLabels = c( main_question_ids_preference = "Primary analysis")
+  
+  subsetplot$mod <- factor(subsetplot$mod, levels = 
+                             c("test_lang", "method", "speech_type", "own_mother", "presentation", 
+                               "dependent_measure", "main_question_ids_preference"), 
+                           labels = 
+                             c("TestLang", "Method", "SpeechType", "Mother", "Presentation", 
+                               "DV", "MainQ_IDS"))
+  
+  subsetplot$level <- factor(subsetplot$level, levels = 
+                               c("b.nonnative", "a.native", "c.artificial", "a.cf", "b.hpp", 
+                                 "c.other", "b.naturalistic", "a.simulated", "c.filtered/synthesized", 
+                                 "a.no", "b.yes", "a.tape recording", "b.video recording", "a.preference", 
+                                 "b.affect", "a.yes", "b.no"), 
+                             labels = 
+                               c("non-native", "native", "artificial", "Central Fixation", "HPP", 
+                                 "Other", "naturalistic", "simulated", "filtered/synthesized", 
+                                 "no", "yes", "Audio", "Video", "Preference", "Affect", "yes", "no"))
+  
+  
   
   
   #@to do in prep code: should make pretty versions of moderator variables (var names and levels) in prep code
   
-  ggplot( data = res, 
+  ggplot( data = subsetplot, 
           aes( x = est,
                y = level,
                color = source ) ) + 
@@ -1174,7 +1195,6 @@ if ( redo.plots == TRUE ) {
                 switch = "both") +
     # https://michaelbach.de/2012/07/22/R-ggplot2-and-axis-limits-unexpected-behaviour-solution.html
     coord_cartesian( xlim = c(breaks[1], breaks[length(breaks)] ) ) 
-  
   
   my_ggsave( name = "subset_forest.pdf",
              width = 10,
