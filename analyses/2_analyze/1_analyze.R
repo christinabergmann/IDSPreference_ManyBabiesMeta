@@ -1543,7 +1543,7 @@ if ( redo.plots == TRUE ) {
     
     geom_vline(xintercept = 0, lty = 2) +
     
-    guides(size = FALSE ) +
+    guides(size = "none") +
     
     scale_shape_manual(values = shapes,
                        name = "",
