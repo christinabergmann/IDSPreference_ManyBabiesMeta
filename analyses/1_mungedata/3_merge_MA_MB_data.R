@@ -1,7 +1,8 @@
 # Merge study level mb and ma data
 
-library(tidyverse)
-library(here)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse,
+               here)
 
 # script expects global vars set by master: ic.dataset, age.matched
 

@@ -1,6 +1,8 @@
-library(tidyverse)
-library(here)
-library(janitor)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse,
+               here,
+               janitor)
+
 source(here("analyses/1_mungedata/compute_es_IDS.R"))
 
 MONTH_IN_DAYS <- 365.25/12

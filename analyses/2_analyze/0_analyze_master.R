@@ -1,7 +1,8 @@
 
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(here,
+               testthat)
 
-library(here)
-library(testthat)
 setwd( here("analyses/2_analyze") )
 
 # 2 versions: using original or corrected Dunst data

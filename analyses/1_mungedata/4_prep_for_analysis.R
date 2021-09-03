@@ -1,11 +1,13 @@
 
 
 # PRELIMINARIES --------------------------------------------------------
-library(tidyverse) 
-library(knitr)
-library(here)
-library(tableone)
-library(fastDummies)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(
+  tidyverse,
+  knitr,
+  here,
+  tableone,
+  fastDummies)
 
 # expects global vars set by master prep script: ic.dataset, age.matched
 

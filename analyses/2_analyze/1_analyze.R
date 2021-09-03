@@ -24,30 +24,31 @@
 
 
 # 0. PRELIMINARIES ------------------------------------------------------------------
+if (!require("pacman")) install.packages("pacman")
 
 # This script uses renv to preserve the R environment specs (e.g., package versions.)
-library(renv)
+pacman::p_load(renv)
 # run this if you want to reproduce results using the R environment we had:
 # library(here); setwd(here)
 # renv::restore()
-
-library(tidyverse) 
-library(knitr)
-library(data.table)
-library(here)
-library(tableone)
-library(corrr)
-library(robumeta)
-library(fastDummies)
-library(weightr)
-library(PublicationBias)
-library(xtable)
-library(boot)
-library(testthat)
-library(ggplot2)
-library(metafor)
-library(MatchIt)
-library(table1)
+pacman::p_load(
+  tidyverse,
+  knitr,
+  data.table,
+  here,
+  tableone,
+  corrr,
+  robumeta,
+  fastDummies,
+  weightr,
+  PublicationBias,
+  xtabl,
+  boot,
+  testthat,
+  ggplot2,
+  metafor,
+  MatchIt,
+  table1)
 
 # run this only if you want to update the R environment specs
 # library(here); setwd(here())

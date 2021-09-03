@@ -1,6 +1,7 @@
 # The final ManyBabies1 dataset from the public github repository, plus the processing pipeline from the paper
-library(tidyverse)
-library(here)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse,
+               here)
 
 # script expects these global vars from master: n_trial_pairs_criterion, age.matched
 

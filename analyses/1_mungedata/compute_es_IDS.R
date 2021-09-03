@@ -1,7 +1,9 @@
 # calculate ES for IDS MA
 
-library(tidyverse)
-library(assertthat)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(
+  tidyverse,
+  assertthat)
 
 complete <- function(...) {
   args = list(...)

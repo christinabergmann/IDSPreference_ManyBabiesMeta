@@ -3,9 +3,10 @@
 # This file runs all data prep scripts in order (#1-4) and handles the need to run 
 #  some files multiple times to create different versions of datasets (for age-matched analyses
 # and analyses that change the inclusion criteria).
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(here,
+               testthat)
 
-library(here)
-library(testthat)
 setwd( here("analyses/1_mungedata") )
 
 # STEP 1: Get Tidy MA Data --------------------------------------------------------

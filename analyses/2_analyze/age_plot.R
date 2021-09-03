@@ -1,7 +1,8 @@
-library(tidyverse)
-library(here)
-library(robumeta)
-library(clubSandwich)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse,
+               here,
+               robumeta,
+               clubSandwich)
 
 d <- read_csv(here("data/mb_ma_combined_prepped_0.125.csv"))
 
