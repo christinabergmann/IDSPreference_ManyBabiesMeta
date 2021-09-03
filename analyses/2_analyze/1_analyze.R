@@ -1546,11 +1546,11 @@ if ( redo.plots == TRUE ) {
     
     scale_shape_manual(values = shapes,
                        name = "",
-                       guide=FALSE) +
+                       guide="none") +
     
     scale_color_manual(values = colors2,
                        name = "",
-                       guide=FALSE) +
+                       guide="none") +
     
     scale_x_continuous(limits = c(min(xBreaks), max(xBreaks)),
                        breaks = xBreaks) +

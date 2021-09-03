@@ -137,7 +137,9 @@ study_moderators <-  mb_data_tidy_fct %>%
          prop_cognitive_developmental = map(data, ~sum(.$cognitive_developmental == "yes",na.rm = T)/nrow(.[!is.na("cognitive_developmental"),])),
          prop_nae = map(data, ~sum(.$nae, na.rm = T)/nrow(.[!is.na("nae"),]))) %>%
   select(-data) %>%
-  unnest()
+  unnest(cols = c(method, mean_age, prop_monolingual, modal_lang1, mean_lang1_exposure, 
+                  prop_preterm, prop_curr_earinfection, prop_hearing_vision, 
+                  prop_cognitive_developmental, prop_nae))
 
 mb_data <- full_join(es_by_study, study_moderators)
 
