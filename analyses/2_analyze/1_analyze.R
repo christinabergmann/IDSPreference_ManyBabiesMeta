@@ -85,13 +85,13 @@ source("MetaUtility development functions.R")
 
 # ~ Code-Running Parameters ------------------------------------------------------------------
 # should we remove existing results file instead of overwriting individual entries? 
-start.res.from.scratch = TRUE
+start.res.from.scratch = FALSE
 # should we use the grateful package to scan and cite packages?
 cite.packages.anew = FALSE
 # should we bootstrap from scratch or read in old resamples?
-boot.from.scratch = TRUE
+boot.from.scratch = FALSE
 # make plots from scratch?
-redo.plots = TRUE
+redo.plots = FALSE
 
 # if (redo.mod.selection == FALSE) {
 #   # read in the surviving moderators
@@ -182,7 +182,9 @@ section = 1
 t = d %>% group_by(study_type) %>%
   summarise( m = n(),
              k = length(unique(study_id) ),
-             nSubjMed = median(n) )
+             nSubjMed = median(n),
+             nSubjMin = min(n),
+             nSubjMax = max(n), )
 t
 
 
@@ -197,6 +199,12 @@ update_result_csv( name = paste( "k studies", t$study_type, sep = " "),
 
 update_result_csv( name = paste( "median n", t$study_type, sep = " "),
                    value = t$nSubjMed )
+
+update_result_csv( name = paste( "min n", t$study_type, sep = " "),
+                   value = t$nSubjMin )
+
+update_result_csv( name = paste( "max n", t$study_type, sep = " "),
+                   value = t$nSubjMax )
 
 
 # ~ Moderators ------------------------------------------------------------------
@@ -991,6 +999,41 @@ update_result_csv( name = "weightr mu pval",
                    value = format_stat( 2 * ( 1 - pnorm( abs(m1[[2]]$par[2]) / ses[2] ) ), cutoffs = c(0.10, pval.cutoff) ) )
 
 
+# ~ Worst-Case Meta-Analysis------------------------------------------------------------------
+
+# meta-analyze only the nonaffirmatives
+# 2-sided pval
+( meta.worst = robu( yi ~ 1, 
+                     data = dma[ dma$affirm == FALSE, ], 
+                     studynum = study_id,
+                     var.eff.size = vi,
+                     modelweights = "HIER",
+                     small = TRUE) )
+mu.worst = meta.worst$b.r
+t2.worst = meta.worst$mod_info$tau.sq
+mu.lo.worst = meta.worst$reg_table$CI.L
+mu.hi.worst = meta.worst$reg_table$CI.U
+mu.se.worst = meta.worst$reg_table$SE
+pval.worst = meta.worst$reg_table$prob
+
+
+# sanity check
+corrected_meta(yi = dma$yi,
+               vi = dma$vi,
+               eta = 1000,
+               clustervar = dma$study_id,
+               favor.positive = TRUE,
+               model = "robust")
+
+
+statCI_result_csv( "Worst mu",
+                   c(meta.worst$b.r,
+                     meta.worst$reg_table$CI.L,
+                     meta.worst$reg_table$CI.U) )
+
+
+update_result_csv( name = "Worst mu pval",
+                   value = round(pval.worst, 3) )
 
 
 

@@ -148,3 +148,7 @@ weightr mu hi,1.26,4
 weightr mu pval,< 0.0001,4
 Perc pvals <0.025,39,4
 Perc pvals >0.975,0,4
+min n MA,10,
+min n MB,10,
+max n MA,77,
+max n MB,47,
