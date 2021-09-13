@@ -362,8 +362,7 @@ gotError = TRUE  # initialize so the while-loop is entered
 # this will print an xtable with the moderator estimates for use in the paper
 while ( gotError == TRUE ) {
   
-  
-  #bm
+
   tryCatch({
     mod1Res = fit_mr( .dat = d,
                       .label = "MOD1",
@@ -1036,6 +1035,54 @@ update_result_csv( name = "Worst mu pval",
                    value = round(pval.worst, 3) )
 
 
+# ~ Meta-Analysis with Eta = 4.70 (Post Hoc) ------------------------------------------------------------------
+# code modified from PublicationBias::significance_funnel innards
+eta = 4.70
+pvals = dma$pval
+A = dma$affirm
+yi = dma$yi
+vi = dma$vi
+clustervar = dma$study_id
+dat = dma
+small = TRUE
+
+metaCorr = corrected_meta( yi = yi,
+                           vi = vi, 
+                           eta = eta,
+                           clustervar = clustervar,
+                           model = "robust",
+                           favor.positive = TRUE )
+
+# **wow! quite close to replication mean
+
+
+update_result_csv( name = "Corr MA est",
+                   value = round( metaCorr$est, 2) )
+
+update_result_csv( name = "Corr MA lo",
+                   value = round( metaCorr$lo, 2) )
+
+update_result_csv( name = "Corr MA hi",
+                   value = round( metaCorr$hi, 2) )
+
+update_result_csv( name = "Corr MA pval",
+                   value = format.pval( metaCorr$pval, eps = pval.cutoff) )
+
+
+# # N.P. for both point estimate and CI
+# update_result_csv( name = "sval est to 1",
+#                    section = 2,
+#                    value = res$sval.est,
+#                    print = FALSE )
+# update_result_csv( name = "sval CI to 1",
+#                    section = 2,
+#                    value = res$sval.ci,
+#                    print = FALSE )
+
+#@not possible even though worst-case estimate has CI crossing null
+# must be the weight thing again
+
+
 
 # ~ Diagnostics for assumption that publication bias is one-tailed  ------------------------------------------------------------------
 
@@ -1113,7 +1160,6 @@ robu( yi ~ isMeta*mean_agec_mos + test_lang + isMeta*(method=="b.hpp"),
 # ~ Fit subset model to each level of each categorical model ------------------------------------------------------------------
 modsCat = mods2[ !mods2 %in% c("isMeta", "mean_agec_mos" ) ]
 
-#bm: this part is breaking for use.corrected.dunst = TRUE
 for ( i in 1:length(modsCat) ) {
   
   .mod = modsCat[[i]] 
@@ -1625,8 +1671,6 @@ if ( redo.plots == TRUE ) {
 
 # 8. WITH MODIFIED SUBJECT INCLUSION CRITERIA ------------------------------------------------------------------
 
-#bm: sanity checks stopped here
-# you should sanity-check quick_sens_analysis next
 
 section = 8
 setwd(data.dir)
@@ -1782,6 +1826,22 @@ update_result_csv( name = "Worst reportedSignif mu pval",
                   clustervar = dma2$study_id,
                   favor.positive = TRUE,
                   model = "robust" ) )
+
+# s-values to reduce effect size to match replications
+( SvalR = svalue( yi = dma$yi,
+                  vi = dma$vi,
+                  q = naive.reps.only$b.r,
+                  clustervar = dma$study_id,
+                  favor.positive = TRUE,
+                  model = "robust" ) )
+
+# N.P. for estimate
+update_result_csv( name = "sval est to reps",
+                   value = round( SvalR$sval.est, 2 ),
+                   print = FALSE )
+update_result_csv( name = "sval CI to reps",
+                   value = round( SvalR$sval.ci, 2 ),
+                   print = FALSE )
 
 
 # ~ Meta-Analysis with Eta = 4.70 (Post Hoc) ------------------------------------------------------------------
