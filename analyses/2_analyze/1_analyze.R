@@ -1475,6 +1475,8 @@ ggplot( data = d[ d$isMeta == TRUE, ],
 
 
 # ~~ Look at weights  ------------------------------------------------------------------
+
+#bm
 summary(d$PSweight)
 # very extreme weights, as expected given lack of overlap
 
@@ -1726,6 +1728,7 @@ table(d$participant_design,
 update_result_csv( name = "k between-S studies",
                    value = sum(d$participant_design == "between") )
 
+#bm
 quick_sens_analysis( .dat = d[ d$participant_design != "between", ],
                      .suffix = "WithinS" )
 
