@@ -42,7 +42,7 @@ pacman::p_load(
   fastDummies,
   weightr,
   PublicationBias,
-  xtabl,
+  xtable,
   boot,
   testthat,
   ggplot2,
@@ -85,13 +85,13 @@ source("MetaUtility development functions.R")
 
 # ~ Code-Running Parameters ------------------------------------------------------------------
 # should we remove existing results file instead of overwriting individual entries? 
-start.res.from.scratch = FALSE
+start.res.from.scratch = TRUE
 # should we use the grateful package to scan and cite packages?
 cite.packages.anew = FALSE
 # should we bootstrap from scratch or read in old resamples?
-boot.from.scratch = FALSE
+boot.from.scratch = TRUE
 # make plots from scratch?
-redo.plots = FALSE
+redo.plots = TRUE
 
 # if (redo.mod.selection == FALSE) {
 #   # read in the surviving moderators
