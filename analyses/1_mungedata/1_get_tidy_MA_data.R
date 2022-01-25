@@ -3,19 +3,23 @@ pacman::p_load(tidyverse,
                here,
                janitor)
 
-source(here("analyses/1_mungedata/compute_es_IDS.R"))
+source(here("analyses","1_mungedata","compute_es_IDS.R"))
 
 MONTH_IN_DAYS <- 365.25/12
 
 if ( use.corrected.dunst == FALSE ) {
-  MA1_PATH <- here("data/from_data_team/Dunst_original.csv")
-  MA_OUT_PATH <- here("data/prepped_with_original_dunst/ma_data_tidy.csv")
+  MA1_PATH <- here("data","from_data_team","Dunst_original.csv")
+  MA_OUT_PATH <- here("data","prepped_with_original_dunst","ma_data_tidy.csv")
 }
 
 if ( use.corrected.dunst == TRUE ) {
-  MA1_PATH <- here("data/from_data_team/Dunst_corrected.csv")
-  MA_OUT_PATH <- here("data/prepped_with_corrected_dunst/ma_data_tidy.csv")
+  MA1_PATH <- here("data","from_data_team","Dunst_corrected.csv")
+  MA_OUT_PATH <- here("data","prepped_with_corrected_dunst","ma_data_tidy.csv")
 }
+
+RECOMPUTE_D <- use.corrected.dunst 
+#if we use the original (uncorrected) meta-analysis, d is *never* recomputed
+#if we use the corrected meta-analysis, d is recomputed where possible
 
 TARGET_VARS <- c("study_id", "short_cite", "expt_num", "original_ma", "main_question_ids_preference", 
                  "response_mode", "exposure_phase", "method", "dependent_measure", "participant_design",
@@ -32,21 +36,23 @@ ma_data_tidy <- ma_data_raw %>%
   select(all_of(TARGET_VARS)) %>%
   mutate(id = 1:n()) 
 
-if ( use.corrected.dunst == TRUE ) {
 ma_data_tidy_with_es <-  ma_data_tidy %>%
   group_by(id) %>%
   nest() %>%
-  mutate(es_data = map(data, compute_es)) %>%
+  mutate(es_data = map(data, compute_es,recompute_d=RECOMPUTE_D)) %>%
   unnest(cols = c(data, es_data)) %>%
   ungroup()
 
 ma_data_tidy <- ma_data_tidy_with_es %>%
   filter(!is.na(d_calc)) %>% # we don't have all effect sizes
+  filter(!is.na(d_var_calc)) %>% # remove if we don't have the variance
   select(-c(d, d_var)) %>%
-  rename(d = d_calc, d_var = d_var_calc) # We replace the reported d column with the recalculated ones. When we couldn't recalculate d, we use the one reported in the meta-analyses. See "es_method" in the intermediate dataset.
+  rename(d = d_calc, d_var = d_var_calc) # If d was recomputed, we replace the reported d column with the recalculated ones. 
+# When we couldn't recalculate d (or for the uncorrected meta-analysis analysis), we use the one reported in the meta-analyses. 
+# We always compute d_var from scratch (not reported in the main meta-analysis).
+# See "es_method" in the intermediate dataset.
 
 remove(ma_data_tidy_with_es)
-}
 
 
 # get study characteristics

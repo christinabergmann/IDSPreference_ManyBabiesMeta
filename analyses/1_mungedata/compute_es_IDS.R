@@ -10,7 +10,7 @@ complete <- function(...) {
   !any(unlist(map(args, ~(is.null(.x) || is.na(.x)))))
 }
 
-compute_es <- function(ma_df) {
+compute_es <- function(ma_df,recompute_d = TRUE) {
 
   participant_design <- ma_df$participant_design
   x_1 <- ma_df$x_1
@@ -29,27 +29,37 @@ compute_es <- function(ma_df) {
   es_method <- "missing"
 
   #effect size calculation
-  if (participant_design == "between" & complete(x_1, x_2, n_1, n_2, SD_1, SD_2)) {
+  if (participant_design == "between" & complete(x_1, x_2, n_1, n_2, SD_1, SD_2) & recompute_d) {
     pooled_SD <- sqrt((((n_1 - 1) * SD_1 ^ 2) + ((n_2 - 1) * SD_2 ^ 2)) / (n_1 + n_2 - 2)) # "classic" Cohen's d with marginal SD
     d_calc <- (x_1 - x_2) / pooled_SD
     d_var_calc <- ((n_1 + n_2) / (n_1 * n_2)) + (d_calc ^ 2 / (2 * (n_1 + n_2)))
     es_method  <- "classic_cohen_d_between"
     
-  } else if (participant_design == "within_two" & complete(x_1, x_2, n_1, SD_1, SD_2)) {
+  } else if (participant_design == "within_two" & complete(x_1, x_2, n_1, SD_1, SD_2) & recompute_d) {
     pooled_SD <- sqrt((SD_1 ^ 2 + SD_2 ^ 2) / 2) 
     d_calc <- (x_1 - x_2) / pooled_SD
     d_var_calc <- (1 / n_1)  + (d_calc ^ 2 / (2 * n_1))
     es_method  <- "d_within_two"
     
-  } else if (participant_design == "within_one" & complete(x_1, x_2, n_1, SD_1)) {
+  } else if (participant_design == "within_one" & complete(x_1, x_2, n_1, SD_1) & recompute_d) {
     d_calc <- (x_1 - x_2) / SD_1
     d_var_calc <- (1 / n_1)  + (d_calc ^ 2 / (2 * n_1)) 
     es_method  <- "classic_cohen_d_within_one"
     
-  } else if (complete(d, d_var)) { 
+  } else if (participant_design == "between" & complete(d,n_1,n_2)) { 
     d_calc <- d
-    d_var_calc <- d_var
-    es_method  <- "reported_d_with_corrections"
+    d_var_calc <- ((n_1 + n_2) / (n_1 * n_2)) + (d_calc ^ 2 / (2 * (n_1 + n_2)))
+    es_method  <- "reported_d"
+    
+  } else if ((participant_design %in% c("within_two","within_one")) & complete(d,n_1)) { 
+    d_calc <- d
+    d_var_calc <- (1 / n_1)  + (d_calc ^ 2 / (2 * n_1))
+    es_method  <- "reported_d"
+    
+  } else if (complete(d)) { 
+    d_calc <- d
+    d_var_calc <- NA
+    es_method  <- "reported_d_and_d_var_uncomputed"
   } 
   
   
