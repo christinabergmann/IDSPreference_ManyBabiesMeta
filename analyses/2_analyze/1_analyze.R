@@ -42,7 +42,7 @@ pacman::p_load(
   fastDummies,
   weightr,
   PublicationBias,
-  xtabl,
+  xtable,
   boot,
   testthat,
   ggplot2,
