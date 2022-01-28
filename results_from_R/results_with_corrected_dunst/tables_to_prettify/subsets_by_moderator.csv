@@ -1,35 +1,35 @@
 "","mod","level","source","k","est","lo","hi"
-"1","test_lang","b.nonnative","Meta-analysis",4,0.486479686101978,0.40926745758746,0.563691914616495
+"1","test_lang","b.nonnative","Meta-analysis",4,NA,NA,NA
 "2","test_lang","b.nonnative","Replications",65,0.292171406816192,0.175956634241934,0.408386179390449
-"3","test_lang","a.native","Meta-analysis",48,0.452970753958496,0.171967375770637,0.733974132146354
+"3","test_lang","a.native","Meta-analysis",48,0.504215267039511,0.228958906166054,0.779471627912967
 "4","test_lang","a.native","Replications",49,0.431577640545946,0.33168210949175,0.531473171600143
 "5","test_lang","c.artificial","Meta-analysis",3,NA,NA,NA
 "6","test_lang","c.artificial","Replications",NA,NA,NA,NA
-"7","method","a.cf","Meta-analysis",29,0.529045987351488,0.173917583963966,0.884174390739011
+"7","method","a.cf","Meta-analysis",29,0.605972714606478,0.264660305593324,0.947285123619631
 "8","method","a.cf","Replications",79,0.25862254594941,0.170394556106342,0.346850535792479
-"9","method","b.hpp","Meta-analysis",20,0.315153765217967,-0.621732991141277,1.25204052157721
+"9","method","b.hpp","Meta-analysis",20,0.347240454703312,-0.474067222614389,1.16854813202101
 "10","method","b.hpp","Replications",35,0.517462174766415,0.414726435693787,0.620197913839042
-"11","method","c.other","Meta-analysis",6,0.464420027560627,-0.0267360138279431,0.955576068949197
+"11","method","c.other","Meta-analysis",6,0.465424626395724,-0.0895799482789418,1.02042920107039
 "12","method","c.other","Replications",NA,NA,NA,NA
-"13","speech_type","b.naturalistic","Meta-analysis",18,0.4313882526533,-0.000930100155852487,0.863706605462453
+"13","speech_type","b.naturalistic","Meta-analysis",18,0.488463529159456,0.0532735973145315,0.92365346100438
 "14","speech_type","b.naturalistic","Replications",114,0.351005019264972,0.274150217909633,0.42785982062031
-"15","speech_type","a.simulated","Meta-analysis",30,0.5013315586564,-0.062157134095606,1.06482025140841
+"15","speech_type","a.simulated","Meta-analysis",30,0.555601138201427,0.00858840254494897,1.10261387385791
 "16","speech_type","a.simulated","Replications",NA,NA,NA,NA
-"17","speech_type","c.filtered/synthesized","Meta-analysis",7,0.273995613980673,-0.954836011635969,1.50282723959732
+"17","speech_type","c.filtered/synthesized","Meta-analysis",7,0.307127343256499,-0.593438376904243,1.20769306341724
 "18","speech_type","c.filtered/synthesized","Replications",NA,NA,NA,NA
-"19","own_mother","a.no","Meta-analysis",53,0.469668728247395,0.221111827959153,0.718225628535636
+"19","own_mother","a.no","Meta-analysis",53,0.522547410533987,0.279511667735633,0.76558315333234
 "20","own_mother","a.no","Replications",114,0.351005019264972,0.274150217909633,0.42785982062031
-"21","own_mother","b.yes","Meta-analysis",2,-0.0181231711848605,-0.0775178468412227,0.0412715044715017
+"21","own_mother","b.yes","Meta-analysis",2,NA,NA,NA
 "22","own_mother","b.yes","Replications",NA,NA,NA,NA
-"23","presentation","a.tape recording","Meta-analysis",40,0.355800885362781,0.148785653366735,0.562816117358827
+"23","presentation","a.tape recording","Meta-analysis",40,0.403762949327961,0.199835663739615,0.607690234916306
 "24","presentation","a.tape recording","Replications",114,0.351005019264972,0.274150217909633,0.42785982062031
-"25","presentation","b.video recording","Meta-analysis",15,0.725660536750103,-0.781861803194317,2.23318287669452
+"25","presentation","b.video recording","Meta-analysis",15,0.770232702799105,-0.264777327517684,1.80524273311589
 "26","presentation","b.video recording","Replications",NA,NA,NA,NA
-"27","dependent_measure","a.preference","Meta-analysis",48,0.409235466644981,0.191776695096891,0.62669423819307
+"27","dependent_measure","a.preference","Meta-analysis",48,0.4533677603234,0.24353579677289,0.663199723873909
 "28","dependent_measure","a.preference","Replications",114,0.351005019264972,0.274150217909633,0.42785982062031
-"29","dependent_measure","b.affect","Meta-analysis",7,0.724063019912187,-1.41096063939594,2.85908667922032
+"29","dependent_measure","b.affect","Meta-analysis",7,0.817807466979675,-0.26723411839619,1.90284905235554
 "30","dependent_measure","b.affect","Replications",NA,NA,NA,NA
-"31","main_question_ids_preference","a.yes","Meta-analysis",41,0.497348804488939,0.231000957339274,0.763696651638604
+"31","main_question_ids_preference","a.yes","Meta-analysis",41,0.552516496641103,0.297873094140355,0.807159899141851
 "32","main_question_ids_preference","a.yes","Replications",114,0.351005019264972,0.274150217909633,0.42785982062031
-"33","main_question_ids_preference","b.no","Meta-analysis",14,0.305196123016633,0.00325205843375326,0.607140187599512
+"33","main_question_ids_preference","b.no","Meta-analysis",14,0.338979254612291,0.0467335496174504,0.631224959607132
 "34","main_question_ids_preference","b.no","Replications",NA,NA,NA,NA
