@@ -845,7 +845,7 @@ res2 = res
 
 # list of numeric variables
 numVars = c("est", "lo", "hi")
-res2[ , numVars ] = round( res2[ , numVars ], 2 )
+res2 = res2 %>% mutate_if(is.numeric, function(x) round(x,2))
 
 # turn Phats into percentages
 inds = grepl( pattern = "Phat", x = res2$stat )
