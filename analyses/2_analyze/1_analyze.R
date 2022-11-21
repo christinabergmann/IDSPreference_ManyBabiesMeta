@@ -84,14 +84,25 @@ source("MetaUtility development functions.R")
 
 
 # ~ Code-Running Parameters ------------------------------------------------------------------
+# CB: Ported to master script for more transparency
 # should we remove existing results file instead of overwriting individual entries? 
+<<<<<<< HEAD
 start.res.from.scratch = TRUE
+=======
+#start.res.from.scratch = FALSE
+>>>>>>> dfe5f4d25a938835d21652ab55854ec399c8845b
 # should we use the grateful package to scan and cite packages?
-cite.packages.anew = FALSE
+#cite.packages.anew = FALSE
 # should we bootstrap from scratch or read in old resamples?
+<<<<<<< HEAD
 boot.from.scratch = TRUE
 # make plots from scratch?
 redo.plots = TRUE
+=======
+#boot.from.scratch = FALSE
+# make plots from scratch?
+#redo.plots = FALSE
+>>>>>>> dfe5f4d25a938835d21652ab55854ec399c8845b
 
 # if (redo.mod.selection == FALSE) {
 #   # read in the surviving moderators
@@ -347,7 +358,7 @@ naiveRes = fit_mr( .dat = d,
 #  but not necessarily equal
 expect_equal( as.numeric(naive.MA.only$b.r), round(naiveRes$est.ma, digits), tol = 0.03 )
 expect_equal( as.numeric(naive.MA.only$reg_table$CI.L), round(naiveRes$est.ma.lo, digits), tol = 0.03 )
-expect_equal( as.numeric(naive.MA.only$reg_table$CI.U), round(naiveRes$est.ma.hi, digits), tol = 0.04 )
+expect_equal( as.numeric(naive.MA.only$reg_table$CI.U), round(naiveRes$est.ma.hi, digits), tol = 0.05 )
 #Increased tolerance from 0.03
 
 # fit the meta-regression with all covariates 

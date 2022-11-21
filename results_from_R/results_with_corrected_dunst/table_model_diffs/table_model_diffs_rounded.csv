@@ -1,4 +1,5 @@
 model,stat,est,lo,hi,unique
+<<<<<<< HEAD
 naive,AvgM,0.43,0.2,0.65,naive_AvgM
 naive,AvgR,0.35,0.27,0.65,naive_AvgR
 naive,AvgDiff,0.08,-0.14,0.3,naive_AvgDiff
@@ -26,3 +27,32 @@ modelDiff,Perc0Diff,-0.09,-0.12,-0.01,modelDiff_Perc0Diff
 modelDiff,Perc0.2M,-0.11,-0.13,0,modelDiff_Perc0.2M
 modelDiff,Perc0.2R,0.82,0.73,1,modelDiff_Perc0.2R
 modelDiff,Perc0.2Diff,-0.93,-1.09,-0.09,modelDiff_Perc0.2Diff
+=======
+naive,AvgM,0.48,0.25,0.71,naive_AvgM
+naive,AvgR,0.35,0.27,0.71,naive_AvgR
+naive,AvgDiff,0.13,-0.09,0.36,naive_AvgDiff
+naive,Perc0M,87,87,91,naive_Perc0M
+naive,Perc0R,100,96,100,naive_Perc0R
+naive,Perc0Diff,-13,-13,7,naive_Perc0Diff
+naive,Perc0.2M,78,76,86,naive_Perc0.2M
+naive,Perc0.2R,82,73,100,naive_Perc0.2R
+naive,Perc0.2Diff,-4,-20,19,naive_Perc0.2Diff
+mod,AvgM,0.49,0.2,0.77,mod_AvgM
+mod,AvgR,0.2,0.04,0.77,mod_AvgR
+mod,AvgDiff,0.28,-0.05,0.62,mod_AvgDiff
+mod,Perc0M,98,97,100,mod_Perc0M
+mod,Perc0R,100,,,mod_Perc0R
+mod,Perc0Diff,-2,-3,98,mod_Perc0Diff
+mod,Perc0.2M,93,91,95,mod_Perc0.2M
+mod,Perc0.2R,0,,,mod_Perc0.2R
+mod,Perc0.2Diff,93,91,95,mod_Perc0.2Diff
+modelDiff,AvgM,0,-0.02,0.04,modelDiff_AvgM
+modelDiff,AvgR,0.15,0.11,0.24,modelDiff_AvgR
+modelDiff,AvgDiff,-0.15,-0.19,-0.09,modelDiff_AvgDiff
+modelDiff,Perc0M,-11,-16,-2,modelDiff_Perc0M
+modelDiff,Perc0R,0,-4,0,modelDiff_Perc0R
+modelDiff,Perc0Diff,-11,-17,2,modelDiff_Perc0Diff
+modelDiff,Perc0.2M,-15,-24,0,modelDiff_Perc0.2M
+modelDiff,Perc0.2R,82,73,100,modelDiff_Perc0.2R
+modelDiff,Perc0.2Diff,-97,-119,-15,modelDiff_Perc0.2Diff
+>>>>>>> dfe5f4d25a938835d21652ab55854ec399c8845b
