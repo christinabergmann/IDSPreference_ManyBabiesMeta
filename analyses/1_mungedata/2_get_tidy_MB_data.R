@@ -111,6 +111,7 @@ d_var_calc <- function(n, d) {
 # V 1 by Molly et al - with additional inclusion criterion update
 es_by_participant <- mb_data_tidy_fct %>%
   group_by(lab, age_group, subid_unique) %>%
+  filter(!is.na(diff)) %>% # MZ/CC: first filter diff NAs to avoid multiple trial pair counting issue
   summarise(d = mean(diff, na.rm = TRUE), n_trial_pairs = n()) %>%
   filter(n_trial_pairs >= n_trial_pairs_criterion)
 
@@ -120,7 +121,7 @@ es_by_study <- es_by_participant %>%
             n = n(),
             d_z_var = d_var_calc(n, d_z)) %>%
    filter(n>9) %>% # Match ManyBabies1 dataset by adding this inclusion criterion
-   filter(!is.na(d_z))
+   filter(!is.na(d_z)) # MZ: I think this shouldn't be needed but keeping to be sage
    
 
 # get study characteristics
@@ -129,7 +130,7 @@ study_moderators <-  mb_data_tidy_fct %>%
   nest() %>%
   mutate(method = map(data, ~unique(.$method)),
          mean_age =  map(data, ~mean(.$age_days, na.rm = T)),
-         prop_monolingual = map(data, ~sum(.$lang_group == "monolingual")/nrow(.[!is.na("lab_group"),])),
+         prop_monolingual = map(data, ~sum(.$lang_group == "monolingual")/nrow(.[!is.na("lang_group"),])),
          modal_lang1 = map(data, ~count(., lang1) %>% arrange(-n) %>% slice(1) %>% pull(lang1)),
          mean_lang1_exposure = map(data, ~mean(.$lang1_exposure, na.rm = T)),
          prop_preterm = map(data, ~sum(.$preterm == "preterm")/nrow(.[!is.na("preterm"),])),
