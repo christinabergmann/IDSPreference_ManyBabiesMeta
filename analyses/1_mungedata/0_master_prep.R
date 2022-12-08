@@ -7,7 +7,7 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(here,
                testthat)
 
-setwd( here("analyses/1_mungedata") )
+setwd( here("analyses","1_mungedata") )
 
 # STEP 1: Get Tidy MA Data --------------------------------------------------------
 # only needs to be run once regardless of which datasets are to be created
@@ -48,7 +48,7 @@ for ( .u in c(FALSE, TRUE) ) {
       for ( .a in c(FALSE, TRUE) ) {
         # for replications, should we look at the much smaller, age-matched dataset?
         age.matched = .a
-        setwd( here("analyses/1_mungedata") )
+        setwd( here("analyses","1_mungedata") )
         suppressMessages( source("2_get_tidy_MB_data.R") )
       }
     }

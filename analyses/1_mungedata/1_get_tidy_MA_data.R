@@ -62,7 +62,7 @@ study_moderators <- ma_data_tidy %>%
               mean_age = mean(c(mean_age_1, mean_age_2), na.rm = TRUE),
               month = round(mean_age/MONTH_IN_DAYS,2),
               age_group =  case_when(month >= 0 & month <= 3.5 ~ "0-3 mo",
-                                     month > 3 & month <= 6.5 ~ "3-6 mo",
+                                     month > 3.5 & month <= 6.5 ~ "3-6 mo",
                                      month > 6.5 & month <= 9.5 ~ "6-9 mo",
                                      month > 9.5 & month <= 12.5 ~ "9-12 mo",
                                      month > 12.5 & month <= 15.5 ~ "12-15 mo",
@@ -81,16 +81,16 @@ ma_data <- full_join(ma_data_tidy, study_moderators) %>%
 
 write_csv(ma_data, MA_OUT_PATH)
 
-# # 2022-1-5: MM doing a sanity check given unexpected changes to results of corrected
+# # Quick sanity check
 # #  Dunst analysis
 # # fit a simple subset model to ma_data
-# robu( d ~ 1, 
-#       data = ma_data, 
+# robu( d ~ 1,
+#       data = ma_data,
 #       studynum = as.factor(study_id),
 #       var.eff.size = d_var,
 #       modelweights = "HIER",
 #       small = TRUE)
-# # yes, this still yields 0.448, which is much less than the naive 0.70
+# # this should yield less than the naive 0.70 for the corrected meta-analysis
 
 
 
