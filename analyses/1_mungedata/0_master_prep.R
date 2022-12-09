@@ -5,7 +5,8 @@
 # and analyses that change the inclusion criteria).
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(here,
-               testthat)
+               testthat,
+               robumeta)
 
 setwd( here("analyses/1_mungedata") )
 
