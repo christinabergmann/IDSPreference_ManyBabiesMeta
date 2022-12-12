@@ -47,8 +47,57 @@ if (age.matched == TRUE) {
   # to do this, take only the youngest MB subjects
   # this one matches almost exactly (mean 144)
   mb_data_tidy = mb_data_tidy[ mb_data_tidy$age_days <= 180, ]
-  mean( mb_data_tidy$age_days )
+  #mean(mb_data_tidy$age_days)
   # this retains only 11% of the data (2,314 subjects)
+  
+  # CC: proposal to carry out age matching; sample proportions from each age group.
+  #calculate proportion of subjects in MA:
+  proportion_subjects_in_age_groups_MA <- dma %>%
+    group_by(age_group) %>%
+    dplyr::summarise(n = sum(n), nprop = sum(n)/sum(dma$n))
+  
+  #sample MB dataset to include all subjects between 3 and 6 months and a proportional number
+  #of participants (to the MA) from infants between 6 and 9 months.
+  set.seed(40)
+  sample_ages_3_6 <- filter(filter(mb_data_tidy, age_group == "3-6 mo"),
+         subid_unique %in% sample(unique(ages_3_6$subid_unique), 310))
+  set.seed(40)
+  sample_ages_6_9 <- filter(filter(mb_data_tidy, age_group == "6-9 mo"),
+           subid_unique %in% sample(unique(ages_6_9$subid_unique),
+                                    (proportion_subjects_in_age_groups_MA$nprop[3]) * 310, 
+                                    replace = FALSE))
+  
+  sample_ages_full <- rbind(sample_ages_3_6, sample_ages_6_9)
+  
+  summary(sample_ages_full$age_days)
+  summary(dma$mean_age)
+  
+  #overview of the data and number of subjects per age group:
+  sample_ages_full %>%
+    group_by(age_group) %>%
+    summarise(n_distinct(subid_unique))
+  
+  age_matching_plot <- ggplot() +
+    geom_density(data = dma, aes(x = mean_age, fill = "#FC4E07"), show.legend = T, 
+                 alpha = 0.8, color = "black") +
+    geom_density(data = sample_ages_full, aes(x = age_days, fill = "steelblue"), 
+                 alpha = 0.8, color = "black") +
+    xlim(c(-50, 400)) +
+    xlab('Mean Age in Days') +
+    ylab('Density') +
+    scale_fill_manual(name = "", labels = c("Meta-analysis", "ManyBabies"), 
+                      values = c("#FC4E07", "steelblue")) +
+    ggtitle('Age-Matched Samples across MA and MB') +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5, size=15),
+          legend.position = "right",
+          axis.text.x = element_text(size = 13),
+          axis.title.x = element_text(size = 13),
+          axis.text.y = element_text(size = 12),
+          axis.title.y = element_text(size = 13))
+  
+  ggsave(plot = age_matching_plot, file = here('age_matching_plot.png'),
+         height = 5, width = 8)
   
   # retitle the dataset
   MB_OUT_PATH <- paste(data.dir, "/mb_data_tidy_", n_trial_pairs_criterion/8, "_age_matched.csv", sep = "")
@@ -121,7 +170,7 @@ es_by_study <- es_by_participant %>%
             n = n(),
             d_z_var = d_var_calc(n, d_z)) %>%
    filter(n>9) %>% # Match ManyBabies1 dataset by adding this inclusion criterion
-   filter(!is.na(d_z)) # MZ: I think this shouldn't be needed but keeping to be sage
+   filter(!is.na(d_z)) # MZ: I think this shouldn't be needed but keeping to be safe
    
 
 # get study characteristics
