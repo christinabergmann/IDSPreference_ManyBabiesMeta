@@ -46,7 +46,7 @@ if (age.matched == TRUE) {
   # as in the MA
   # to do this, take only the youngest MB subjects
   # this one matches almost exactly (mean 144)
-  mb_data_tidy = mb_data_tidy[ mb_data_tidy$age_days <= 180, ]
+  #mb_data_tidy = mb_data_tidy[ mb_data_tidy$age_days <= 180, ]
   #mean(mb_data_tidy$age_days)
   # this retains only 11% of the data (2,314 subjects)
   
@@ -96,8 +96,10 @@ if (age.matched == TRUE) {
           axis.text.y = element_text(size = 12),
           axis.title.y = element_text(size = 13))
   
-  ggsave(plot = age_matching_plot, file = here('age_matching_plot.png'),
-         height = 5, width = 8)
+  #save plot for supplementary materials:
+  ggsave(plot = age_matching_plot, file = here('age_matching_plot.png'), height = 5, width = 8)
+  
+  mb_data_tidy <- sample_ages_full
   
   # retitle the dataset
   MB_OUT_PATH <- paste(data.dir, "/mb_data_tidy_", n_trial_pairs_criterion/8, "_age_matched.csv", sep = "")
@@ -156,7 +158,6 @@ d_var_calc <- function(n, d) {
 #  # left_join(ages) %>%
 #  filter(!is.na(d_z)) 
 
-
 # V 1 by Molly et al - with additional inclusion criterion update
 es_by_participant <- mb_data_tidy_fct %>%
   group_by(lab, age_group, subid_unique) %>%
@@ -172,7 +173,6 @@ es_by_study <- es_by_participant %>%
    filter(n>9) %>% # Match ManyBabies1 dataset by adding this inclusion criterion
    filter(!is.na(d_z)) # MZ: I think this shouldn't be needed but keeping to be safe
    
-
 # get study characteristics
 study_moderators <-  mb_data_tidy_fct %>%
   group_by(lab, age_group) %>%
@@ -198,7 +198,6 @@ mb_data <- full_join(es_by_study, study_moderators)
 methodological_vars <- read_csv(here("data/mb_methodological_variables.csv"))
 
 mb_data <- full_join(mb_data, methodological_vars)
-
 
 write_csv(mb_data, MB_OUT_PATH)
 
