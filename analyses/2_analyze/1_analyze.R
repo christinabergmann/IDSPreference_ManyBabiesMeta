@@ -58,19 +58,23 @@ if ( use.corrected.dunst == FALSE ) {
   data.dir = here("data/prepped_with_original_dunst")
   # where to save results
   results.dir = here("results_from_R/results_with_original_dunst")
-  overleaf.dir = "~/Dropbox/Apps/Overleaf/MB-Meta/R_objects"
+  overleaf.dir = here("Overleaf")
 }
 
 if ( use.corrected.dunst == TRUE ) {
   data.dir = here("data/prepped_with_corrected_dunst")
   # where to save results
   results.dir = here("results_from_R/results_with_corrected_dunst")
-  overleaf.dir = "~/Dropbox/Apps/Overleaf/MB-Meta/R_objects/corrected_dunst"
+  overleaf.dir = here("Overleaf/corrected_dunst")
 }
 
 if(!dir.exists(results.dir)){
   dir.create(results.dir)
-} 
+}
+
+if(!dir.exists(overleaf.dir)){
+  dir.create(overleaf.dir)
+}
 
 
 code.dir = here("analyses/2_analyze")
@@ -1304,7 +1308,6 @@ section = 6
 # and it's one with little overlap
 age_densities(d)
 
-
 # ~~ Make matches - coarsened exact matching (CEM) ------------------------------------------------------------------
 
 # start from all candidate moderators, not just the survivors from multivariable meta-regression
@@ -1324,7 +1327,7 @@ mods3 = mods2[ !mods2 %in% c("isMeta") ]
 # MatchIt::matchit docs: "if a categorical variable does not appear in grouping, it will not be coarsened, so exact matching will take place on it"
 # regarding subclasses: "setting method = "cem" performs coarsened exact matching. With coarsened exact matching, covariates are coarsened into bins, and a complete cross of the coarsened covariates is used to form subclasses defined by each combination of the coarsened covariate levels. Any subclass that doesn't contain both treated and control units is discarded, leaving only subclasses containing treatment and control units that are exactly equal on the coarsened covariates."
 string = paste( "isMeta ~ ",
-                paste( mods3, collapse=" + "),
+                paste(mods3[1], collapse=" + "), # CC: changed this to mods3[1] since only age is relevant
                 collapse = "")
 
 x = matchit( formula = eval( parse( text = string ) ),
@@ -1844,7 +1847,7 @@ update_result_csv( name = "sval est to reps",
                    value = round( SvalR$sval.est, 2 ),
                    print = FALSE )
 update_result_csv( name = "sval CI to reps",
-                   value = round( SvalR$sval.ci, 2 ),
+                   value = SvalR$sval.ci, #CC: changed this because no value ci sval.
                    print = FALSE )
 
 
