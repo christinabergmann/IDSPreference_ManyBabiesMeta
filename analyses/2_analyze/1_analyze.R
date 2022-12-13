@@ -1578,7 +1578,7 @@ if ( redo.plots == TRUE ) {
     # row ID after which to insert the pooled row
     this.group.rows = which(dp$sourcePretty == l)
     
-    pooled.label = paste( "POOLED - ", toupper(l), sep = "" )
+    pooled.label = paste( "Pooled ", l, sep = "" )
     
     dp = add_row( as.data.frame(dp),
                   .after = this.group.rows[ length(this.group.rows) ],
@@ -1592,11 +1592,11 @@ if ( redo.plots == TRUE ) {
   
   
   # for aes on plot
-  dp$is.pooled = grepl("POOL", dp$label)
+  dp$is.pooled = grepl("Pooled", dp$label)
   if ( color.subclasses == TRUE ) dp$is.pooled[ dp$unique %in% dmt$unique ] = 2
   
   # for pooled estimates, don't include number of studies in string
-  ind = grepl("POOL", dp$label)
+  ind = grepl("Pooled", dp$label)
   dp$info.strings[ind] = paste( round( dp$yi[ind], 2 ), " ",
                                 format_CI( dp$lo[ind], dp$hi[ind], 2 ),
                                 sep = "" )
@@ -1609,19 +1609,19 @@ if ( redo.plots == TRUE ) {
   
   # regular circle: 19
   # 2 is open triangle
-  shapes = c(19,17)
-  if ( color.subclasses == TRUE ) shapes = c(19,17,19)
+  shapes = c(19,18)
+  if ( color.subclasses == TRUE ) shapes = c(19,18,19)
   
   # ~ Make the Plot ------------------------------------------------------------------
   
   # now color-coding by whether it's the pooled estimate or not
-  colors2 = c("black", "red2")
-  if( color.subclasses == TRUE ) colors2 = c("black", "red2", "green3" )
+  colors2 = c("black", "#d95f02")
+  if( color.subclasses == TRUE ) colors2 = c("black", "#d95f02", "#66a61e" )
   
   # choose good axis breaks
   min(d$lo)
   max(d$hi)
-  xBreaks = seq( -1.5, 4.5, 0.5)
+  xBreaks = seq( -2.5, 5, 0.5)
   
   p = ggplot( data = dp, aes( x = yi, 
                               y = label, 
