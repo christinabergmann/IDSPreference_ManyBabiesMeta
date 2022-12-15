@@ -39,7 +39,7 @@ if (age.matched == TRUE) {
   dma = read_csv("ma_data_tidy.csv")
   summary(dma$mean_age)
   
-  # without further restriction, mean age in MB is 284 days
+  # without further restriction, mean age in MB is ~280-290 days
   summary(mb_data_tidy$age_days)
   
   # subset the MB subjects to get a mean of 144 days 
@@ -56,18 +56,48 @@ if (age.matched == TRUE) {
     group_by(age_group) %>%
     dplyr::summarise(n = sum(n), nprop = sum(n)/sum(dma$n))
   
-  #sample MB dataset to include all subjects between 3 and 6 months and a proportional number
-  #of participants (to the MA) from infants between 6 and 9 months.
-  set.seed(40)
-  sample_ages_3_6 <- filter(filter(mb_data_tidy, age_group == "3-6 mo"),
-         subid_unique %in% sample(unique(ages_3_6$subid_unique), 310))
-  set.seed(40)
-  sample_ages_6_9 <- filter(filter(mb_data_tidy, age_group == "6-9 mo"),
-           subid_unique %in% sample(unique(ages_6_9$subid_unique),
-                                    (proportion_subjects_in_age_groups_MA$nprop[3]) * 310, 
-                                    replace = FALSE))
+  proportion_subjects_in_age_groups_MB <- mb_data_tidy %>%
+    distinct(subid_unique, age_group) %>%
+    mutate(total_n = n()) %>%
+    group_by(age_group,total_n) %>%
+    dplyr::summarise(n = n()) %>%
+    mutate(nprop = n/total_n)
   
-  sample_ages_full <- rbind(sample_ages_3_6, sample_ages_6_9)
+  #sample MB dataset to include all subjects between 3 and 6 months and a proportional number
+  #of participants (to the MA) from infants between 6 and 9 months and 9 to 12 months.
+  
+  sample_subids_3_6 <- mb_data_tidy %>%
+    filter(age_group=="3-6 mo") %>%
+    distinct(subid_unique)
+
+  
+  set.seed(40)
+  
+  sample_subids_6_9 <- mb_data_tidy %>%
+    filter(age_group=="6-9 mo") %>%
+    distinct(subid_unique) %>%
+    slice_sample(
+      n=round(filter(proportion_subjects_in_age_groups_MA,age_group=="6-9 mo")$nprop*nrow(sample_subids_3_6)))
+  
+  # check whether the MA has a 9-12 month age group
+  # if yes sample 9-12 month olds proportionally
+  if ("9-12 mo" %in% proportion_subjects_in_age_groups_MA$age_group) {
+    sample_subids_9_12 <- mb_data_tidy %>%
+      filter(age_group=="9-12 mo") %>%
+      distinct(subid_unique) %>%
+      slice_sample(
+        n=round(filter(proportion_subjects_in_age_groups_MA,age_group=="9-12 mo")$nprop*nrow(sample_subids_3_6)))
+    #subids to use for subsample
+    sample_subids <- bind_rows(sample_subids_3_6,sample_subids_6_9,sample_subids_9_12)
+    
+  } else {
+    #subids to use for subsample
+    sample_subids <- bind_rows(sample_subids_3_6,sample_subids_6_9)
+  }
+  
+  #select final age-matched sample
+  sample_ages_full <- mb_data_tidy %>%
+    filter(subid_unique %in% sample_subids$subid_unique)
   
   summary(sample_ages_full$age_days)
   summary(dma$mean_age)
@@ -77,10 +107,15 @@ if (age.matched == TRUE) {
     group_by(age_group) %>%
     summarise(n_distinct(subid_unique))
   
+  sample_ages_full_subj_count <- sample_ages_full %>%
+    distinct(subid_unique,age_days)
+  
+  #show overlapping age plot - much better match than the "cutoff method" previously used
+  #the MB looks a bit more "peak-y" mainly because it does not have any participants in the 0-3 mo age range (which affects the peak of the density)
   age_matching_plot <- ggplot() +
-    geom_density(data = dma, aes(x = mean_age, fill = "#FC4E07"), show.legend = T, 
+    geom_density(data = dma, aes(x = mean_age,weight=n/sum(n), fill = "#FC4E07"), show.legend = T, 
                  alpha = 0.8, color = "black") +
-    geom_density(data = sample_ages_full, aes(x = age_days, fill = "steelblue"), 
+    geom_density(data = sample_ages_full_subj_count, aes(x = age_days, fill = "steelblue"), 
                  alpha = 0.8, color = "black") +
     xlim(c(-50, 400)) +
     xlab('Mean Age in Days') +
