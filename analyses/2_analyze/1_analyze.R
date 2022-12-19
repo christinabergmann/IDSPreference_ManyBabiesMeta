@@ -233,7 +233,7 @@ t <- d %>%
   mutate(method = factor(method, labels = c("central fixation", "headturn preference procedure", "other"))) %>%
   mutate(`speech type` = factor(speech_type, labels = c("simulated", "naturalistic", "filtered/synthesized"))) %>%
   mutate(`own mother` = factor( own_mother, labels = c("no", "yes"))) %>%
-  mutate(presentation = factor(presentation, labels = c("tape recording", "video recording"))) %>%
+  mutate(presentation = factor(presentation, labels = c("audio recording", "video recording"))) %>%
   mutate(`main question was about IDS prerence` = factor(main_question_ids_preference, labels = c("yes", "no"))) %>%
   select(study_type, `centered age (months)`, `test language`, `native language`, method, `speech type`, `own mother`, presentation, `main question was about IDS prerence`)
 

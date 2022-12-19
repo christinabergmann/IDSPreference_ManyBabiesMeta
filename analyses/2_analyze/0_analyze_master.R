@@ -12,7 +12,7 @@ for ( .u in c(FALSE, TRUE) ) {
   # should we remove existing results file instead of overwriting individual entries? 
   start.res.from.scratch = TRUE
   # should we use the grateful package to scan and cite packages?
-  cite.packages.anew = FALSE
+  cite.packages.anew = TRUE
   # should we bootstrap from scratch or read in old resamples?
   boot.from.scratch = TRUE
   # make plots from scratch?
