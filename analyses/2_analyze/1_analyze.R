@@ -77,7 +77,7 @@ if(!dir.exists(overleaf.dir)){
 }
 
 
-code.dir = here("analyses/2_analyze")
+code.dir = here("analyses","2_analyze")
 
 # helper fns
 setwd(code.dir)
@@ -1758,11 +1758,14 @@ ggplot(d, aes(mean_age, calibNaive, color=sourcePretty)) +
   scale_color_manual(values=colors) +
   theme_classic()
 
-# apparent nonlinearity in replications seems largely driven by the outlying replication
-#  study with largest mean age
-# try excluding that one
-temp = d %>% filter( !(isMeta == TRUE & mean_age > 300 ) )
-expect_equal(nrow(temp), nrow(d) - 1)
+## in original Dunst only:
+if (!use.corrected.dunst) {
+  # apparent nonlinearity in replications seems largely driven by the outlying replication
+  #  study with largest mean age
+  # try excluding that one
+  temp = d %>% filter( !(isMeta & mean_age > 300 ) )
+  expect_equal(nrow(temp), nrow(d) - 1)
+}
 
 ggplot(temp, aes(mean_age, calibNaive, color=sourcePretty)) +
   geom_point() +
