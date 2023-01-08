@@ -1765,13 +1765,15 @@ if (!use.corrected.dunst) {
   # try excluding that one
   temp = d %>% filter( !(isMeta & mean_age > 300 ) )
   expect_equal(nrow(temp), nrow(d) - 1)
+  
+  ggplot(temp, aes(mean_age, calibNaive, color=sourcePretty)) +
+    geom_point() +
+    geom_smooth(se=FALSE) +
+    scale_color_manual(values=colors) +
+    theme_classic()
 }
 
-ggplot(temp, aes(mean_age, calibNaive, color=sourcePretty)) +
-  geom_point() +
-  geom_smooth(se=FALSE) +
-  scale_color_manual(values=colors) +
-  theme_classic()
+
 
 
 
