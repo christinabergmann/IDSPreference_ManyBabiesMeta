@@ -12,7 +12,7 @@ for ( .u in c(FALSE, TRUE) ) {
   # should we use the grateful package to scan and cite packages?
   cite.packages.anew = TRUE
   # should we bootstrap from scratch or read in old resamples?
-  boot.from.scratch = TRUE
+  boot.from.scratch = FALSE
   # make plots from scratch?
   redo.plots = TRUE
   
