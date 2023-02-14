@@ -13,9 +13,8 @@ setwd( here("analyses/1_mungedata") )
 # STEP 1: Get Tidy MA Data --------------------------------------------------------
 # only needs to be run once regardless of which datasets are to be created
 
-# 2 versions: using original or corrected Dunst data
-for ( .u in c(FALSE, TRUE) ) {
-  use.corrected.dunst = .u
+# 4 data versions: using original Dunst; corrected Dunst; community-augmented MA; an extended version of the community-augmented MA
+for (ma_version in c("Dunst_original","Dunst_corrected","augmented_ma","augmented_ma_extended")) {
   source("1_get_tidy_MA_data.R")
 }
 
@@ -35,10 +34,8 @@ criteria.vec = c(.125, .25, .5, .75)*8
 
 
 # even though this part of script preps the MB data,
-#  depends on use.corrected.dunst because of age-matching
-for ( .u in c(FALSE, TRUE) ) {
-  
-  use.corrected.dunst = .u
+#  depends on MA version because of age-matching
+for (ma_version in c("Dunst_original","Dunst_corrected","augmented_ma","augmented_ma_extended")) {
   
   for ( .c in criteria.vec ) {
     
@@ -70,9 +67,7 @@ for ( .u in c(FALSE, TRUE) ) {
 # .ic: for replications, should we make the sensitivity-analysis dataset with more
 #  stringent inclusion (set to TRUE), or the main-analysis dataset?
 
-for ( .u in c(FALSE, TRUE) ) {
-  
-  use.corrected.dunst = .u
+for (ma_version in c("Dunst_original","Dunst_corrected","augmented_ma","augmented_ma_extended")) {
   
   for ( .ic in c(FALSE, TRUE) ) {
     

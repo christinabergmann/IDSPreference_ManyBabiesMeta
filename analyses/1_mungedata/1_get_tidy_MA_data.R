@@ -7,19 +7,21 @@ source(here("analyses","1_mungedata","compute_es_IDS.R"))
 
 MONTH_IN_DAYS <- 365.25/12
 
-if ( use.corrected.dunst == FALSE ) {
-  MA1_PATH <- here("data","from_data_team","Dunst_original.csv")
+MA1_PATH <- here("data","from_data_team",paste0(ma_version,".csv"))
+
+if (ma_version == "Dunst_original") {
   MA_OUT_PATH <- here("data","prepped_with_original_dunst","ma_data_tidy.csv")
-}
-
-if ( use.corrected.dunst == TRUE ) {
-  MA1_PATH <- here("data","from_data_team","Dunst_corrected.csv")
+  #if we use the original (uncorrected) meta-analysis, d is *never* recomputed
+  RECOMPUTE_D <- FALSE
+} else if (ma_version == "Dunst_corrected") {
   MA_OUT_PATH <- here("data","prepped_with_corrected_dunst","ma_data_tidy.csv")
+  #if we use the corrected or augmented meta-analysis, d is recomputed where possible
+  RECOMPUTE_D <- TRUE 
+} else {
+  MA_OUT_PATH <- here("data",paste0("prepped_with_",ma_version),"ma_data_tidy.csv")
+  #if we use the corrected or augmented meta-analysis, d is recomputed where possible
+  RECOMPUTE_D <- TRUE 
 }
-
-RECOMPUTE_D <- use.corrected.dunst 
-#if we use the original (uncorrected) meta-analysis, d is *never* recomputed
-#if we use the corrected meta-analysis, d is recomputed where possible
 
 TARGET_VARS <- c("study_id", "short_cite", "expt_num", "original_ma", "main_question_ids_preference", 
                  "response_mode", "exposure_phase", "method", "dependent_measure", "participant_design",
@@ -84,13 +86,13 @@ write_csv(ma_data, MA_OUT_PATH)
 # 2022-1-5: MM doing a sanity check given unexpected changes to results of corrected
 #  Dunst analysis
 # fit a simple subset model to ma_data
+library(robumeta)
 robu( d ~ 1, 
       data = ma_data, 
       studynum = as.factor(study_id),
       var.eff.size = d_var,
       modelweights = "HIER",
       small = TRUE)
-# yes, this still yields 0.448, which is much less than the naive 0.70
 
 
 
