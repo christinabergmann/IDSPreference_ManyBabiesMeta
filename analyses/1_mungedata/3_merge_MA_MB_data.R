@@ -6,8 +6,13 @@ pacman::p_load(tidyverse,
 
 # script expects global vars set by master: ic.dataset, age.matched
 
-if ( use.corrected.dunst == FALSE ) data.dir = here("data/prepped_with_original_dunst")
-if ( use.corrected.dunst == TRUE ) data.dir = here("data/prepped_with_corrected_dunst")
+if (ma_version == "Dunst_original") {
+  data.dir = here("data","prepped_with_original_dunst")
+} else if (ma_version == "Dunst_corrected") {
+  data.dir = here("data","prepped_with_corrected_dunst")
+} else {
+  data.dir = here("data",paste0("prepped_with_",ma_version))
+}
 setwd(data.dir)
 
 MA_DATA_PATH <- paste(data.dir, "ma_data_tidy.csv", sep = "/")

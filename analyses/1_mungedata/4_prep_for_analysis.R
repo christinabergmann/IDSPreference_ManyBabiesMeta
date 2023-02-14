@@ -15,15 +15,15 @@ pacman::p_load(
 # If working on the preregistration, set this to T, otherwise F to use the veridical dataset without scrambling.
 prereg = FALSE
 
-if ( use.corrected.dunst == FALSE ){
-  data.dir = here("data/prepped_with_original_dunst")
-  results.dir = here("results_from_R/results_with_original_dunst")
-}
-
-
-if ( use.corrected.dunst == TRUE ){
-  data.dir = here("data/prepped_with_corrected_dunst")
-  results.dir = here("results_from_R/results_with_corrected_dunst")
+if (ma_version == "Dunst_original") {
+  data.dir = here("data","prepped_with_original_dunst")
+  results.dir = here("results_from_R","results_with_original_dunst")
+} else if (ma_version == "Dunst_corrected") {
+  data.dir = here("data","prepped_with_corrected_dunst")
+  results.dir = here("results_from_R","results_with_corrected_dunst")
+} else {
+  data.dir = here("data",paste0("prepped_with_",ma_version))
+  results.dir = here("results_from_R",paste0("results_with_",ma_version))
 }
 
 

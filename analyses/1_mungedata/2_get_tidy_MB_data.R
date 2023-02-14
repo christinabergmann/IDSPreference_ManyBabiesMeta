@@ -6,18 +6,17 @@ pacman::p_load(tidyverse,
 # script expects these global vars from master: n_trial_pairs_criterion, age.matched
 
 MB1_PATH <- "https://raw.githubusercontent.com/manybabies/mb1-analysis-public/master/processed_data/03_data_diff_main.csv"
+ma_file_outname <- paste("mb_data_tidy_", n_trial_pairs_criterion/8, ".csv", sep = "")
 
-if ( use.corrected.dunst == FALSE ){
-  data.dir = here("data/prepped_with_original_dunst")
-  MB_OUT_PATH = here(paste("data/prepped_with_original_dunst/mb_data_tidy_", n_trial_pairs_criterion/8, ".csv", sep = ""))
+if (ma_version == "Dunst_original") {
+  data.dir = here("data","prepped_with_original_dunst")
+} else if (ma_version == "Dunst_corrected") {
+  data.dir = here("data","prepped_with_corrected_dunst")
+} else {
+  data.dir = here("data",paste0("prepped_with_",ma_version))
 }
 
-if ( use.corrected.dunst == TRUE ){
-  data.dir = here("data/prepped_with_corrected_dunst")
-  MB_OUT_PATH = here(paste("data/prepped_with_corrected_dunst/mb_data_tidy_", n_trial_pairs_criterion/8, ".csv", sep = ""))
-}
-
-
+MB_OUT_PATH = here(data.dir,ma_file_outname)
 
 TARGET_VARS <- c("lab", "subid_unique", "trial_num", "method", "age_days", "age_group",
                  "lang_group", "lang1", "lang1_exposure",
