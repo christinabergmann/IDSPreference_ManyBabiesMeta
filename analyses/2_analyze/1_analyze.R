@@ -54,19 +54,35 @@ pacman::p_load(
 # library(here); setwd(here())
 # renv::snapshot()
 
-if ( use.corrected.dunst == FALSE ) {
-  data.dir = here("data/prepped_with_original_dunst")
+if (ma.version == "Dunst_original" ) {
+  data.dir = here("data","prepped_with_original_dunst")
   # where to save results
-  results.dir = here("results_from_R/results_with_original_dunst")
-  overleaf.dir = here("Overleaf")
+  results.dir = here("results_from_R","results_with_original_dunst")
+  overleaf.dir = here("Overleaf","original_dunst")
 }
 
-if ( use.corrected.dunst == TRUE ) {
-  data.dir = here("data/prepped_with_corrected_dunst")
+if (ma.version == "Dunst_corrected") {
+  data.dir = here("data","prepped_with_corrected_dunst")
   # where to save results
-  results.dir = here("results_from_R/results_with_corrected_dunst")
-  overleaf.dir = here("Overleaf/corrected_dunst")
+  results.dir = here("results_from_R","results_with_corrected_dunst")
+  overleaf.dir = here("Overleaf","corrected_dunst")
 }
+
+if (ma.version == "augmented_ma") {
+  data.dir = here("data","prepped_with_augmented_ma")
+  # where to save results
+  results.dir = here("results_from_R","results_with_augmented_ma")
+  overleaf.dir = here("Overleaf","augmented_ma")
+}
+
+if (ma.version == "augmented_ma") {
+  data.dir = here("data","prepped_with_augmented_ma_extended")
+  # where to save results
+  results.dir = here("results_from_R","results_with_augmented_ma_extended")
+  overleaf.dir = here("Overleaf","augmented_ma_extended")
+}
+
+
 
 if(!dir.exists(results.dir)){
   dir.create(results.dir)
