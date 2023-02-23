@@ -98,49 +98,59 @@ MOD1 avg for meta,0.58,1
 MOD1 avg lo for meta,0.29,1
 MOD1 avg hi for meta,0.88,1
 MOD1 avg pval for meta,1e-03,1
-MA subset mods tau,0.55,1
-MA subset mods k,51,1
-MA subset mods n subj,1062,1
-MA subset mods est X.Intercept.,0.74,1
-MA subset mods est mean_agec_mos,0.09,1
-MA subset mods est test_langb.nonnative,-0.26,1
-MA subset mods est test_langc.artificial,-0.49,1
-MA subset mods est methodb.hpp,-0.37,1
-MA subset mods est methodc.other,0.55,1
-MA subset mods lo X.Intercept.,0.35,1
-MA subset mods lo mean_agec_mos,-0.03,1
-MA subset mods lo test_langb.nonnative,-0.95,1
-MA subset mods lo test_langc.artificial,-2.04,1
-MA subset mods lo methodb.hpp,-2.22,1
-MA subset mods lo methodc.other,-0.91,1
-MA subset mods hi X.Intercept.,1.13,1
-MA subset mods hi mean_agec_mos,0.21,1
-MA subset mods hi test_langb.nonnative,0.44,1
-MA subset mods hi test_langc.artificial,1.06,1
-MA subset mods hi methodb.hpp,1.48,1
-MA subset mods hi methodc.other,2.02,1
-MA subset mods pval X.Intercept.,0.0057956,1
-MA subset mods pval mean_agec_mos,0.1207885,1
-MA subset mods pval test_langb.nonnative,0.3120079,1
-MA subset mods pval test_langc.artificial,0.3362166,1
-MA subset mods pval methodb.hpp,0.5830986,1
-MA subset mods pval methodc.other,0.2996742,1
-Reps subset mods tau,0,1
-Reps subset mods k,104,1
-Reps subset mods n subj,2139,1
-Reps subset mods est X.Intercept.,0.1,1
-Reps subset mods est mean_agec_mos,0.05,1
-Reps subset mods est test_langb.nonnative,-0.08,1
-Reps subset mods est methodb.hpp,0.22,1
-Reps subset mods lo X.Intercept.,-0.05,1
-Reps subset mods lo mean_agec_mos,0.02,1
-Reps subset mods lo test_langb.nonnative,-0.19,1
-Reps subset mods lo methodb.hpp,0.12,1
-Reps subset mods hi X.Intercept.,0.25,1
-Reps subset mods hi mean_agec_mos,0.07,1
-Reps subset mods hi test_langb.nonnative,0.04,1
-Reps subset mods hi methodb.hpp,0.32,1
-Reps subset mods pval X.Intercept.,0.18966468,1
-Reps subset mods pval mean_agec_mos,0.00029046,1
-Reps subset mods pval test_langb.nonnative,0.19337149,1
-Reps subset mods pval methodb.hpp,0.00014863,1
+MA subset mods tau,0.55,4
+MA subset mods k,51,4
+MA subset mods n subj,1062,4
+MA subset mods est X.Intercept.,0.74,4
+MA subset mods est mean_agec_mos,0.09,4
+MA subset mods est test_langb.nonnative,-0.26,4
+MA subset mods est test_langc.artificial,-0.49,4
+MA subset mods est methodb.hpp,-0.37,4
+MA subset mods est methodc.other,0.55,4
+MA subset mods lo X.Intercept.,0.35,4
+MA subset mods lo mean_agec_mos,-0.03,4
+MA subset mods lo test_langb.nonnative,-0.95,4
+MA subset mods lo test_langc.artificial,-2.04,4
+MA subset mods lo methodb.hpp,-2.22,4
+MA subset mods lo methodc.other,-0.91,4
+MA subset mods hi X.Intercept.,1.13,4
+MA subset mods hi mean_agec_mos,0.21,4
+MA subset mods hi test_langb.nonnative,0.44,4
+MA subset mods hi test_langc.artificial,1.06,4
+MA subset mods hi methodb.hpp,1.48,4
+MA subset mods hi methodc.other,2.02,4
+MA subset mods pval X.Intercept.,0.0057956,4
+MA subset mods pval mean_agec_mos,0.1207885,4
+MA subset mods pval test_langb.nonnative,0.3120079,4
+MA subset mods pval test_langc.artificial,0.3362166,4
+MA subset mods pval methodb.hpp,0.5830986,4
+MA subset mods pval methodc.other,0.2996742,4
+Reps subset mods tau,0,4
+Reps subset mods k,104,4
+Reps subset mods n subj,2139,4
+Reps subset mods est X.Intercept.,0.1,4
+Reps subset mods est mean_agec_mos,0.05,4
+Reps subset mods est test_langb.nonnative,-0.08,4
+Reps subset mods est methodb.hpp,0.22,4
+Reps subset mods lo X.Intercept.,-0.05,4
+Reps subset mods lo mean_agec_mos,0.02,4
+Reps subset mods lo test_langb.nonnative,-0.19,4
+Reps subset mods lo methodb.hpp,0.12,4
+Reps subset mods hi X.Intercept.,0.25,4
+Reps subset mods hi mean_agec_mos,0.07,4
+Reps subset mods hi test_langb.nonnative,0.04,4
+Reps subset mods hi methodb.hpp,0.32,4
+Reps subset mods pval X.Intercept.,0.18966468,4
+Reps subset mods pval mean_agec_mos,0.00029046,4
+Reps subset mods pval test_langb.nonnative,0.19337149,4
+Reps subset mods pval methodb.hpp,0.00014863,4
+MA k nonaffirmative,23,4
+MA k affirmative,28,4
+weightr mu ,0.62,4
+weightr mu lo,0.34,4
+weightr mu hi,0.89,4
+weightr mu pval,< 0.0001,4
+Worst mu ,0.16,4
+Worst mu lo,-0.01,4
+Worst mu hi,0.33,4
+Worst mu pval,0.06,4
