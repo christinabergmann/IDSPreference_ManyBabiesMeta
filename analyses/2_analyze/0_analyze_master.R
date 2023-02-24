@@ -19,7 +19,7 @@ for (ma.version in ma.versions) {
     # make plots from scratch?
     redo.plots = TRUE
     
-    setwd( here("analyses/2_analyze") )
+    setwd( here("analyses","2_analyze") )
     source("1_analyze.R")
   }
 }

@@ -1,0 +1,12 @@
+name,value,section
+m ests MA,112,1
+m ests MB,104,1
+m ests total,216,1
+k studies MA,30,1
+k studies MB,62,1
+median n MA,16.5,1
+median n MB,16,1
+min n MA,9,1
+min n MB,10,1
+max n MA,77,1
+max n MB,46,1

@@ -194,7 +194,7 @@ IPW robu lo isMetaTRUE,-0.11,6
 IPW robu hi X.Intercept.,0.5,6
 IPW robu hi isMetaTRUE,0.39,6
 IPW robu pval X.Intercept.,0.000283132870207536,6
-IPW robu pval isMetaTRUE,0.260426183627044,6
+IPW robu pval isMetaTRUE,0.260426183627045,6
 Reps subset naiveIC tau,0.05,8
 Reps subset naiveIC k,56,8
 Reps subset naiveIC n subj,1060,8

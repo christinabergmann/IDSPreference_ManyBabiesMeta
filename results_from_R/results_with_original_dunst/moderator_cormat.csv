@@ -1,507 +1,307 @@
 "","x","y","r"
-"1","study_type_MB","speech_type_b.naturalistic",0.771214134874398
-"2","study_type_MA","speech_type_a.simulated",0.670515368926047
-"3","test_lang_a.native","native_lang_english",0.649938951755157
-"4","test_lang_c.artificial","speech_type_c.filtered/synthesized",0.645982378306643
-"5","test_lang_c.artificial","method_c.other",0.645982378306643
-"6","study_type_MB","mean_agec_mos",0.607138208471745
-"7","speech_type_b.naturalistic","mean_agec_mos",0.559410290437789
-"8","presentation_a.tape recording","dependent_measure_a.preference",0.559325247497008
-"9","speech_type_a.simulated","main_question_ids_preference_b.no",0.52331493707556
-"10","speech_type_b.naturalistic","main_question_ids_preference_a.yes",0.511766315719159
-"11","native_lang_cantonese","presentation_b.video recording",0.497232961600038
-"12","study_type_MB","presentation_a.tape recording",0.467426352442803
-"13","study_type_MA","presentation_b.video recording",0.467426352442802
-"14","study_type_MB","test_lang_b.nonnative",0.459659742564147
-"15","test_lang_b.nonnative","speech_type_b.naturalistic",0.4409585518441
-"16","test_lang_b.nonnative","native_lang_german",0.415526016638666
-"17","method_c.other","speech_type_c.filtered/synthesized",0.401544401544403
-"18","study_type_MA","test_lang_a.native",0.400336485561854
-"19","test_lang_a.native","speech_type_a.simulated",0.399036459785281
-"20","study_type_MB","main_question_ids_preference_a.yes",0.394681416435209
-"21","study_type_MA","main_question_ids_preference_b.no",0.394681416435209
-"22","native_lang_cantonese","dependent_measure_b.affect",0.356492798661784
-"23","study_type_MA","native_lang_english",0.334693184612203
-"24","study_type_MA","speech_type_c.filtered/synthesized",0.310563021892559
-"25","study_type_MA","method_c.other",0.310563021892559
-"26","study_type_MB","dependent_measure_a.preference",0.310563021892558
-"27","study_type_MA","dependent_measure_b.affect",0.310563021892558
-"28","native_lang_english","speech_type_a.simulated",0.305030187759555
-"29","test_lang_b.nonnative","mean_agec_mos",0.302368285469093
-"30","native_lang_dutch","method_b.hpp",0.285449612859227
-"31","test_lang_b.nonnative","native_lang_french",0.245769576155713
-"32","speech_type_a.simulated","presentation_b.video recording",0.243349871799816
-"33","study_type_MB","native_lang_german",0.237586089601916
-"34","test_lang_a.native","main_question_ids_preference_b.no",0.23488242396233
-"35","study_type_MA","native_lang_cantonese",0.232419789555038
-"36","method_b.hpp","mean_agec_mos",0.232113006980074
-"37","test_lang_b.nonnative","main_question_ids_preference_a.yes",0.225667733462111
-"38","test_lang_b.nonnative","native_lang_dutch",0.223606797749978
-"39","main_question_ids_preference_a.yes","mean_agec_mos",0.223082865908381
-"40","native_lang_korean","method_b.hpp",0.21964884255349
-"41","method_b.hpp","presentation_a.tape recording",0.209358947339656
-"42","study_type_MA","test_lang_c.artificial",0.200618239496253
-"43","test_lang_b.nonnative","native_lang_japanese",0.199336648255528
-"44","speech_type_b.naturalistic","presentation_a.tape recording",0.188561808316413
-"45","method_a.cf","presentation_b.video recording",0.186358877465534
-"46","native_lang_german","speech_type_b.naturalistic",0.183229750550532
-"47","native_lang_english","main_question_ids_preference_b.no",0.179548079193568
-"48","test_lang_b.nonnative","native_lang_korean",0.172061800402922
-"49","own_mother_a.no","mean_agec_mos",0.163517450248016
-"50","study_type_MB","own_mother_a.no",0.163267921526756
-"51","study_type_MA","own_mother_b.yes",0.163267921526756
-"52","native_lang_german","mean_agec_mos",0.156502088779579
-"53","method_a.cf","dependent_measure_b.affect",0.154525878671561
-"54","presentation_a.tape recording","mean_agec_mos",0.148429968824049
-"55","study_type_MB","method_b.hpp",0.145395818145026
-"56","native_lang_english","speech_type_c.filtered/synthesized",0.141281022433224
-"57","native_lang_english","method_c.other",0.141281022433224
-"58","study_type_MB","native_lang_french",0.14052413135116
-"59","speech_type_a.simulated","dependent_measure_b.affect",0.140149491431129
-"60","test_lang_b.nonnative","native_lang_spanish",0.140028008402801
-"61","test_lang_b.nonnative","native_lang_hungarian",0.140028008402801
-"62","method_b.hpp","dependent_measure_a.preference",0.139100303194832
-"63","test_lang_a.native","native_lang_cantonese",0.138317441040358
-"64","native_lang_swissgerman","mean_agec_mos",0.128343080358247
-"65","study_type_MB","native_lang_dutch",0.12785207798919
-"66","native_lang_french","mean_agec_mos",0.124181198815244
-"67","native_lang_turkish","mean_agec_mos",0.123665739747408
-"68","native_lang_cantonese","method_a.cf",0.115644393150182
-"69","native_lang_japanese","method_a.cf",0.115644393150182
-"70","study_type_MB","native_lang_japanese",0.113975089108721
-"71","native_lang_german","presentation_a.tape recording",0.111053999253772
-"72","native_lang_french","speech_type_b.naturalistic",0.108374196388961
-"73","native_lang_german","method_a.cf",0.106335527207137
-"74","test_lang_b.nonnative","method_a.cf",0.105988242709892
-"75","speech_type_b.naturalistic","dependent_measure_a.preference",0.105467380105061
-"76","test_lang_a.native","presentation_b.video recording",0.101283983227583
-"77","test_lang_b.nonnative","native_lang_swissgerman",0.0986927542439652
-"78","test_lang_b.nonnative","native_lang_italian",0.0986927542439651
-"79","test_lang_b.nonnative","native_lang_turkish",0.0986927542439649
-"80","test_lang_b.nonnative","native_lang_norwegian",0.0986927542439648
-"81","native_lang_dutch","speech_type_b.naturalistic",0.0986013297183274
-"82","study_type_MB","native_lang_korean",0.0983800982145085
-"83","dependent_measure_a.preference","mean_agec_mos",0.0975417561300312
-"84","test_lang_a.native","own_mother_b.yes",0.0971638480216898
-"85","native_lang_german","main_question_ids_preference_a.yes",0.0937708143693867
-"86","test_lang_b.nonnative","own_mother_a.no",0.0933520056018676
-"87","native_lang_french","method_b.hpp",0.0926964820652256
-"88","test_lang_c.artificial","native_lang_english",0.0912650508810075
-"89","native_lang_korean","mean_agec_mos",0.0897919102604241
-"90","test_lang_b.nonnative","presentation_a.tape recording",0.0890870806374747
-"91","native_lang_cantonese","speech_type_b.naturalistic",0.0878991997442142
-"92","native_lang_japanese","speech_type_b.naturalistic",0.087899199744214
-"93","native_lang_hungarian","method_a.cf",0.0812367128547896
-"94","native_lang_spanish","method_a.cf",0.0812367128547895
-"95","method_a.cf","own_mother_b.yes",0.0812367128547894
-"96","native_lang_dutch","mean_agec_mos",0.0802031328492883
-"97","study_type_MB","native_lang_hungarian",0.0800640769025439
-"98","study_type_MB","native_lang_spanish",0.0800640769025438
-"99","presentation_b.video recording","main_question_ids_preference_b.no",0.0795024964743052
-"100","presentation_a.tape recording","main_question_ids_preference_a.yes",0.0795024964743052
-"101","native_lang_spanish","mean_agec_mos",0.0772745244817791
-"102","native_lang_korean","speech_type_b.naturalistic",0.0758721223333606
-"103","native_lang_english","own_mother_b.yes",0.0742736812105962
-"104","native_lang_german","dependent_measure_a.preference",0.0737854539464072
-"105","method_b.hpp","speech_type_b.naturalistic",0.0734712726038408
-"106","method_b.hpp","own_mother_a.no",0.073127242412713
-"107","speech_type_c.filtered/synthesized","presentation_a.tape recording",0.0711868496814375
-"108","method_a.cf","main_question_ids_preference_a.yes",0.0696944451776924
-"109","native_lang_french","presentation_a.tape recording",0.0656846821476657
-"110","native_lang_hungarian","speech_type_b.naturalistic",0.0617465478029123
-"111","native_lang_spanish","speech_type_b.naturalistic",0.0617465478029123
-"112","speech_type_b.naturalistic","own_mother_b.yes",0.0617465478029122
-"113","speech_type_c.filtered/synthesized","main_question_ids_preference_b.no",0.0608887609287724
-"114","method_c.other","main_question_ids_preference_b.no",0.0608887609287724
-"115","dependent_measure_a.preference","main_question_ids_preference_b.no",0.0601081357886601
-"116","dependent_measure_b.affect","main_question_ids_preference_a.yes",0.0601081357886601
-"117","native_lang_dutch","presentation_a.tape recording",0.0597614304667198
-"118","test_lang_a.native","dependent_measure_b.affect",0.0588993078832719
-"119","native_lang_swissgerman","method_a.cf",0.0572562234428304
-"120","native_lang_turkish","method_a.cf",0.0572562234428304
-"121","native_lang_italian","method_a.cf",0.0572562234428303
-"122","native_lang_norwegian","method_a.cf",0.0572562234428303
-"123","study_type_MB","native_lang_swissgerman",0.0564297411328077
-"124","study_type_MB","native_lang_italian",0.0564297411328077
-"125","study_type_MB","native_lang_norwegian",0.0564297411328076
-"126","native_lang_french","main_question_ids_preference_a.yes",0.0554622632050029
-"127","test_lang_a.native","method_b.hpp",0.0538911517560125
-"128","speech_type_a.simulated","own_mother_a.no",0.0536841940620325
-"129","native_lang_japanese","presentation_a.tape recording",0.0532749601714326
-"130","test_lang_b.nonnative","dependent_measure_a.preference",0.0507346289431842
-"131","native_lang_dutch","main_question_ids_preference_a.yes",0.0504608392349583
-"132","method_c.other","dependent_measure_a.preference",0.0472972972972974
-"133","test_lang_c.artificial","presentation_a.tape recording",0.0459854504613725
-"134","native_lang_korean","presentation_a.tape recording",0.0459854504613725
-"135","native_lang_japanese","main_question_ids_preference_a.yes",0.0449838496077589
-"136","native_lang_cantonese","main_question_ids_preference_a.yes",0.0449838496077589
-"137","method_b.hpp","main_question_ids_preference_b.no",0.0446405796203628
-"138","native_lang_french","dependent_measure_a.preference",0.0436415988812429
-"139","native_lang_italian","speech_type_b.naturalistic",0.0435194139889243
-"140","native_lang_turkish","speech_type_b.naturalistic",0.0435194139889243
-"141","native_lang_norwegian","speech_type_b.naturalistic",0.0435194139889242
-"142","native_lang_dutch","dependent_measure_a.preference",0.0397061276955659
-"143","test_lang_c.artificial","main_question_ids_preference_a.yes",0.0388287965123372
-"144","native_lang_german","own_mother_a.no",0.0387901870329743
-"145","own_mother_a.no","presentation_b.video recording",0.037424059428256
-"146","native_lang_hungarian","presentation_a.tape recording",0.037424059428256
-"147","own_mother_b.yes","presentation_a.tape recording",0.037424059428256
-"148","native_lang_japanese","dependent_measure_a.preference",0.0353964480940778
-"149","native_lang_hungarian","mean_agec_mos",0.0345453948694115
-"150","method_c.other","presentation_b.video recording",0.0338984998483035
-"151","own_mother_a.no","main_question_ids_preference_b.no",0.0315998032774734
-"152","native_lang_hungarian","main_question_ids_preference_a.yes",0.0315998032774734
-"153","native_lang_spanish","main_question_ids_preference_a.yes",0.0315998032774734
-"154","own_mother_b.yes","main_question_ids_preference_a.yes",0.0315998032774734
-"155","test_lang_c.artificial","dependent_measure_a.preference",0.0305532205955845
-"156","native_lang_korean","dependent_measure_a.preference",0.0305532205955845
-"157","native_lang_swissgerman","presentation_a.tape recording",0.0263767480669998
-"158","native_lang_italian","presentation_a.tape recording",0.0263767480669998
-"159","native_lang_turkish","presentation_a.tape recording",0.0263767480669998
-"160","native_lang_norwegian","presentation_a.tape recording",0.0263767480669998
-"161","method_c.other","own_mother_a.no",0.0248649416678922
-"162","native_lang_hungarian","dependent_measure_a.preference",0.0248649416678921
-"163","native_lang_spanish","dependent_measure_a.preference",0.0248649416678921
-"164","own_mother_a.no","dependent_measure_b.affect",0.0248649416678921
-"165","own_mother_b.yes","dependent_measure_a.preference",0.0248649416678921
-"166","native_lang_french","own_mother_a.no",0.0229430828500566
-"167","native_lang_swissgerman","main_question_ids_preference_a.yes",0.0222717701593686
-"168","native_lang_italian","main_question_ids_preference_a.yes",0.0222717701593686
-"169","native_lang_turkish","main_question_ids_preference_a.yes",0.0222717701593686
-"170","native_lang_norwegian","main_question_ids_preference_a.yes",0.0222717701593686
-"171","native_lang_english","presentation_b.video recording",0.0215722889015283
-"172","native_lang_dutch","own_mother_a.no",0.0208741430361718
-"173","native_lang_cantonese","own_mother_a.no",0.0186084759046076
-"174","native_lang_japanese","own_mother_a.no",0.0186084759046075
-"175","native_lang_swissgerman","dependent_measure_a.preference",0.0175249909308195
-"176","native_lang_italian","dependent_measure_a.preference",0.0175249909308195
-"177","native_lang_norwegian","dependent_measure_a.preference",0.0175249909308195
-"178","test_lang_c.artificial","own_mother_a.no",0.0160623141550809
-"179","native_lang_korean","own_mother_a.no",0.0160623141550808
-"180","method_a.cf","speech_type_a.simulated",0.0139774734080323
-"181","native_lang_hungarian","own_mother_a.no",0.0130718954248366
-"182","native_lang_spanish","own_mother_a.no",0.0130718954248366
-"183","native_lang_swissgerman","own_mother_a.no",0.00921316654704636
-"184","native_lang_italian","own_mother_a.no",0.00921316654704636
-"185","native_lang_turkish","own_mother_a.no",0.00921316654704635
-"186","native_lang_norwegian","own_mother_a.no",0.00921316654704635
-"187","method_a.cf","speech_type_b.naturalistic",0.00843364006337233
-"188","native_lang_english","dependent_measure_b.affect",0.00526513127080345
-"189","study_type_MA","method_a.cf",0.00318953138164514
-"190","study_type_MB","method_a.cf",-0.00318953138164513
-"191","test_lang_a.native","speech_type_c.filtered/synthesized",-0.00406202123332917
-"192","test_lang_a.native","method_c.other",-0.00406202123332917
-"193","method_b.hpp","speech_type_a.simulated",-0.00476701501709948
-"194","native_lang_english","dependent_measure_a.preference",-0.00526513127080345
-"195","native_lang_norwegian","native_lang_swissgerman",-0.00649350649350648
-"196","native_lang_swissgerman","native_lang_turkish",-0.00649350649350649
-"197","native_lang_italian","native_lang_swissgerman",-0.00649350649350649
-"198","native_lang_italian","native_lang_norwegian",-0.00649350649350649
-"199","native_lang_italian","native_lang_turkish",-0.0064935064935065
-"200","native_lang_norwegian","native_lang_turkish",-0.00649350649350653
-"201","native_lang_norwegian","mean_agec_mos",-0.00828832357748426
-"202","native_lang_norwegian","own_mother_b.yes",-0.00921316654704635
-"203","native_lang_turkish","own_mother_b.yes",-0.00921316654704636
-"204","native_lang_italian","own_mother_b.yes",-0.00921316654704636
-"205","native_lang_swissgerman","own_mother_b.yes",-0.00921316654704637
-"206","native_lang_spanish","native_lang_swissgerman",-0.00921316654704639
-"207","native_lang_hungarian","native_lang_swissgerman",-0.0092131665470464
-"208","native_lang_italian","native_lang_spanish",-0.0092131665470464
-"209","native_lang_norwegian","native_lang_spanish",-0.00921316654704641
-"210","native_lang_hungarian","native_lang_italian",-0.00921316654704641
-"211","native_lang_spanish","native_lang_turkish",-0.00921316654704641
-"212","native_lang_hungarian","native_lang_norwegian",-0.00921316654704646
-"213","native_lang_hungarian","native_lang_turkish",-0.00921316654704646
-"214","native_lang_korean","native_lang_norwegian",-0.0113208353212931
-"215","native_lang_korean","native_lang_turkish",-0.0113208353212931
-"216","native_lang_italian","native_lang_korean",-0.0113208353212931
-"217","native_lang_korean","native_lang_swissgerman",-0.0113208353212931
-"218","test_lang_c.artificial","native_lang_italian",-0.0113208353212931
-"219","test_lang_c.artificial","native_lang_norwegian",-0.0113208353212931
-"220","test_lang_c.artificial","native_lang_swissgerman",-0.0113208353212931
-"221","native_lang_spanish","own_mother_b.yes",-0.0130718954248366
-"222","native_lang_hungarian","own_mother_b.yes",-0.0130718954248366
-"223","native_lang_hungarian","native_lang_spanish",-0.0130718954248367
-"224","native_lang_cantonese","native_lang_norwegian",-0.0131153885587324
-"225","native_lang_cantonese","native_lang_turkish",-0.0131153885587324
-"226","native_lang_cantonese","native_lang_italian",-0.0131153885587324
-"227","native_lang_cantonese","native_lang_swissgerman",-0.0131153885587324
-"228","native_lang_japanese","native_lang_swissgerman",-0.0131153885587324
-"229","native_lang_italian","native_lang_japanese",-0.0131153885587324
-"230","native_lang_japanese","native_lang_turkish",-0.0131153885587325
-"231","native_lang_japanese","native_lang_norwegian",-0.0131153885587325
-"232","native_lang_dutch","native_lang_norwegian",-0.0147122471584125
-"233","native_lang_dutch","native_lang_turkish",-0.0147122471584126
-"234","native_lang_dutch","native_lang_italian",-0.0147122471584126
-"235","native_lang_dutch","native_lang_swissgerman",-0.0147122471584126
-"236","native_lang_hungarian","native_lang_korean",-0.0160623141550808
-"237","native_lang_korean","native_lang_spanish",-0.0160623141550808
-"238","test_lang_c.artificial","native_lang_spanish",-0.0160623141550809
-"239","test_lang_c.artificial","own_mother_b.yes",-0.0160623141550809
-"240","test_lang_c.artificial","native_lang_hungarian",-0.0160623141550809
-"241","native_lang_french","native_lang_norwegian",-0.0161704509201193
-"242","native_lang_french","native_lang_turkish",-0.0161704509201194
-"243","native_lang_french","native_lang_italian",-0.0161704509201194
-"244","native_lang_french","native_lang_swissgerman",-0.0161704509201194
-"245","native_lang_turkish","dependent_measure_b.affect",-0.0175249909308195
-"246","native_lang_norwegian","dependent_measure_b.affect",-0.0175249909308195
-"247","native_lang_italian","dependent_measure_b.affect",-0.0175249909308195
-"248","native_lang_swissgerman","dependent_measure_b.affect",-0.0175249909308195
-"249","native_lang_turkish","method_c.other",-0.0175249909308195
-"250","native_lang_norwegian","method_c.other",-0.0175249909308195
-"251","native_lang_norwegian","speech_type_c.filtered/synthesized",-0.0175249909308195
-"252","native_lang_italian","method_c.other",-0.0175249909308195
-"253","native_lang_swissgerman","method_c.other",-0.0175249909308195
-"254","native_lang_italian","speech_type_c.filtered/synthesized",-0.0175249909308196
-"255","native_lang_swissgerman","speech_type_c.filtered/synthesized",-0.0175249909308196
-"256","native_lang_japanese","own_mother_b.yes",-0.0186084759046076
-"257","native_lang_cantonese","own_mother_b.yes",-0.0186084759046076
-"258","native_lang_cantonese","native_lang_spanish",-0.0186084759046076
-"259","native_lang_cantonese","native_lang_hungarian",-0.0186084759046076
-"260","native_lang_japanese","native_lang_spanish",-0.0186084759046077
-"261","native_lang_hungarian","native_lang_japanese",-0.0186084759046077
-"262","test_lang_c.artificial","native_lang_korean",-0.0197368421052631
-"263","native_lang_english","method_b.hpp",-0.0200726742050263
-"264","native_lang_japanese","mean_agec_mos",-0.0208308714909738
-"265","native_lang_dutch","own_mother_b.yes",-0.0208741430361718
-"266","native_lang_dutch","native_lang_spanish",-0.0208741430361718
-"267","native_lang_dutch","native_lang_hungarian",-0.0208741430361718
-"268","method_c.other","speech_type_a.simulated",-0.0213610749021424
-"269","native_lang_english","presentation_a.tape recording",-0.0215722889015283
-"270","native_lang_norwegian","main_question_ids_preference_b.no",-0.0222717701593686
-"271","native_lang_turkish","main_question_ids_preference_b.no",-0.0222717701593686
-"272","native_lang_italian","main_question_ids_preference_b.no",-0.0222717701593686
-"273","native_lang_swissgerman","main_question_ids_preference_b.no",-0.0222717701593687
-"274","native_lang_japanese","native_lang_korean",-0.0228654817234199
-"275","test_lang_c.artificial","native_lang_japanese",-0.02286548172342
-"276","native_lang_cantonese","native_lang_korean",-0.0228654817234201
-"277","test_lang_c.artificial","native_lang_cantonese",-0.0228654817234201
-"278","native_lang_french","native_lang_hungarian",-0.0229430828500565
-"279","native_lang_french","native_lang_spanish",-0.0229430828500565
-"280","native_lang_french","own_mother_b.yes",-0.0229430828500566
-"281","own_mother_b.yes","dependent_measure_b.affect",-0.0248649416678921
-"282","own_mother_a.no","dependent_measure_a.preference",-0.0248649416678921
-"283","native_lang_spanish","dependent_measure_b.affect",-0.0248649416678921
-"284","native_lang_hungarian","dependent_measure_b.affect",-0.0248649416678921
-"285","method_c.other","own_mother_b.yes",-0.0248649416678922
-"286","speech_type_c.filtered/synthesized","own_mother_b.yes",-0.0248649416678922
-"287","native_lang_spanish","method_c.other",-0.0248649416678922
-"288","native_lang_hungarian","method_c.other",-0.0248649416678922
-"289","native_lang_hungarian","speech_type_c.filtered/synthesized",-0.0248649416678922
-"290","native_lang_dutch","native_lang_korean",-0.0256494588021288
-"291","test_lang_c.artificial","native_lang_dutch",-0.0256494588021289
-"292","native_lang_norwegian","presentation_b.video recording",-0.0263767480669998
-"293","native_lang_turkish","presentation_b.video recording",-0.0263767480669998
-"294","native_lang_italian","presentation_b.video recording",-0.0263767480669999
-"295","native_lang_swissgerman","presentation_b.video recording",-0.0263767480669999
-"296","native_lang_cantonese","native_lang_japanese",-0.0264900662251655
-"297","native_lang_german","native_lang_turkish",-0.0273396046947291
-"298","native_lang_german","native_lang_norwegian",-0.0273396046947291
-"299","native_lang_german","native_lang_italian",-0.0273396046947291
-"300","native_lang_german","native_lang_swissgerman",-0.0273396046947291
-"301","native_lang_french","native_lang_korean",-0.0281917038384096
-"302","test_lang_c.artificial","native_lang_french",-0.0281917038384098
-"303","test_lang_b.nonnative","method_b.hpp",-0.0290129426592829
-"304","native_lang_dutch","native_lang_japanese",-0.0297153530604219
-"305","native_lang_cantonese","native_lang_dutch",-0.029715353060422
-"306","native_lang_korean","method_c.other",-0.0305532205955845
-"307","native_lang_korean","dependent_measure_b.affect",-0.0305532205955845
-"308","test_lang_c.artificial","dependent_measure_b.affect",-0.0305532205955845
-"309","own_mother_b.yes","main_question_ids_preference_b.no",-0.0315998032774734
-"310","native_lang_spanish","main_question_ids_preference_b.no",-0.0315998032774734
-"311","native_lang_hungarian","main_question_ids_preference_b.no",-0.0315998032774734
-"312","own_mother_a.no","main_question_ids_preference_a.yes",-0.0315998032774734
-"313","native_lang_french","native_lang_japanese",-0.0326605890360409
-"314","native_lang_cantonese","native_lang_french",-0.032660589036041
-"315","method_c.other","presentation_a.tape recording",-0.0338984998483035
-"316","native_lang_japanese","dependent_measure_b.affect",-0.0353964480940778
-"317","native_lang_cantonese","method_c.other",-0.0353964480940779
-"318","native_lang_japanese","method_c.other",-0.0353964480940779
-"319","native_lang_japanese","speech_type_c.filtered/synthesized",-0.0353964480940779
-"320","native_lang_dutch","native_lang_french",-0.0366371652723655
-"321","own_mother_a.no","presentation_a.tape recording",-0.0374240594282559
-"322","own_mother_b.yes","presentation_b.video recording",-0.037424059428256
-"323","native_lang_hungarian","presentation_b.video recording",-0.0374240594282561
-"324","native_lang_spanish","presentation_b.video recording",-0.0374240594282561
-"325","native_lang_turkish","speech_type_a.simulated",-0.0378370086940658
-"326","native_lang_norwegian","speech_type_a.simulated",-0.0378370086940658
-"327","native_lang_italian","speech_type_a.simulated",-0.0378370086940658
-"328","native_lang_swissgerman","speech_type_a.simulated",-0.0378370086940658
-"329","native_lang_german","own_mother_b.yes",-0.0387901870329744
-"330","native_lang_german","native_lang_spanish",-0.0387901870329744
-"331","native_lang_german","native_lang_hungarian",-0.0387901870329745
-"332","test_lang_c.artificial","main_question_ids_preference_b.no",-0.0388287965123372
-"333","native_lang_korean","main_question_ids_preference_b.no",-0.0388287965123372
-"334","native_lang_dutch","dependent_measure_b.affect",-0.0397061276955659
-"335","native_lang_dutch","method_c.other",-0.0397061276955659
-"336","native_lang_dutch","speech_type_c.filtered/synthesized",-0.039706127695566
-"337","native_lang_english","method_a.cf",-0.0428391184694075
-"338","method_a.cf","speech_type_c.filtered/synthesized",-0.0428766861149113
-"339","native_lang_french","method_c.other",-0.0436415988812428
-"340","native_lang_french","dependent_measure_b.affect",-0.0436415988812429
-"341","method_b.hpp","main_question_ids_preference_a.yes",-0.0446405796203628
-"342","native_lang_cantonese","main_question_ids_preference_b.no",-0.0449838496077589
-"343","native_lang_japanese","main_question_ids_preference_b.no",-0.0449838496077589
-"344","native_lang_korean","presentation_b.video recording",-0.0459854504613725
-"345","test_lang_c.artificial","presentation_b.video recording",-0.0459854504613725
-"346","method_c.other","dependent_measure_b.affect",-0.0472972972972974
-"347","speech_type_c.filtered/synthesized","dependent_measure_b.affect",-0.0472972972972974
-"348","native_lang_german","native_lang_korean",-0.0476641030247351
-"349","test_lang_c.artificial","native_lang_german",-0.0476641030247353
-"350","test_lang_a.native","method_a.cf",-0.0500218574363212
-"351","native_lang_dutch","main_question_ids_preference_b.no",-0.0504608392349584
-"352","test_lang_b.nonnative","dependent_measure_b.affect",-0.0507346289431842
-"353","native_lang_norwegian","method_b.hpp",-0.0515406099558033
-"354","native_lang_turkish","method_b.hpp",-0.0515406099558033
-"355","native_lang_italian","method_b.hpp",-0.0515406099558035
-"356","native_lang_swissgerman","method_b.hpp",-0.0515406099558035
-"357","native_lang_japanese","presentation_b.video recording",-0.0532749601714327
-"358","speech_type_a.simulated","own_mother_b.yes",-0.0536841940620324
-"359","native_lang_spanish","speech_type_a.simulated",-0.0536841940620325
-"360","native_lang_hungarian","speech_type_a.simulated",-0.0536841940620325
-"361","native_lang_cantonese","native_lang_german",-0.0552197089464817
-"362","native_lang_german","native_lang_japanese",-0.0552197089464818
-"363","native_lang_cantonese","mean_agec_mos",-0.0553986979514927
-"364","native_lang_french","main_question_ids_preference_b.no",-0.0554622632050029
-"365","study_type_MA","native_lang_norwegian",-0.0564297411328076
-"366","study_type_MA","native_lang_italian",-0.0564297411328076
-"367","study_type_MA","native_lang_turkish",-0.0564297411328076
-"368","study_type_MA","native_lang_swissgerman",-0.0564297411328076
-"369","test_lang_a.native","dependent_measure_a.preference",-0.0588993078832719
-"370","native_lang_dutch","presentation_b.video recording",-0.0597614304667197
-"371","dependent_measure_a.preference","main_question_ids_preference_a.yes",-0.0601081357886601
-"372","method_c.other","main_question_ids_preference_a.yes",-0.0608887609287724
-"373","speech_type_c.filtered/synthesized","main_question_ids_preference_a.yes",-0.0608887609287724
-"374","speech_type_b.naturalistic","own_mother_a.no",-0.0617465478029125
-"375","native_lang_dutch","native_lang_german",-0.0619429613082514
-"376","native_lang_french","presentation_b.video recording",-0.0656846821476657
-"377","native_lang_korean","speech_type_a.simulated",-0.0659653678492821
-"378","test_lang_c.artificial","speech_type_a.simulated",-0.0659653678492822
-"379","native_lang_french","native_lang_german",-0.068082435327304
-"380","native_lang_italian","mean_agec_mos",-0.0695010133318824
-"381","method_a.cf","main_question_ids_preference_b.no",-0.0696944451776924
-"382","native_lang_french","method_a.cf",-0.0699201557843811
-"383","speech_type_c.filtered/synthesized","presentation_b.video recording",-0.0711868496814375
-"384","native_lang_hungarian","method_b.hpp",-0.0731272424127128
-"385","native_lang_spanish","method_b.hpp",-0.0731272424127129
-"386","method_b.hpp","own_mother_b.yes",-0.0731272424127129
-"387","native_lang_german","dependent_measure_b.affect",-0.0737854539464072
-"388","native_lang_german","method_c.other",-0.0737854539464074
-"389","native_lang_german","speech_type_c.filtered/synthesized",-0.0737854539464074
-"390","native_lang_english","own_mother_a.no",-0.0742736812105962
-"391","native_lang_cantonese","speech_type_a.simulated",-0.0764220489221128
-"392","native_lang_japanese","speech_type_a.simulated",-0.0764220489221128
-"393","native_lang_german","method_b.hpp",-0.0768546571503838
-"394","presentation_b.video recording","main_question_ids_preference_a.yes",-0.0795024964743052
-"395","presentation_a.tape recording","main_question_ids_preference_b.no",-0.0795024964743056
-"396","study_type_MA","native_lang_spanish",-0.0800640769025437
-"397","study_type_MA","native_lang_hungarian",-0.0800640769025438
-"398","method_a.cf","own_mother_a.no",-0.0812367128547894
-"399","native_lang_dutch","speech_type_a.simulated",-0.0857267832408835
-"400","test_lang_b.nonnative","presentation_b.video recording",-0.0890870806374747
-"401","test_lang_c.artificial","method_b.hpp",-0.0898563446809729
-"402","test_lang_b.nonnative","own_mother_b.yes",-0.0933520056018677
-"403","native_lang_german","main_question_ids_preference_b.no",-0.0937708143693867
-"404","native_lang_french","speech_type_a.simulated",-0.0942235897759351
-"405","test_lang_a.native","native_lang_norwegian",-0.0948209311861515
-"406","test_lang_a.native","native_lang_turkish",-0.0948209311861516
-"407","test_lang_a.native","native_lang_italian",-0.0948209311861518
-"408","test_lang_a.native","native_lang_swissgerman",-0.0948209311861518
-"409","test_lang_a.native","own_mother_a.no",-0.0971638480216897
-"410","dependent_measure_b.affect","mean_agec_mos",-0.0975417561300312
-"411","study_type_MA","native_lang_korean",-0.0983800982145084
-"412","test_lang_a.native","presentation_a.tape recording",-0.101283983227583
-"413","speech_type_a.simulated","speech_type_c.filtered/synthesized",-0.102116358068778
-"414","native_lang_japanese","method_b.hpp",-0.104100169423163
-"415","native_lang_cantonese","method_b.hpp",-0.104100169423163
-"416","speech_type_b.naturalistic","dependent_measure_b.affect",-0.105467380105061
-"417","method_c.other","mean_agec_mos",-0.106041925127532
-"418","native_lang_german","presentation_b.video recording",-0.111053999253773
-"419","study_type_MA","native_lang_japanese",-0.113975089108721
-"420","test_lang_b.nonnative","test_lang_c.artificial",-0.114707866935281
-"421","native_lang_english","native_lang_swissgerman",-0.124043488849345
-"422","native_lang_english","native_lang_italian",-0.124043488849346
-"423","native_lang_english","native_lang_turkish",-0.124043488849346
-"424","native_lang_english","native_lang_norwegian",-0.124043488849346
-"425","study_type_MA","native_lang_dutch",-0.12785207798919
-"426","test_lang_b.nonnative","native_lang_cantonese",-0.132891098837019
-"427","test_lang_a.native","native_lang_hungarian",-0.134534558799262
-"428","method_b.hpp","speech_type_c.filtered/synthesized",-0.139100303194832
-"429","method_b.hpp","method_c.other",-0.139100303194832
-"430","speech_type_a.simulated","dependent_measure_a.preference",-0.140149491431129
-"431","study_type_MA","native_lang_french",-0.14052413135116
-"432","study_type_MA","method_b.hpp",-0.145395818145026
-"433","test_lang_c.artificial","mean_agec_mos",-0.148181136736637
-"434","presentation_b.video recording","mean_agec_mos",-0.148429968824049
-"435","method_a.cf","dependent_measure_a.preference",-0.154525878671561
-"436","native_lang_german","speech_type_a.simulated",-0.159305124521126
-"437","study_type_MB","own_mother_b.yes",-0.163267921526756
-"438","study_type_MA","own_mother_a.no",-0.163267921526756
-"439","own_mother_b.yes","mean_agec_mos",-0.163517450248016
-"440","test_lang_a.native","native_lang_korean",-0.165311630633395
-"441","test_lang_a.native","test_lang_c.artificial",-0.165311630633395
-"442","native_lang_english","native_lang_spanish",-0.17599633156424
-"443","native_lang_english","native_lang_hungarian",-0.17599633156424
-"444","method_a.cf","mean_agec_mos",-0.176504534628695
-"445","test_lang_b.nonnative","method_c.other",-0.177571201301145
-"446","native_lang_english","main_question_ids_preference_a.yes",-0.179548079193568
-"447","method_c.other","speech_type_b.naturalistic",-0.1797739433609
-"448","method_a.cf","presentation_a.tape recording",-0.186358877465534
-"449","speech_type_b.naturalistic","presentation_b.video recording",-0.188561808316413
-"450","test_lang_a.native","native_lang_japanese",-0.19151645682511
-"451","test_lang_c.artificial","method_a.cf",-0.197722354716547
-"452","native_lang_korean","method_a.cf",-0.197722354716547
-"453","study_type_MB","test_lang_c.artificial",-0.200618239496253
-"454","method_b.hpp","presentation_b.video recording",-0.209358947339656
-"455","test_lang_a.native","native_lang_dutch",-0.214834462211829
-"456","native_lang_english","native_lang_korean",-0.216258490131083
-"457","main_question_ids_preference_b.no","mean_agec_mos",-0.223082865908381
-"458","test_lang_b.nonnative","main_question_ids_preference_b.no",-0.22566773346211
-"459","study_type_MB","native_lang_cantonese",-0.232419789555038
-"460","test_lang_a.native","main_question_ids_preference_a.yes",-0.23488242396233
-"461","test_lang_a.native","native_lang_french",-0.236127770947638
-"462","study_type_MA","native_lang_german",-0.237586089601916
-"463","speech_type_a.simulated","presentation_a.tape recording",-0.243349871799816
-"464","native_lang_english","mean_agec_mos",-0.246463995239124
-"465","native_lang_cantonese","native_lang_english",-0.250539297383753
-"466","native_lang_english","native_lang_japanese",-0.250539297383754
-"467","native_lang_dutch","method_a.cf",-0.256954550505807
-"468","test_lang_a.native","mean_agec_mos",-0.258818454413164
-"469","test_lang_c.artificial","speech_type_b.naturalistic",-0.260132990857236
-"470","native_lang_dutch","native_lang_english",-0.281043603816876
-"471","method_a.cf","method_c.other",-0.306080105830208
-"472","native_lang_english","native_lang_french",-0.308899228853403
-"473","study_type_MA","dependent_measure_a.preference",-0.310563021892558
-"474","study_type_MB","dependent_measure_b.affect",-0.310563021892558
-"475","study_type_MB","method_c.other",-0.310563021892559
-"476","study_type_MB","speech_type_c.filtered/synthesized",-0.31056302189256
-"477","speech_type_c.filtered/synthesized","mean_agec_mos",-0.329879708728396
-"478","study_type_MB","native_lang_english",-0.334693184612204
-"479","native_lang_english","speech_type_b.naturalistic",-0.350839970663679
-"480","native_lang_cantonese","dependent_measure_a.preference",-0.356492798661784
-"481","test_lang_a.native","speech_type_b.naturalistic",-0.365153944710177
-"482","test_lang_b.nonnative","speech_type_a.simulated",-0.38338182963801
-"483","study_type_MA","main_question_ids_preference_a.yes",-0.394681416435209
-"484","study_type_MB","main_question_ids_preference_b.no",-0.394681416435209
-"485","test_lang_a.native","native_lang_german",-0.399224483413988
-"486","study_type_MB","test_lang_a.native",-0.400336485561854
-"487","speech_type_b.naturalistic","speech_type_c.filtered/synthesized",-0.402693633128415
-"488","speech_type_a.simulated","mean_agec_mos",-0.429903722927342
-"489","study_type_MA","test_lang_b.nonnative",-0.459659742564147
-"490","study_type_MA","presentation_a.tape recording",-0.467426352442802
-"491","study_type_MB","presentation_b.video recording",-0.467426352442803
-"492","native_lang_cantonese","presentation_a.tape recording",-0.497232961600038
-"493","speech_type_b.naturalistic","main_question_ids_preference_b.no",-0.511766315719159
-"494","native_lang_english","native_lang_german",-0.522260192314806
-"495","speech_type_a.simulated","main_question_ids_preference_a.yes",-0.52331493707556
-"496","presentation_a.tape recording","dependent_measure_b.affect",-0.559325247497008
-"497","study_type_MA","mean_agec_mos",-0.607138208471745
-"498","study_type_MB","speech_type_a.simulated",-0.670515368926048
-"499","test_lang_b.nonnative","native_lang_english",-0.680321533280497
-"500","study_type_MA","speech_type_b.naturalistic",-0.771214134874398
-"501","speech_type_a.simulated","speech_type_b.naturalistic",-0.869428267202662
-"502","method_a.cf","method_b.hpp",-0.900174808198212
-"503","test_lang_a.native","test_lang_b.nonnative",-0.960768922830523
-"504","study_type_MA","study_type_MB",-0.999999999999999
-"505","own_mother_a.no","own_mother_b.yes",-1
-"506","study_type_MA","study_type_MA",NA
+"1","study_type_MB","speech_type_b.naturalistic",0.771214134874397
+"2","study_type_MA","speech_type_a.simulated",0.670515368926048
+"3","test_lang_a.native","native_lang_english",0.649938951755159
+"4","test_lang_c.artificial","method_c.other",0.645982378306643
+"5","study_type_MB","mean_agec_mos",0.607138208471744
+"6","speech_type_b.naturalistic","mean_agec_mos",0.559410290437789
+"7","presentation_a.tape recording","dependent_measure_a.preference",0.559325247497008
+"8","speech_type_a.simulated","main_question_ids_preference_b.no",0.52331493707556
+"9","speech_type_b.naturalistic","main_question_ids_preference_a.yes",0.511766315719159
+"10","native_lang_cantonese","presentation_b.video recording",0.497232961600038
+"11","study_type_MA","presentation_b.video recording",0.467426352442803
+"12","study_type_MB","test_lang_b.nonnative",0.459659742564147
+"13","test_lang_b.nonnative","speech_type_b.naturalistic",0.440958551844098
+"14","test_lang_b.nonnative","native_lang_german",0.415526016638666
+"15","method_c.other","speech_type_c.filtered/synthesized",0.401544401544402
+"16","study_type_MA","test_lang_a.native",0.400336485561854
+"17","test_lang_a.native","speech_type_a.simulated",0.399036459785281
+"18","study_type_MA","main_question_ids_preference_b.no",0.394681416435209
+"19","native_lang_cantonese","dependent_measure_b.affect",0.356492798661784
+"20","study_type_MA","native_lang_english",0.334693184612203
+"21","study_type_MA","method_c.other",0.310563021892558
+"22","native_lang_english","speech_type_a.simulated",0.305030187759554
+"23","test_lang_b.nonnative","mean_agec_mos",0.302368285469092
+"24","native_lang_dutch","method_b.hpp",0.285449612859225
+"25","test_lang_b.nonnative","native_lang_french",0.245769576155712
+"26","speech_type_a.simulated","presentation_b.video recording",0.243349871799816
+"27","study_type_MB","native_lang_german",0.237586089601916
+"28","test_lang_a.native","main_question_ids_preference_b.no",0.23488242396233
+"29","study_type_MA","native_lang_cantonese",0.232419789555038
+"30","method_b.hpp","mean_agec_mos",0.232113006980074
+"31","test_lang_b.nonnative","main_question_ids_preference_a.yes",0.22566773346211
+"32","test_lang_b.nonnative","native_lang_dutch",0.223606797749979
+"33","main_question_ids_preference_a.yes","mean_agec_mos",0.223082865908381
+"34","native_lang_korean","method_b.hpp",0.21964884255349
+"35","method_b.hpp","presentation_a.tape recording",0.209358947339656
+"36","study_type_MA","test_lang_c.artificial",0.200618239496253
+"37","test_lang_b.nonnative","native_lang_japanese",0.199336648255529
+"38","speech_type_b.naturalistic","presentation_a.tape recording",0.188561808316413
+"39","method_a.cf","presentation_b.video recording",0.186358877465534
+"40","native_lang_german","speech_type_b.naturalistic",0.183229750550533
+"41","native_lang_english","main_question_ids_preference_b.no",0.179548079193568
+"42","test_lang_b.nonnative","native_lang_korean",0.172061800402921
+"43","own_mother_a.no","mean_agec_mos",0.163517450248016
+"44","study_type_MA","own_mother_b.yes",0.163267921526756
+"45","native_lang_german","mean_agec_mos",0.156502088779579
+"46","method_a.cf","dependent_measure_b.affect",0.154525878671561
+"47","presentation_a.tape recording","mean_agec_mos",0.148429968824049
+"48","study_type_MB","method_b.hpp",0.145395818145026
+"49","native_lang_english","method_c.other",0.141281022433223
+"50","study_type_MB","native_lang_french",0.14052413135116
+"51","speech_type_a.simulated","dependent_measure_b.affect",0.140149491431129
+"52","test_lang_b.nonnative","native_lang_hungarian",0.140028008402801
+"53","method_b.hpp","dependent_measure_a.preference",0.139100303194833
+"54","test_lang_a.native","native_lang_cantonese",0.138317441040358
+"55","native_lang_swissgerman","mean_agec_mos",0.128343080358247
+"56","study_type_MB","native_lang_dutch",0.12785207798919
+"57","native_lang_french","mean_agec_mos",0.124181198815244
+"58","native_lang_turkish","mean_agec_mos",0.123665739747408
+"59","native_lang_cantonese","method_a.cf",0.115644393150182
+"60","study_type_MB","native_lang_japanese",0.113975089108721
+"61","native_lang_german","presentation_a.tape recording",0.111053999253773
+"62","native_lang_french","speech_type_b.naturalistic",0.108374196388961
+"63","native_lang_german","method_a.cf",0.106335527207137
+"64","test_lang_b.nonnative","method_a.cf",0.105988242709892
+"65","speech_type_b.naturalistic","dependent_measure_a.preference",0.105467380105061
+"66","test_lang_a.native","presentation_b.video recording",0.101283983227583
+"67","test_lang_b.nonnative","native_lang_italian",0.0986927542439653
+"68","native_lang_dutch","speech_type_b.naturalistic",0.0986013297183269
+"69","study_type_MB","native_lang_korean",0.0983800982145086
+"70","dependent_measure_a.preference","mean_agec_mos",0.0975417561300312
+"71","test_lang_a.native","own_mother_b.yes",0.0971638480216896
+"72","native_lang_german","main_question_ids_preference_a.yes",0.0937708143693868
+"73","test_lang_b.nonnative","own_mother_a.no",0.0933520056018673
+"74","native_lang_french","method_b.hpp",0.0926964820652254
+"75","test_lang_c.artificial","native_lang_english",0.0912650508810075
+"76","native_lang_korean","mean_agec_mos",0.0897919102604241
+"77","test_lang_b.nonnative","presentation_a.tape recording",0.0890870806374748
+"78","native_lang_cantonese","speech_type_b.naturalistic",0.0878991997442143
+"79","native_lang_hungarian","method_a.cf",0.0812367128547893
+"80","native_lang_dutch","mean_agec_mos",0.080203132849288
+"81","study_type_MB","native_lang_hungarian",0.0800640769025436
+"82","presentation_a.tape recording","main_question_ids_preference_a.yes",0.0795024964743054
+"83","native_lang_spanish","mean_agec_mos",0.077274524481779
+"84","native_lang_korean","speech_type_b.naturalistic",0.0758721223333605
+"85","native_lang_english","own_mother_b.yes",0.074273681210596
+"86","native_lang_german","dependent_measure_a.preference",0.0737854539464073
+"87","method_b.hpp","speech_type_b.naturalistic",0.0734712726038409
+"88","method_b.hpp","own_mother_a.no",0.0731272424127131
+"89","speech_type_c.filtered/synthesized","presentation_a.tape recording",0.0711868496814374
+"90","method_a.cf","main_question_ids_preference_a.yes",0.0696944451776924
+"91","native_lang_french","presentation_a.tape recording",0.0656846821476658
+"92","native_lang_hungarian","speech_type_b.naturalistic",0.0617465478029124
+"93","method_c.other","main_question_ids_preference_b.no",0.0608887609287725
+"94","dependent_measure_a.preference","main_question_ids_preference_b.no",0.06010813578866
+"95","native_lang_dutch","presentation_a.tape recording",0.0597614304667197
+"96","test_lang_a.native","dependent_measure_b.affect",0.058899307883272
+"97","native_lang_italian","method_a.cf",0.0572562234428304
+"98","study_type_MB","native_lang_italian",0.0564297411328077
+"99","native_lang_french","main_question_ids_preference_a.yes",0.055462263205003
+"100","test_lang_a.native","method_b.hpp",0.0538911517560125
+"101","speech_type_a.simulated","own_mother_a.no",0.0536841940620324
+"102","native_lang_japanese","presentation_a.tape recording",0.0532749601714327
+"103","test_lang_b.nonnative","dependent_measure_a.preference",0.0507346289431841
+"104","native_lang_dutch","main_question_ids_preference_a.yes",0.0504608392349582
+"105","method_c.other","dependent_measure_a.preference",0.0472972972972973
+"106","test_lang_c.artificial","presentation_a.tape recording",0.0459854504613724
+"107","native_lang_cantonese","main_question_ids_preference_a.yes",0.044983849607759
+"108","method_b.hpp","main_question_ids_preference_b.no",0.0446405796203629
+"109","native_lang_french","dependent_measure_a.preference",0.0436415988812429
+"110","native_lang_italian","speech_type_b.naturalistic",0.0435194139889245
+"111","native_lang_norwegian","speech_type_b.naturalistic",0.0435194139889245
+"112","native_lang_dutch","dependent_measure_a.preference",0.0397061276955658
+"113","test_lang_c.artificial","main_question_ids_preference_a.yes",0.0388287965123372
+"114","native_lang_german","own_mother_a.no",0.0387901870329744
+"115","native_lang_hungarian","presentation_a.tape recording",0.037424059428256
+"116","native_lang_japanese","dependent_measure_a.preference",0.0353964480940779
+"117","native_lang_hungarian","mean_agec_mos",0.0345453948694114
+"118","method_c.other","presentation_b.video recording",0.0338984998483035
+"119","native_lang_hungarian","main_question_ids_preference_a.yes",0.0315998032774734
+"120","test_lang_c.artificial","dependent_measure_a.preference",0.0305532205955845
+"121","native_lang_italian","presentation_a.tape recording",0.0263767480669999
+"122","native_lang_hungarian","dependent_measure_a.preference",0.0248649416678921
+"123","native_lang_french","own_mother_a.no",0.0229430828500566
+"124","native_lang_italian","main_question_ids_preference_a.yes",0.0222717701593687
+"125","native_lang_english","presentation_b.video recording",0.0215722889015284
+"126","native_lang_dutch","own_mother_a.no",0.0208741430361717
+"127","native_lang_cantonese","own_mother_a.no",0.0186084759046076
+"128","native_lang_italian","dependent_measure_a.preference",0.0175249909308195
+"129","test_lang_c.artificial","own_mother_a.no",0.0160623141550809
+"130","method_a.cf","speech_type_a.simulated",0.0139774734080322
+"131","native_lang_hungarian","own_mother_a.no",0.0130718954248366
+"132","native_lang_italian","own_mother_a.no",0.00921316654704637
+"133","method_a.cf","speech_type_b.naturalistic",0.00843364006337226
+"134","native_lang_english","dependent_measure_b.affect",0.00526513127080334
+"135","study_type_MA","method_a.cf",0.0031895313816452
+"136","study_type_MB","method_a.cf",-0.0031895313816452
+"137","test_lang_a.native","method_c.other",-0.00406202123332911
+"138","method_b.hpp","speech_type_a.simulated",-0.00476701501709939
+"139","native_lang_english","dependent_measure_a.preference",-0.00526513127080334
+"140","native_lang_italian","native_lang_norwegian",-0.00649350649350649
+"141","native_lang_norwegian","mean_agec_mos",-0.00828832357748429
+"142","native_lang_hungarian","native_lang_italian",-0.00921316654704637
+"143","test_lang_c.artificial","native_lang_italian",-0.0113208353212932
+"144","native_lang_hungarian","native_lang_spanish",-0.0130718954248366
+"145","native_lang_cantonese","native_lang_italian",-0.0131153885587324
+"146","native_lang_dutch","native_lang_italian",-0.0147122471584125
+"147","test_lang_c.artificial","native_lang_hungarian",-0.0160623141550809
+"148","native_lang_french","native_lang_italian",-0.0161704509201195
+"149","native_lang_italian","method_c.other",-0.0175249909308195
+"150","native_lang_cantonese","native_lang_hungarian",-0.0186084759046076
+"151","test_lang_c.artificial","native_lang_korean",-0.0197368421052632
+"152","native_lang_english","method_b.hpp",-0.0200726742050263
+"153","native_lang_japanese","mean_agec_mos",-0.0208308714909738
+"154","native_lang_dutch","native_lang_hungarian",-0.0208741430361717
+"155","method_c.other","speech_type_a.simulated",-0.0213610749021424
+"156","native_lang_english","presentation_a.tape recording",-0.0215722889015284
+"157","native_lang_italian","main_question_ids_preference_b.no",-0.0222717701593687
+"158","test_lang_c.artificial","native_lang_cantonese",-0.0228654817234201
+"159","native_lang_french","native_lang_hungarian",-0.0229430828500566
+"160","native_lang_hungarian","method_c.other",-0.0248649416678921
+"161","test_lang_c.artificial","native_lang_dutch",-0.0256494588021289
+"162","native_lang_italian","presentation_b.video recording",-0.0263767480669999
+"163","native_lang_cantonese","native_lang_japanese",-0.0264900662251656
+"164","native_lang_german","native_lang_italian",-0.0273396046947292
+"165","test_lang_c.artificial","native_lang_french",-0.0281917038384098
+"166","test_lang_b.nonnative","method_b.hpp",-0.029012942659283
+"167","native_lang_cantonese","native_lang_dutch",-0.0297153530604218
+"168","test_lang_c.artificial","dependent_measure_b.affect",-0.0305532205955845
+"169","native_lang_hungarian","main_question_ids_preference_b.no",-0.0315998032774734
+"170","native_lang_cantonese","native_lang_french",-0.032660589036041
+"171","method_c.other","presentation_a.tape recording",-0.0338984998483035
+"172","native_lang_cantonese","method_c.other",-0.0353964480940779
+"173","native_lang_dutch","native_lang_french",-0.0366371652723656
+"174","native_lang_hungarian","presentation_b.video recording",-0.037424059428256
+"175","native_lang_italian","speech_type_a.simulated",-0.0378370086940659
+"176","native_lang_german","native_lang_hungarian",-0.0387901870329744
+"177","test_lang_c.artificial","main_question_ids_preference_b.no",-0.0388287965123372
+"178","native_lang_dutch","method_c.other",-0.0397061276955658
+"179","native_lang_english","method_a.cf",-0.0428391184694076
+"180","method_a.cf","speech_type_c.filtered/synthesized",-0.0428766861149112
+"181","native_lang_french","method_c.other",-0.0436415988812429
+"182","method_b.hpp","main_question_ids_preference_a.yes",-0.0446405796203629
+"183","native_lang_cantonese","main_question_ids_preference_b.no",-0.044983849607759
+"184","test_lang_c.artificial","presentation_b.video recording",-0.0459854504613724
+"185","method_c.other","dependent_measure_b.affect",-0.0472972972972973
+"186","test_lang_c.artificial","native_lang_german",-0.0476641030247354
+"187","test_lang_a.native","method_a.cf",-0.0500218574363213
+"188","native_lang_dutch","main_question_ids_preference_b.no",-0.0504608392349582
+"189","test_lang_b.nonnative","dependent_measure_b.affect",-0.0507346289431841
+"190","native_lang_italian","method_b.hpp",-0.0515406099558037
+"191","native_lang_japanese","presentation_b.video recording",-0.0532749601714327
+"192","native_lang_hungarian","speech_type_a.simulated",-0.0536841940620324
+"193","native_lang_cantonese","native_lang_german",-0.0552197089464818
+"194","native_lang_cantonese","mean_agec_mos",-0.0553986979514926
+"195","native_lang_french","main_question_ids_preference_b.no",-0.055462263205003
+"196","study_type_MA","native_lang_italian",-0.0564297411328077
+"197","test_lang_a.native","dependent_measure_a.preference",-0.058899307883272
+"198","native_lang_dutch","presentation_b.video recording",-0.0597614304667197
+"199","dependent_measure_a.preference","main_question_ids_preference_a.yes",-0.06010813578866
+"200","method_c.other","main_question_ids_preference_a.yes",-0.0608887609287725
+"201","speech_type_b.naturalistic","own_mother_a.no",-0.0617465478029124
+"202","native_lang_dutch","native_lang_german",-0.0619429613082511
+"203","native_lang_french","presentation_b.video recording",-0.0656846821476658
+"204","test_lang_c.artificial","speech_type_a.simulated",-0.065965367849282
+"205","native_lang_french","native_lang_german",-0.0680824353273043
+"206","native_lang_italian","mean_agec_mos",-0.0695010133318825
+"207","method_a.cf","main_question_ids_preference_b.no",-0.0696944451776924
+"208","native_lang_french","method_a.cf",-0.069920155784381
+"209","speech_type_c.filtered/synthesized","presentation_b.video recording",-0.0711868496814374
+"210","native_lang_hungarian","method_b.hpp",-0.0731272424127131
+"211","native_lang_german","method_c.other",-0.0737854539464073
+"212","native_lang_english","own_mother_a.no",-0.074273681210596
+"213","native_lang_cantonese","speech_type_a.simulated",-0.0764220489221129
+"214","native_lang_german","method_b.hpp",-0.076854657150384
+"215","presentation_a.tape recording","main_question_ids_preference_b.no",-0.0795024964743054
+"216","study_type_MA","native_lang_hungarian",-0.0800640769025436
+"217","method_a.cf","own_mother_a.no",-0.0812367128547893
+"218","native_lang_dutch","speech_type_a.simulated",-0.0857267832408833
+"219","test_lang_b.nonnative","presentation_b.video recording",-0.0890870806374748
+"220","test_lang_c.artificial","method_b.hpp",-0.0898563446809731
+"221","test_lang_b.nonnative","own_mother_b.yes",-0.0933520056018673
+"222","native_lang_german","main_question_ids_preference_b.no",-0.0937708143693868
+"223","native_lang_french","speech_type_a.simulated",-0.0942235897759351
+"224","test_lang_a.native","native_lang_italian",-0.0948209311861521
+"225","test_lang_a.native","own_mother_a.no",-0.0971638480216896
+"226","dependent_measure_b.affect","mean_agec_mos",-0.0975417561300312
+"227","study_type_MA","native_lang_korean",-0.0983800982145086
+"228","test_lang_a.native","presentation_a.tape recording",-0.101283983227583
+"229","speech_type_a.simulated","speech_type_c.filtered/synthesized",-0.102116358068778
+"230","native_lang_cantonese","method_b.hpp",-0.104100169423164
+"231","speech_type_b.naturalistic","dependent_measure_b.affect",-0.105467380105061
+"232","method_c.other","mean_agec_mos",-0.106041925127532
+"233","native_lang_german","presentation_b.video recording",-0.111053999253773
+"234","study_type_MA","native_lang_japanese",-0.113975089108721
+"235","test_lang_b.nonnative","test_lang_c.artificial",-0.114707866935281
+"236","native_lang_english","native_lang_italian",-0.124043488849345
+"237","study_type_MA","native_lang_dutch",-0.12785207798919
+"238","test_lang_b.nonnative","native_lang_cantonese",-0.132891098837019
+"239","test_lang_a.native","native_lang_hungarian",-0.134534558799262
+"240","method_b.hpp","method_c.other",-0.139100303194833
+"241","speech_type_a.simulated","dependent_measure_a.preference",-0.140149491431129
+"242","study_type_MA","native_lang_french",-0.14052413135116
+"243","study_type_MA","method_b.hpp",-0.145395818145026
+"244","test_lang_c.artificial","mean_agec_mos",-0.148181136736637
+"245","presentation_b.video recording","mean_agec_mos",-0.148429968824049
+"246","method_a.cf","dependent_measure_a.preference",-0.154525878671561
+"247","native_lang_german","speech_type_a.simulated",-0.159305124521126
+"248","study_type_MA","own_mother_a.no",-0.163267921526756
+"249","own_mother_b.yes","mean_agec_mos",-0.163517450248016
+"250","test_lang_a.native","test_lang_c.artificial",-0.165311630633395
+"251","native_lang_english","native_lang_hungarian",-0.175996331564238
+"252","method_a.cf","mean_agec_mos",-0.176504534628695
+"253","test_lang_b.nonnative","method_c.other",-0.177571201301144
+"254","native_lang_english","main_question_ids_preference_a.yes",-0.179548079193568
+"255","method_c.other","speech_type_b.naturalistic",-0.179773943360899
+"256","method_a.cf","presentation_a.tape recording",-0.186358877465534
+"257","speech_type_b.naturalistic","presentation_b.video recording",-0.188561808316413
+"258","test_lang_a.native","native_lang_japanese",-0.191516456825111
+"259","test_lang_c.artificial","method_a.cf",-0.197722354716547
+"260","study_type_MB","test_lang_c.artificial",-0.200618239496253
+"261","method_b.hpp","presentation_b.video recording",-0.209358947339656
+"262","test_lang_a.native","native_lang_dutch",-0.21483446221183
+"263","native_lang_english","native_lang_korean",-0.216258490131083
+"264","main_question_ids_preference_b.no","mean_agec_mos",-0.223082865908381
+"265","test_lang_b.nonnative","main_question_ids_preference_b.no",-0.22566773346211
+"266","study_type_MB","native_lang_cantonese",-0.232419789555038
+"267","test_lang_a.native","main_question_ids_preference_a.yes",-0.23488242396233
+"268","test_lang_a.native","native_lang_french",-0.236127770947638
+"269","study_type_MA","native_lang_german",-0.237586089601916
+"270","speech_type_a.simulated","presentation_a.tape recording",-0.243349871799816
+"271","native_lang_english","mean_agec_mos",-0.246463995239124
+"272","native_lang_cantonese","native_lang_english",-0.250539297383753
+"273","native_lang_dutch","method_a.cf",-0.256954550505806
+"274","test_lang_a.native","mean_agec_mos",-0.258818454413164
+"275","test_lang_c.artificial","speech_type_b.naturalistic",-0.260132990857236
+"276","native_lang_dutch","native_lang_english",-0.281043603816875
+"277","method_a.cf","method_c.other",-0.306080105830208
+"278","native_lang_english","native_lang_french",-0.308899228853403
+"279","study_type_MA","dependent_measure_a.preference",-0.310563021892558
+"280","speech_type_c.filtered/synthesized","mean_agec_mos",-0.329879708728395
+"281","study_type_MB","native_lang_english",-0.334693184612203
+"282","native_lang_english","speech_type_b.naturalistic",-0.350839970663678
+"283","native_lang_cantonese","dependent_measure_a.preference",-0.356492798661784
+"284","test_lang_a.native","speech_type_b.naturalistic",-0.365153944710177
+"285","test_lang_b.nonnative","speech_type_a.simulated",-0.38338182963801
+"286","study_type_MA","main_question_ids_preference_a.yes",-0.394681416435209
+"287","test_lang_a.native","native_lang_german",-0.399224483413989
+"288","study_type_MB","test_lang_a.native",-0.400336485561854
+"289","speech_type_b.naturalistic","speech_type_c.filtered/synthesized",-0.402693633128415
+"290","speech_type_a.simulated","mean_agec_mos",-0.429903722927342
+"291","study_type_MA","test_lang_b.nonnative",-0.459659742564147
+"292","study_type_MA","presentation_a.tape recording",-0.467426352442803
+"293","native_lang_cantonese","presentation_a.tape recording",-0.497232961600038
+"294","speech_type_b.naturalistic","main_question_ids_preference_b.no",-0.511766315719159
+"295","native_lang_english","native_lang_german",-0.522260192314805
+"296","speech_type_a.simulated","main_question_ids_preference_a.yes",-0.52331493707556
+"297","presentation_a.tape recording","dependent_measure_b.affect",-0.559325247497008
+"298","study_type_MA","mean_agec_mos",-0.607138208471744
+"299","study_type_MB","speech_type_a.simulated",-0.670515368926048
+"300","test_lang_b.nonnative","native_lang_english",-0.680321533280497
+"301","study_type_MA","speech_type_b.naturalistic",-0.771214134874397
+"302","speech_type_a.simulated","speech_type_b.naturalistic",-0.869428267202662
+"303","method_a.cf","method_b.hpp",-0.900174808198211
+"304","test_lang_a.native","test_lang_b.nonnative",-0.960768922830523
+"305","study_type_MA","study_type_MB",-1
+"306","study_type_MA","study_type_MA",NA
