@@ -78,7 +78,7 @@
 "77","test_lang_b.nonnative","presentation_a.tape recording",0.0890870806374748
 "78","native_lang_cantonese","speech_type_b.naturalistic",0.0878991997442143
 "79","native_lang_hungarian","method_a.cf",0.0812367128547893
-"80","native_lang_dutch","mean_agec_mos",0.080203132849288
+"80","native_lang_dutch","mean_agec_mos",0.0802031328492879
 "81","study_type_MB","native_lang_hungarian",0.0800640769025436
 "82","presentation_a.tape recording","main_question_ids_preference_a.yes",0.0795024964743054
 "83","native_lang_spanish","mean_agec_mos",0.077274524481779
@@ -139,7 +139,7 @@
 "138","method_b.hpp","speech_type_a.simulated",-0.00476701501709939
 "139","native_lang_english","dependent_measure_a.preference",-0.00526513127080334
 "140","native_lang_italian","native_lang_norwegian",-0.00649350649350649
-"141","native_lang_norwegian","mean_agec_mos",-0.00828832357748429
+"141","native_lang_norwegian","mean_agec_mos",-0.0082883235774843
 "142","native_lang_hungarian","native_lang_italian",-0.00921316654704637
 "143","test_lang_c.artificial","native_lang_italian",-0.0113208353212932
 "144","native_lang_hungarian","native_lang_spanish",-0.0130718954248366
@@ -192,7 +192,7 @@
 "191","native_lang_japanese","presentation_b.video recording",-0.0532749601714327
 "192","native_lang_hungarian","speech_type_a.simulated",-0.0536841940620324
 "193","native_lang_cantonese","native_lang_german",-0.0552197089464818
-"194","native_lang_cantonese","mean_agec_mos",-0.0553986979514926
+"194","native_lang_cantonese","mean_agec_mos",-0.0553986979514927
 "195","native_lang_french","main_question_ids_preference_b.no",-0.055462263205003
 "196","study_type_MA","native_lang_italian",-0.0564297411328077
 "197","test_lang_a.native","dependent_measure_a.preference",-0.058899307883272
