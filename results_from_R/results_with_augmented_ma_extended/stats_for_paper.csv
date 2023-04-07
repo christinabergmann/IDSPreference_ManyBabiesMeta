@@ -403,3 +403,7 @@ Worst reportedSignif mu ,0.04,9
 Worst reportedSignif mu lo,-0.13,9
 Worst reportedSignif mu hi,0.2,9
 Worst reportedSignif mu pval,0.618,9
+Corr MA reportedSignif est,0.17,9
+Corr MA reportedSignif lo,0.02,9
+Corr MA reportedSignif hi,0.32,9
+Corr MA reportedSignif pval,0.034657,9
