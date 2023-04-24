@@ -194,13 +194,13 @@ d_var_calc <- function(n, d) {
 
 # V 1 by Molly et al - with additional inclusion criterion update
 es_by_participant <- mb_data_tidy_fct %>%
-  group_by(lab, age_group, subid_unique) %>%
+  group_by(lab, age_group, method,subid_unique) %>%
   filter(!is.na(diff)) %>% # MZ/CC: first filter diff NAs to avoid multiple trial pair counting issue
   summarise(d = mean(diff, na.rm = TRUE), n_trial_pairs = n()) %>%
   filter(n_trial_pairs >= n_trial_pairs_criterion)
 
 es_by_study <- es_by_participant %>%
-  group_by(lab, age_group) %>%
+  group_by(lab, age_group, method) %>%
   summarise(d_z = mean(d, na.rm=TRUE)/ sd(d, na.rm=TRUE),
             n = n(),
             d_z_var = d_var_calc(n, d_z)) %>%
