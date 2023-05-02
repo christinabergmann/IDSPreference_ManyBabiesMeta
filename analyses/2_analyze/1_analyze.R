@@ -506,6 +506,170 @@ if ( exists("resCSV") ) {
   # oh yeahhhhhh
 }
 
+# 2A. INTERACTION MODEL FOR THE MODERATED MODEL --------------------------
+
+#singularity issue when fitting the multilevel predictors
+# intmods <- paste(modsS[-1]," * isMeta",sep="",collapse = " + ")
+# intmods_line = paste("isMeta",intmods, sep=" + ")
+# intmods_formula  <- paste( "yi ~ ",intmods_line,collapse="")
+
+#our solution: binarize test_lang and method
+d <- d %>%
+  mutate(test_lang_b = 
+           case_when(
+             test_lang == "a.native" ~ "native",
+             TRUE ~ "other"
+           ),
+         method_b=
+           case_when(
+             method == "b.hpp" ~ "HPP",
+             TRUE ~ "other"
+           )) %>%
+  mutate(
+    test_lang_c =ifelse(test_lang == "a.native",.5,-.5),
+    method_c = ifelse(method == "b.hpp",.5,-.5),
+    isMeta_c = ifelse(isMeta,0.5,-0.5),
+    isMeta_rep = ifelse(isMeta,1,0),
+    isMeta_meta = ifelse(isMeta,0,-1),
+  )
+
+mod1Int <-  robu( eval( parse( text = intmods_formula ) ), 
+                  data = d, 
+                  studynum = as.factor(study_id),
+                  var.eff.size = vi,
+                  modelweights = "HIER",
+                  small = TRUE)
+
+mod1_binary_variables <-  robu(yi ~ isMeta+mean_agec_mos+test_lang_b+method_b, 
+                  data = d, 
+                  studynum = as.factor(study_id),
+                  var.eff.size = vi,
+                  modelweights = "HIER",
+                  small = TRUE)
+mod1_binary_variables
+
+mod1Int_centered <- robu(yi ~ isMeta_c+mean_agec_mos*isMeta_c+test_lang_c*isMeta_c+method_c*isMeta_c, 
+                               data = d, 
+                               studynum = as.factor(study_id),
+                               var.eff.size = vi,
+                               modelweights = "HIER",
+                               small = TRUE)
+mod1Int_centered
+robu(yi ~ isMeta_rep+mean_agec_mos*isMeta_rep+test_lang_c*isMeta_rep+method_c*isMeta_rep, 
+     data = d, 
+     studynum = as.factor(study_id),
+     var.eff.size = vi,
+     modelweights = "HIER",
+     small = TRUE)
+robu(yi ~ isMeta_meta+mean_agec_mos*isMeta_meta+test_lang_c*isMeta_meta+method_c*isMeta_meta, 
+     data = d, 
+     studynum = as.factor(study_id),
+     var.eff.size = vi,
+     modelweights = "HIER",
+     small = TRUE)
+
+robu(yi ~ isMeta+mean_agec_mos+test_lang+method, 
+     data = d, 
+     studynum = as.factor(study_id),
+     var.eff.size = vi,
+     modelweights = "HIER",
+     small = TRUE)
+
+robu(yi ~ isMeta, 
+     data = d, 
+     studynum = as.factor(study_id),
+     var.eff.size = vi,
+     modelweights = "HIER",
+     small = TRUE)
+
+robu(yi ~ 1, 
+     data = d, 
+     studynum = as.factor(study_id),
+     var.eff.size = vi,
+     modelweights = "HIER",
+     small = TRUE)
+
+#Moderators*Source interactions: c("isMeta*mean_agec_mos","isMeta*test_lang_b","isMeta*method_b")
+intmods <- paste(c("mean_agec_mos","test_lang_b","method_b")," * isMeta",sep="",collapse = " + ")
+intmods_line <-  paste(intmods,collapse=" + ")
+intmods_formula <- paste( "yi ~ ",intmods_line,sep="")
+
+mod1Int <-  robu( eval( parse( text = intmods_formula ) ), 
+               data = d, 
+               studynum = as.factor(study_id),
+               var.eff.size = vi,
+               modelweights = "HIER",
+               small = TRUE)
+
+est = mod1Int$b.r
+t2 = mod1Int$mod_info$tau.sq
+mu.lo = mod1Int$reg_table$CI.L
+mu.hi = mod1Int$reg_table$CI.U
+mu.se = mod1Int$reg_table$SE
+pval = mod1Int$reg_table$prob
+V = mod1Int$VR.r  # variance-covariance matrix
+est.rep = est[ meta$labels == "X.Intercept."]
+
+# save this one separately since it will ultimately be returned
+est.rep = est[ mod1IntRes$labels == "X.Intercept."]
+
+# rounded and formatted estimates for text
+# expects pval.cutoff to be a global var
+ests = round( est, 2 )
+pvals2 = format.pval(pval, eps = pval.cutoff)
+
+# save results to csv file
+update_result_csv( name = paste("mod1Int", "tau"),
+                     value = round( sqrt(t2), 2 ) )
+update_result_csv( name = paste("mod1Int", "k"),
+                     value = nrow(mod1Int$data.full) )
+update_result_csv( name = paste("mod1Int", "n subj"),
+                     value = round( sum(d$n) ) )
+update_result_csv( name = paste( "mod1Int", "est", mod1Int$labels ),
+                     value = ests )
+update_result_csv( name = paste( "mod1Int", "lo", mod1Int$labels ),
+                     value = round(mu.lo, digits) )
+update_result_csv( name = paste( "mod1Int", "hi", mod1Int$labels ),
+                     value = round(mu.hi, digits) )
+update_result_csv( name = paste("mod1Int", "pval", mod1Int$labels ),
+                     value = pvals2 )
+
+mod1IntRes <-  data.frame(
+  est.rep = est.rep,
+  est.rep.lo = mu.lo[ mod1Int$labels == "X.Intercept." ],
+  est.rep.hi = mu.hi[ mod1Int$labels == "X.Intercept." ])
+
+CIs <-  format_CI( mu.lo,
+                   mu.hi )
+temp <-  data.frame( Moderator = mod1Int$labels, 
+                     EstCI = paste( ests, CIs, sep = " " ),
+                     Pval = pvals2 )
+# save results
+setwd(results.dir)
+if(!dir.exists("tables_to_prettify")){
+  dir.create("tables_to_prettify")
+  }
+setwd("tables_to_prettify")
+
+write.csv( temp,
+           paste("model_", "mod1Int", "_table.csv", sep = "" ),
+           row.names = FALSE)
+  
+# also print it as an xtable
+print( xtable(temp), include.rownames = FALSE)
+
+ggplot(filter(d,mean_age<450),aes(mean_age,yi,color=studyTypePretty))+
+  geom_pointrange(aes(size=1/vi,ymin=lo,ymax=hi),position=position_jitter(width=10),fatten=1)+
+  geom_smooth(method="lm", color="black",size=1.5)+
+  scale_color_brewer(type="qual",palette="Set1",direction=-1)+
+  facet_wrap(~studyTypePretty)+
+  theme_bw()+
+  theme(legend.position="none",
+        strip.text = element_text(size=16),
+        axis.text=element_text(size=12))+
+  ylab("Effect Size")+
+  xlab("Mean Age (in days)")
+
 
 # 2. DENSITY PLOT OF META-ANALYSIS VS. REPLICATION CALIBRATED ESTIMATES ------------------------------------------------------------------
 
