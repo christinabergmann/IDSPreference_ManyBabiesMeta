@@ -659,7 +659,7 @@ write.csv( temp,
 print( xtable(temp), include.rownames = FALSE)
 
 ggplot(filter(d,mean_age<450),aes(mean_age,yi,color=studyTypePretty))+
-  geom_pointrange(aes(size=1/vi,ymin=lo,ymax=hi),position=position_jitter(width=10),fatten=1)+
+  geom_pointrange(aes(size=1/vi,ymin=lo,ymax=hi),position=position_jitter(width=10),fatten=1,alpha=0.6)+
   geom_smooth(method="lm", color="black",size=1.5)+
   scale_color_brewer(type="qual",palette="Set1",direction=-1)+
   facet_wrap(~studyTypePretty)+
