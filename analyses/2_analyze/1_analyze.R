@@ -48,7 +48,9 @@ pacman::p_load(
   ggplot2,
   metafor,
   MatchIt,
-  table1)
+  table1,
+  gghalves,
+  patchwork)
 
 # run this only if you want to update the R environment specs
 # library(here); setwd(here())
@@ -568,26 +570,21 @@ robu(yi ~ isMeta_meta+mean_agec_mos*isMeta_meta+test_lang_c*isMeta_meta+method_c
      modelweights = "HIER",
      small = TRUE)
 
-robu(yi ~ isMeta+mean_agec_mos+test_lang+method, 
+robu(yi ~ isMeta+mean_agec_mos+test_lang_c+method_c, 
      data = d, 
      studynum = as.factor(study_id),
      var.eff.size = vi,
      modelweights = "HIER",
      small = TRUE)
 
-robu(yi ~ isMeta, 
+temp <- robu(yi ~ mean_agec_mos, 
      data = d, 
      studynum = as.factor(study_id),
      var.eff.size = vi,
      modelweights = "HIER",
      small = TRUE)
 
-robu(yi ~ 1, 
-     data = d, 
-     studynum = as.factor(study_id),
-     var.eff.size = vi,
-     modelweights = "HIER",
-     small = TRUE)
+
 
 #Moderators*Source interactions: c("isMeta*mean_agec_mos","isMeta*test_lang_b","isMeta*method_b")
 intmods <- paste(c("mean_agec_mos","test_lang_b","method_b")," * isMeta",sep="",collapse = " + ")
@@ -658,18 +655,55 @@ write.csv( temp,
 # also print it as an xtable
 print( xtable(temp), include.rownames = FALSE)
 
-ggplot(filter(d,mean_age<450),aes(mean_age,yi,color=studyTypePretty))+
+#ggplot(filter(d,mean_age<450),aes(mean_age,yi,color=studyTypePretty))+
+p1 <- ggplot(d,aes(mean_age,yi,color=studyTypePretty))+
   geom_pointrange(aes(size=1/vi,ymin=lo,ymax=hi),position=position_jitter(width=10),fatten=1,alpha=0.6)+
-  geom_smooth(method="lm", color="black",size=1.5)+
+  geom_smooth(method="lm",color="black",size=1.5)+
+  #geom_smooth(color="#d01c8b",se=FALSE,linetype="dashed")+
   scale_color_brewer(type="qual",palette="Set1",direction=-1)+
   facet_wrap(~studyTypePretty)+
   theme_bw()+
   theme(legend.position="none",
         strip.text = element_text(size=16),
-        axis.text=element_text(size=12))+
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=16))+
   ylab("Effect Size")+
   xlab("Mean Age (in days)")
 
+p2 <- ggplot(d,aes(method,yi,color=studyTypePretty))+
+  geom_hline(yintercept=0,linetype="dashed",color="black")+
+  geom_point(aes(size=1/vi),position=position_jitter(width=0.05),fatten=1,alpha=0.3)+
+  geom_half_violin(position = position_nudge(x = -.15, y = 0), width=0.5,adjust=1.5,trim = FALSE,side="l")+
+  geom_half_boxplot(position = position_nudge(x = .15, y = 0), center=TRUE,width=0.5,side="r",errorbar.draw = FALSE, outlier.shape=NA)+
+  scale_color_brewer(type="qual",palette="Set1",direction=-1)+
+  scale_x_discrete(breaks=c("a.cf","b.hpp","c.other"),labels=c("Central\nFixation","HPP","Other"))+
+  facet_wrap(~studyTypePretty)+
+  theme_bw()+
+  theme(legend.position="none",
+        strip.text = element_text(size=16),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=16))+
+  ylab("Effect Size")+
+  xlab("Method")
+
+p3 <- ggplot(d,aes(test_lang,yi,color=studyTypePretty))+
+  geom_hline(yintercept=0,linetype="dashed",color="black")+
+  geom_point(aes(size=1/vi),position=position_jitter(width=0.05),fatten=1,alpha=0.3)+
+  geom_half_violin(position = position_nudge(x = -.15, y = 0), width=0.6,adjust=1.5,trim = FALSE,side="l")+
+  geom_half_boxplot(position = position_nudge(x = .15, y = 0), center=TRUE,width=0.6,side="r",errorbar.draw = FALSE, outlier.shape=NA)+
+  scale_color_brewer(type="qual",palette="Set1",direction=-1)+
+  scale_x_discrete(breaks=c("b.nonnative","a.native","c.artificial"),labels=c("Non-native","Native","Other"))+
+  facet_wrap(~studyTypePretty)+
+  theme_bw()+
+  theme(legend.position="none",
+        strip.text = element_text(size=16),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=16))+
+  ylab("Effect Size")+
+  xlab("Method")
+p_final <- p1/(p2+p3) + plot_annotation(tag_levels = 'A')+theme(plot.tag = element_text(size = 20))
+
+my_ggsave(name="interaction_overview.pdf",width=12,height=9)
 
 # 2. DENSITY PLOT OF META-ANALYSIS VS. REPLICATION CALIBRATED ESTIMATES ------------------------------------------------------------------
 
