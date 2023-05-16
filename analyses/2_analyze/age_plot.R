@@ -4,7 +4,7 @@ pacman::p_load(tidyverse,
                robumeta,
                clubSandwich)
 
-d <- read_csv(here("data/mb_ma_combined_prepped_0.125.csv"))
+d <- read_csv(here("data/prepped_with_augmented_ma_extended/mb_ma_combined_prepped_0.125.csv"))
 
 moderators = c( "isMeta",  # code this way since we expect meta to have larger effect sizes
            "mean_agec_mos",
