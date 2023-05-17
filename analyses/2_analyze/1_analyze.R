@@ -511,11 +511,19 @@ if ( exists("resCSV") ) {
 # 2A. INTERACTION MODEL FOR THE MODERATED MODEL --------------------------
 
 #singularity issue when fitting the multilevel predictors
+
 # intmods <- paste(modsS[-1]," * isMeta",sep="",collapse = " + ")
 # intmods_line = paste("isMeta",intmods, sep=" + ")
 # intmods_formula  <- paste( "yi ~ ",intmods_line,collapse="")
 
-#our solution: binarize test_lang and method
+# mod1Int <-  robu( eval( parse( text = intmods_formula ) ), 
+#                   data = d, 
+#                   studynum = as.factor(study_id),
+#                   var.eff.size = vi,
+#                   modelweights = "HIER",
+#                   small = TRUE)
+
+# our solution: binarize test_lang and method
 d <- d %>%
   mutate(test_lang_b = 
            case_when(
@@ -535,14 +543,8 @@ d <- d %>%
     isMeta_meta = ifelse(isMeta,0,-1),
   )
 
-mod1Int <-  robu( eval( parse( text = intmods_formula ) ), 
-                  data = d, 
-                  studynum = as.factor(study_id),
-                  var.eff.size = vi,
-                  modelweights = "HIER",
-                  small = TRUE)
-
-mod1_binary_variables <-  robu(yi ~ isMeta+mean_agec_mos+test_lang_b+method_b, 
+#first re-fit moderator model by hand with binary variables - similar results
+mod1_binary_variables <-  robu(yi ~ isMeta+mean_agec_mos+test_lang_c+method_c, 
                   data = d, 
                   studynum = as.factor(study_id),
                   var.eff.size = vi,
@@ -550,13 +552,14 @@ mod1_binary_variables <-  robu(yi ~ isMeta+mean_agec_mos+test_lang_b+method_b,
                   small = TRUE)
 mod1_binary_variables
 
-mod1Int_centered <- robu(yi ~ isMeta_c+mean_agec_mos*isMeta_c+test_lang_c*isMeta_c+method_c*isMeta_c, 
+mod1Int <- robu(yi ~ isMeta_c+mean_agec_mos*isMeta_c+test_lang_c*isMeta_c+method_c*isMeta_c, 
                                data = d, 
                                studynum = as.factor(study_id),
                                var.eff.size = vi,
                                modelweights = "HIER",
                                small = TRUE)
-mod1Int_centered
+mod1Int
+
 robu(yi ~ isMeta_rep+mean_agec_mos*isMeta_rep+test_lang_c*isMeta_rep+method_c*isMeta_rep, 
      data = d, 
      studynum = as.factor(study_id),
@@ -570,34 +573,7 @@ robu(yi ~ isMeta_meta+mean_agec_mos*isMeta_meta+test_lang_c*isMeta_meta+method_c
      modelweights = "HIER",
      small = TRUE)
 
-robu(yi ~ isMeta+mean_agec_mos+test_lang_c+method_c, 
-     data = d, 
-     studynum = as.factor(study_id),
-     var.eff.size = vi,
-     modelweights = "HIER",
-     small = TRUE)
-
-temp <- robu(yi ~ mean_agec_mos, 
-     data = d, 
-     studynum = as.factor(study_id),
-     var.eff.size = vi,
-     modelweights = "HIER",
-     small = TRUE)
-
-
-
-#Moderators*Source interactions: c("isMeta*mean_agec_mos","isMeta*test_lang_b","isMeta*method_b")
-intmods <- paste(c("mean_agec_mos","test_lang_b","method_b")," * isMeta",sep="",collapse = " + ")
-intmods_line <-  paste(intmods,collapse=" + ")
-intmods_formula <- paste( "yi ~ ",intmods_line,sep="")
-
-mod1Int <-  robu( eval( parse( text = intmods_formula ) ), 
-               data = d, 
-               studynum = as.factor(study_id),
-               var.eff.size = vi,
-               modelweights = "HIER",
-               small = TRUE)
-
+## moderator interaction model
 est = mod1Int$b.r
 t2 = mod1Int$mod_info$tau.sq
 mu.lo = mod1Int$reg_table$CI.L
@@ -605,10 +581,7 @@ mu.hi = mod1Int$reg_table$CI.U
 mu.se = mod1Int$reg_table$SE
 pval = mod1Int$reg_table$prob
 V = mod1Int$VR.r  # variance-covariance matrix
-est.rep = est[ meta$labels == "X.Intercept."]
-
-# save this one separately since it will ultimately be returned
-est.rep = est[ mod1IntRes$labels == "X.Intercept."]
+est.rep = est[ mod1Int$labels == "X.Intercept."]
 
 # rounded and formatted estimates for text
 # expects pval.cutoff to be a global var
@@ -654,6 +627,8 @@ write.csv( temp,
   
 # also print it as an xtable
 print( xtable(temp), include.rownames = FALSE)
+
+## Create Plot of Results
 
 #ggplot(filter(d,mean_age<450),aes(mean_age,yi,color=studyTypePretty))+
 p1 <- ggplot(d,aes(mean_age,yi,color=studyTypePretty))+
