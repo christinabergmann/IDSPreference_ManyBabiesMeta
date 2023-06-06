@@ -8,7 +8,6 @@ set.seed(4711)
 # 4 versions: using original, corrected Dunst, augmented meta-analysis, or extended augmented meta-analysis data
 ma.versions <- c("Dunst_original","Dunst_corrected","augmented_ma","augmented_ma_extended")
 for (ma.version in ma.versions) {
-  for ( .u in c(FALSE, TRUE) ) {
     # ~ Code-Running Parameters ------------------------------------------------------------------
     # should we remove existing results file instead of overwriting individual entries? 
     start.res.from.scratch = TRUE
@@ -21,6 +20,5 @@ for (ma.version in ma.versions) {
     
     setwd( here("analyses","2_analyze") )
     source("1_analyze.R")
-  }
 }
 

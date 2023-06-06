@@ -252,8 +252,9 @@ t <- d %>%
   mutate(`speech type` = factor(speech_type, labels = c("simulated", "naturalistic", "filtered/synthesized"))) %>%
   mutate(`own mother` = factor( own_mother, labels = c("no", "yes"))) %>%
   mutate(presentation = factor(presentation, labels = c("audio recording", "video recording"))) %>%
-  mutate(`main question was about IDS prerence` = factor(main_question_ids_preference, labels = c("yes", "no"))) %>%
-  select(study_type, `centered age (months)`, `test language`, `native language`, method, `speech type`, `own mother`, presentation, `main question was about IDS prerence`)
+  mutate(`dependent measure` = factor(dependent_measure, labels = c("preference","affect"))) %>%
+  mutate(`main question was about IDS preference` = factor(main_question_ids_preference, labels = c("yes", "no"))) %>%
+  select(study_type, `centered age (months)`, `test language`, `native language`, method, `speech type`, `own mother`, presentation,`dependent measure`, `main question was about IDS preference`)
 
 
 my.render.cont <- function(x) {
@@ -261,7 +262,7 @@ my.render.cont <- function(x) {
                                                                     "Mean (SD)"=sprintf("%s (&plusmn; %s)", MEAN, SD)))
 }
 
-table1(~ `centered age (months)` + `test language` + `native language` + method + `speech type` + `own mother` + presentation + `main question was about IDS prerence`| study_type, data = t, overall = F, render.continuous=my.render.cont)
+table1(~ `centered age (months)` + `test language` + `native language` + method + `speech type` + `own mother` + presentation + `dependent measure` + `main question was about IDS preference`| study_type, data = t, overall = F, render.continuous=my.render.cont)
 
 
 
@@ -560,6 +561,7 @@ mod1Int <- robu(yi ~ isMeta_c+mean_agec_mos*isMeta_c+test_lang_c*isMeta_c+method
                                small = TRUE)
 mod1Int
 
+##refit model centered on replication or meta-analysis
 robu(yi ~ isMeta_rep+mean_agec_mos*isMeta_rep+test_lang_c*isMeta_rep+method_c*isMeta_rep, 
      data = d, 
      studynum = as.factor(study_id),
@@ -1248,20 +1250,18 @@ metaCorr = corrected_meta( yi = yi,
                            model = "robust",
                            favor.positive = TRUE )
 
-# **wow! quite close to replication mean
-
 
 update_result_csv( name = "Corr MA est",
-                   value = round( metaCorr$est, 2) )
+                   value = round( metaCorr$stats$estimate, 2) )
 
 update_result_csv( name = "Corr MA lo",
-                   value = round( metaCorr$lo, 2) )
+                   value = round( metaCorr$stats$ci_lower, 2) )
 
 update_result_csv( name = "Corr MA hi",
-                   value = round( metaCorr$hi, 2) )
+                   value = round( metaCorr$stats$ci_upper, 2) )
 
 update_result_csv( name = "Corr MA pval",
-                   value = format.pval( metaCorr$pval, eps = pval.cutoff) )
+                   value = format.pval( metaCorr$stats$p_value, eps = pval.cutoff) )
 
 
 # # N.P. for both point estimate and CI
@@ -2048,10 +2048,10 @@ update_result_csv( name = "Worst reportedSignif mu pval",
 
 # N.P. for estimate
 update_result_csv( name = "sval est to reps",
-                   value = round( SvalR$sval.est, 2 ),
+                   value = round( SvalR$stats$sval_est, 2 ),
                    print = FALSE )
 update_result_csv( name = "sval CI to reps",
-                   value = SvalR$sval.ci, #CC: changed this because no value ci sval and could not be rounded.
+                   value = SvalR$stats$sval_ci, #CC: changed this because no value ci sval and could not be rounded.
                    print = FALSE )
 
 
