@@ -1453,7 +1453,7 @@ if ( redo.plots == TRUE ) {
   
   #@to do in prep code: should make pretty versions of moderator variables (var names and levels) in prep code
   
-  ggplot( data = subsetplot, 
+  ggplot( data = filter(subsetplot,k>=5), #MZ: just plotting effects where there are at least 5 observations (otherwise too noisy)
           aes( x = est,
                y = level,
                color = source ) ) + 

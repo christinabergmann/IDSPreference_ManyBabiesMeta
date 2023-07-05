@@ -133,52 +133,52 @@ mod1Int pval method_c,0.4671896,1
 mod1Int pval isMeta_c.mean_agec_mos,0.0024874,1
 mod1Int pval isMeta_c.test_lang_c,0.2140865,1
 mod1Int pval isMeta_c.method_c,0.0049267,1
-MA subset mods tau,0.33,1
-MA subset mods k,112,1
-MA subset mods n subj,2257,1
-MA subset mods est X.Intercept.,0.38,1
-MA subset mods est mean_agec_mos,0,1
-MA subset mods est test_langb.nonnative,0.15,1
-MA subset mods est test_langc.artificial,-0.19,1
-MA subset mods est methodb.hpp,-0.13,1
-MA subset mods est methodc.other,0.2,1
-MA subset mods lo X.Intercept.,0.18,1
-MA subset mods lo mean_agec_mos,-0.02,1
-MA subset mods lo test_langb.nonnative,-0.53,1
-MA subset mods lo test_langc.artificial,-2.83,1
-MA subset mods lo methodb.hpp,-0.4,1
-MA subset mods lo methodc.other,-1.98,1
-MA subset mods hi X.Intercept.,0.58,1
-MA subset mods hi mean_agec_mos,0.02,1
-MA subset mods hi test_langb.nonnative,0.84,1
-MA subset mods hi test_langc.artificial,2.44,1
-MA subset mods hi methodb.hpp,0.14,1
-MA subset mods hi methodc.other,2.38,1
-MA subset mods pval X.Intercept.,0.0013188,1
-MA subset mods pval mean_agec_mos,0.8136707,1
-MA subset mods pval test_langb.nonnative,0.3901213,1
-MA subset mods pval test_langc.artificial,0.5234555,1
-MA subset mods pval methodb.hpp,0.3327818,1
-MA subset mods pval methodc.other,0.5298959,1
-Reps subset mods tau,0,1
-Reps subset mods k,102,1
-Reps subset mods n subj,2004,1
-Reps subset mods est X.Intercept.,0.25,1
-Reps subset mods est mean_agec_mos,0.04,1
-Reps subset mods est test_langb.nonnative,-0.1,1
-Reps subset mods est methodb.hpp,0.22,1
-Reps subset mods lo X.Intercept.,0.15,1
-Reps subset mods lo mean_agec_mos,0.02,1
-Reps subset mods lo test_langb.nonnative,-0.21,1
-Reps subset mods lo methodb.hpp,0.12,1
-Reps subset mods hi X.Intercept.,0.35,1
-Reps subset mods hi mean_agec_mos,0.07,1
-Reps subset mods hi test_langb.nonnative,0,1
-Reps subset mods hi methodb.hpp,0.33,1
-Reps subset mods pval X.Intercept.,< 0.0001,1
-Reps subset mods pval mean_agec_mos,0.00032137,1
-Reps subset mods pval test_langb.nonnative,0.05959164,1
-Reps subset mods pval methodb.hpp,0.00011699,1
+MA subset mods tau,0.33,3
+MA subset mods k,112,3
+MA subset mods n subj,2257,3
+MA subset mods est X.Intercept.,0.38,3
+MA subset mods est mean_agec_mos,0,3
+MA subset mods est test_langb.nonnative,0.15,3
+MA subset mods est test_langc.artificial,-0.19,3
+MA subset mods est methodb.hpp,-0.13,3
+MA subset mods est methodc.other,0.2,3
+MA subset mods lo X.Intercept.,0.18,3
+MA subset mods lo mean_agec_mos,-0.02,3
+MA subset mods lo test_langb.nonnative,-0.53,3
+MA subset mods lo test_langc.artificial,-2.83,3
+MA subset mods lo methodb.hpp,-0.4,3
+MA subset mods lo methodc.other,-1.98,3
+MA subset mods hi X.Intercept.,0.58,3
+MA subset mods hi mean_agec_mos,0.02,3
+MA subset mods hi test_langb.nonnative,0.84,3
+MA subset mods hi test_langc.artificial,2.44,3
+MA subset mods hi methodb.hpp,0.14,3
+MA subset mods hi methodc.other,2.38,3
+MA subset mods pval X.Intercept.,0.0013188,3
+MA subset mods pval mean_agec_mos,0.8136707,3
+MA subset mods pval test_langb.nonnative,0.3901213,3
+MA subset mods pval test_langc.artificial,0.5234555,3
+MA subset mods pval methodb.hpp,0.3327818,3
+MA subset mods pval methodc.other,0.5298959,3
+Reps subset mods tau,0,3
+Reps subset mods k,102,3
+Reps subset mods n subj,2004,3
+Reps subset mods est X.Intercept.,0.25,3
+Reps subset mods est mean_agec_mos,0.04,3
+Reps subset mods est test_langb.nonnative,-0.1,3
+Reps subset mods est methodb.hpp,0.22,3
+Reps subset mods lo X.Intercept.,0.15,3
+Reps subset mods lo mean_agec_mos,0.02,3
+Reps subset mods lo test_langb.nonnative,-0.21,3
+Reps subset mods lo methodb.hpp,0.12,3
+Reps subset mods hi X.Intercept.,0.35,3
+Reps subset mods hi mean_agec_mos,0.07,3
+Reps subset mods hi test_langb.nonnative,0,3
+Reps subset mods hi methodb.hpp,0.33,3
+Reps subset mods pval X.Intercept.,< 0.0001,3
+Reps subset mods pval mean_agec_mos,0.00032137,3
+Reps subset mods pval test_langb.nonnative,0.05959164,3
+Reps subset mods pval methodb.hpp,0.00011699,3
 MA k nonaffirmative,71,4
 MA k affirmative,41,4
 weightr mu ,0.28,4
