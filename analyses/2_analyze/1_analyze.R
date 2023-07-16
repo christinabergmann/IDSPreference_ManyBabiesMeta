@@ -1732,7 +1732,7 @@ update_result_csv( name = paste( "IPW robu pval", IPW.robu$labels ),
 if ( redo.plots == TRUE ) {
   
   # should we color-code studies in the matched set?
-  color.subclasses = TRUE
+  color.subclasses = FALSE
   
   # ~ Make plotting dataframe ------------------------------------------------------------------
   
