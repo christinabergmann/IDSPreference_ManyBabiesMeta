@@ -5,8 +5,8 @@ pacman::p_load(here,
 
 set.seed(4711)
 
-# 4 versions: using original, corrected Dunst, augmented meta-analysis, or extended augmented meta-analysis data
-ma.versions <- c("Dunst_original","Dunst_corrected","augmented_ma","augmented_ma_extended")
+# 4 versions: using original, corrected Dunst, extended community-augmented meta-analysis data
+ma.versions <- c("Dunst_original","Dunst_corrected","augmented_ma_extended")
 for (ma.version in ma.versions) {
     # ~ Code-Running Parameters ------------------------------------------------------------------
     # should we remove existing results file instead of overwriting individual entries? 

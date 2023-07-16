@@ -13,8 +13,8 @@ setwd( here("analyses/1_mungedata") )
 # STEP 1: Get Tidy MA Data --------------------------------------------------------
 # only needs to be run once regardless of which datasets are to be created
 
-# 4 data versions: using original Dunst; corrected Dunst; community-augmented MA; an extended version of the community-augmented MA
-for (ma_version in c("Dunst_original","Dunst_corrected","augmented_ma","augmented_ma_extended")) {
+# 4 data versions: using original Dunst; corrected Dunst; the community-augmented MA
+for (ma_version in c("Dunst_original","Dunst_corrected","augmented_ma_extended")) {
   source("1_get_tidy_MA_data.R")
 }
 
@@ -35,7 +35,7 @@ criteria.vec = c(.125, .25, .5, .75)*8
 
 # even though this part of script preps the MB data,
 #  depends on MA version because of age-matching
-for (ma_version in c("Dunst_original","Dunst_corrected","augmented_ma","augmented_ma_extended")) {
+for (ma_version in c("Dunst_original","Dunst_corrected","augmented_ma_extended")) {
   
   for ( .c in criteria.vec ) {
     
