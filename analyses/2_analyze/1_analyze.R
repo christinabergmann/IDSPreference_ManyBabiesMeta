@@ -133,7 +133,8 @@ excelMax = 8
 # max digits in Excel; only used for running sanity checks against the results that are auto-written to a csv file
 
 # plot colors
-colors = c("darkgray", "red2")  # replications, originals
+#colors = c("darkgray", "red2")  # replications, originals
+colors = RColorBrewer::brewer.pal(n=2,name="Set1") # replications, originals
 
 # stop sci notation
 options(scipen=999)
@@ -633,8 +634,8 @@ print( xtable(temp), include.rownames = FALSE)
 ## Create Plot of Results
 
 #ggplot(filter(d,mean_age<450),aes(mean_age,yi,color=studyTypePretty))+
-p1 <- ggplot(d,aes(mean_age,yi,color=studyTypePretty))+
-  geom_pointrange(aes(size=1/vi,ymin=lo,ymax=hi),position=position_jitter(width=10),fatten=1,alpha=0.6)+
+p1 <- ggplot(d,aes(mean_age/30.44,yi,color=studyTypePretty))+
+  geom_pointrange(aes(size=1/vi,ymin=lo,ymax=hi),position=position_jitter(width=0.3),fatten=1,alpha=0.6)+
   geom_smooth(method="lm",color="black",size=1.5)+
   #geom_smooth(color="#d01c8b",se=FALSE,linetype="dashed")+
   scale_color_brewer(type="qual",palette="Set1",direction=-1)+
@@ -645,7 +646,7 @@ p1 <- ggplot(d,aes(mean_age,yi,color=studyTypePretty))+
         axis.text=element_text(size=12),
         axis.title=element_text(size=16))+
   ylab("Effect Size")+
-  xlab("Mean Age (in days)")
+  xlab("Mean Age (in months)")
 
 p2 <- ggplot(d,aes(method,yi,color=studyTypePretty))+
   geom_hline(yintercept=0,linetype="dashed",color="black")+
@@ -677,7 +678,7 @@ p3 <- ggplot(d,aes(test_lang,yi,color=studyTypePretty))+
         axis.text=element_text(size=12),
         axis.title=element_text(size=16))+
   ylab("Effect Size")+
-  xlab("Method")
+  xlab("Test Language")
 p_final <- p1/(p2+p3) + plot_annotation(tag_levels = 'A')+theme(plot.tag = element_text(size = 20))
 
 my_ggsave(name="interaction_overview.pdf",width=12,height=9)
@@ -1194,6 +1195,9 @@ statCI_result_csv( "weightr mu",
 update_result_csv( name = "weightr mu pval",
                    value = format_stat( 2 * ( 1 - pnorm( abs(m1[[2]]$par[2]) / ses[2] ) ), cutoffs = c(0.10, pval.cutoff) ) )
 
+#add estimated selection ratio
+update_result_csv( name = "weightr selection ratio",
+                   value = round(1/m1$output_adj$par[3],1))
 
 # ~ Worst-Case Meta-Analysis------------------------------------------------------------------
 
