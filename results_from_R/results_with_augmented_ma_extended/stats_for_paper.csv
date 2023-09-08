@@ -185,7 +185,7 @@ weightr mu ,0.28,4
 weightr mu lo,0.14,4
 weightr mu hi,0.41,4
 weightr mu pval,< 0.0001,4
-weightr selection ratio,1.5,4
+weightr selection ratio,1.54585985806173,4
 Worst mu ,0.09,4
 Worst mu lo,-0.01,4
 Worst mu hi,0.18,4

@@ -134,7 +134,7 @@ excelMax = 8
 
 # plot colors
 #colors = c("darkgray", "red2")  # replications, originals
-colors = RColorBrewer::brewer.pal(n=2,name="Set1") # replications, originals
+colors = RColorBrewer::brewer.pal(n=2,name="Set1")[1:2] # replications, originals
 
 # stop sci notation
 options(scipen=999)
@@ -640,6 +640,7 @@ p1 <- ggplot(d,aes(mean_age/30.44,yi,color=studyTypePretty))+
   #geom_smooth(color="#d01c8b",se=FALSE,linetype="dashed")+
   scale_color_brewer(type="qual",palette="Set1",direction=-1)+
   facet_wrap(~studyTypePretty)+
+  scale_x_continuous(breaks=seq(0,30,3))+
   theme_bw()+
   theme(legend.position="none",
         strip.text = element_text(size=16),
@@ -1197,7 +1198,7 @@ update_result_csv( name = "weightr mu pval",
 
 #add estimated selection ratio
 update_result_csv( name = "weightr selection ratio",
-                   value = round(1/m1$output_adj$par[3],1))
+                   value = 1/m1$output_adj$par[3])
 
 # ~ Worst-Case Meta-Analysis------------------------------------------------------------------
 
@@ -1949,7 +1950,7 @@ quick_sens_analysis( .dat = d[ d$participant_design != "between", ],
 ggplot(d, aes(mean_age, calibNaive, color=sourcePretty)) +
   geom_point() +
   geom_smooth(se=FALSE) +
-  scale_color_manual(values=colors) +
+  scale_color_manual(values=rev(colors)) +
   theme_classic()
 
 ## in original Dunst only:
@@ -1963,7 +1964,7 @@ if (ma.version=="Dunst_original") {
   ggplot(temp, aes(mean_age, calibNaive, color=sourcePretty)) +
     geom_point() +
     geom_smooth(se=FALSE) +
-    scale_color_manual(values=colors) +
+    scale_color_manual(values=rev(colors)) +
     theme_classic()
 }
 
