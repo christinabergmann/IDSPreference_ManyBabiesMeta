@@ -67,7 +67,7 @@ for (ma_version in c("Dunst_original","Dunst_corrected","augmented_ma_extended")
 # .ic: for replications, should we make the sensitivity-analysis dataset with more
 #  stringent inclusion (set to TRUE), or the main-analysis dataset?
 
-for (ma_version in c("Dunst_original","Dunst_corrected","augmented_ma","augmented_ma_extended")) {
+for (ma_version in c("Dunst_original","Dunst_corrected","augmented_ma_extended")) {
   
   for ( .ic in c(FALSE, TRUE) ) {
     

@@ -29,117 +29,6 @@ mb_data_tidy <- mb_data_raw %>%
   #filter(!is.na(diff)) %>% #Removing this line because it is not in the MB scripts
   select(all_of(TARGET_VARS))
 
-if (age.matched == TRUE) {
-  
-  # in main analysis, MB subjects were on average 12 months older than MA subjects
-  
-  # check mean age in MA: 144 days
-  setwd(data.dir)
-  dma = read_csv("ma_data_tidy.csv")
-  summary(dma$mean_age)
-  
-  # without further restriction, mean age in MB is ~280-290 days
-  summary(mb_data_tidy$age_days)
-  
-  # subset the MB subjects to get a mean of 144 days 
-  # as in the MA
-  # to do this, take only the youngest MB subjects
-  # this one matches almost exactly (mean 144)
-  #mb_data_tidy = mb_data_tidy[ mb_data_tidy$age_days <= 180, ]
-  #mean(mb_data_tidy$age_days)
-  # this retains only 11% of the data (2,314 subjects)
-  
-  # CC: proposal to carry out age matching; sample proportions from each age group.
-  #calculate proportion of subjects in MA:
-  proportion_subjects_in_age_groups_MA <- dma %>%
-    group_by(age_group) %>%
-    dplyr::summarise(n = sum(n), nprop = sum(n)/sum(dma$n))
-  
-  proportion_subjects_in_age_groups_MB <- mb_data_tidy %>%
-    distinct(subid_unique, age_group) %>%
-    mutate(total_n = n()) %>%
-    group_by(age_group,total_n) %>%
-    dplyr::summarise(n = n()) %>%
-    mutate(nprop = n/total_n)
-  
-  #sample MB dataset to include all subjects between 3 and 6 months and a proportional number
-  #of participants (to the MA) from infants between 6 and 9 months and 9 to 12 months.
-  
-  sample_subids_3_6 <- mb_data_tidy %>%
-    filter(age_group=="3-6 mo") %>%
-    distinct(subid_unique)
-
-  
-  set.seed(40)
-  
-  sample_subids_6_9 <- mb_data_tidy %>%
-    filter(age_group=="6-9 mo") %>%
-    distinct(subid_unique) %>%
-    slice_sample(
-      n=round(filter(proportion_subjects_in_age_groups_MA,age_group=="6-9 mo")$nprop*nrow(sample_subids_3_6)))
-  
-  # check whether the MA has a 9-12 month age group
-  # if yes sample 9-12 month olds proportionally
-  if ("9-12 mo" %in% proportion_subjects_in_age_groups_MA$age_group) {
-    sample_subids_9_12 <- mb_data_tidy %>%
-      filter(age_group=="9-12 mo") %>%
-      distinct(subid_unique) %>%
-      slice_sample(
-        n=round(filter(proportion_subjects_in_age_groups_MA,age_group=="9-12 mo")$nprop*nrow(sample_subids_3_6)))
-    #subids to use for subsample
-    sample_subids <- bind_rows(sample_subids_3_6,sample_subids_6_9,sample_subids_9_12)
-    
-  } else {
-    #subids to use for subsample
-    sample_subids <- bind_rows(sample_subids_3_6,sample_subids_6_9)
-  }
-  
-  #select final age-matched sample
-  sample_ages_full <- mb_data_tidy %>%
-    filter(subid_unique %in% sample_subids$subid_unique)
-  
-  summary(sample_ages_full$age_days)
-  summary(dma$mean_age)
-  
-  #overview of the data and number of subjects per age group:
-  sample_ages_full %>%
-    group_by(age_group) %>%
-    summarise(n_distinct(subid_unique))
-  
-  sample_ages_full_subj_count <- sample_ages_full %>%
-    distinct(subid_unique,age_days)
-  
-  #show overlapping age plot - much better match than the "cutoff method" previously used
-  #the MB looks a bit more "peak-y" mainly because it does not have any participants in the 0-3 mo age range (which affects the peak of the density)
-  age_matching_plot <- ggplot() +
-    geom_density(data = dma, aes(x = mean_age,weight=n/sum(n), fill = "#FC4E07"), show.legend = T, 
-                 alpha = 0.8, color = "black") +
-    geom_density(data = sample_ages_full_subj_count, aes(x = age_days, fill = "steelblue"), 
-                 alpha = 0.8, color = "black") +
-    xlim(c(-50, 400)) +
-    xlab('Mean Age in Days') +
-    ylab('Density') +
-    scale_fill_manual(name = "", labels = c("Meta-analysis", "ManyBabies"), 
-                      values = c("#FC4E07", "steelblue")) +
-    ggtitle('Age-Matched Samples across MA and MB') +
-    theme_bw() +
-    theme(plot.title = element_text(hjust = 0.5, size=15),
-          legend.position = "right",
-          axis.text.x = element_text(size = 13),
-          axis.title.x = element_text(size = 13),
-          axis.text.y = element_text(size = 12),
-          axis.title.y = element_text(size = 13))
-  
-  #save plot for supplementary materials:
-  ggsave(plot = age_matching_plot, file = here('age_matching_plot.png'), height = 5, width = 8)
-  
-  mb_data_tidy <- sample_ages_full
-  
-  # retitle the dataset
-  MB_OUT_PATH <- paste(data.dir, "/mb_data_tidy_", n_trial_pairs_criterion/8, "_age_matched.csv", sep = "")
-}
-
-
 # tidy factors
 mb_data_tidy_fct <- mb_data_tidy %>%
   mutate_at(vars(lang1, 
@@ -206,7 +95,7 @@ es_by_study <- es_by_participant %>%
             d_z_var = d_var_calc(n, d_z)) %>%
    filter(n>9) %>% # Match ManyBabies1 dataset by adding this inclusion criterion
    filter(!is.na(d_z)) # MZ: I think this shouldn't be needed but keeping to be safe
-   
+
 # get study characteristics
 study_moderators <-  mb_data_tidy_fct %>%
   group_by(lab, age_group) %>%
@@ -232,6 +121,129 @@ mb_data <- full_join(es_by_study, study_moderators)
 methodological_vars <- read_csv(here("data/mb_methodological_variables.csv"))
 
 mb_data <- full_join(mb_data, methodological_vars)
+
+if (age.matched == TRUE) {
+  
+  mb_data <- mb_data %>%
+    unite(unique_study_id,lab,method,age_group,sep="_",remove=FALSE)
+  
+  # in main analysis, MB subjects were not well-matched with MA subjects
+  
+  # check mean age in MA: 248 days (median 186 days)
+  setwd(data.dir)
+  dma_original <- read_csv("ma_data_tidy.csv")
+  summary(dma_original$mean_age)
+  
+  #check mean age of subset MA data: 216 days (median 186 days)
+  dma_mb_ages <- read_csv("ma_data_tidy_mb_ages.csv")
+  summary(dma_mb_ages$mean_age)
+  #select subset MA restricted to MB age groups (3-15 months)
+  dma <- dma_mb_ages
+  
+  # without further restriction, mean age in MB is ~280-290 days
+  summary(mb_data$mean_age)
+  
+  # CC: proposal to carry out age matching; sample proportions from each age group.
+  #calculate proportion of subjects in MA:
+  proportion_subjects_in_age_groups_MA <- dma %>%
+    group_by(age_group) %>%
+    dplyr::summarise(n = sum(n), nprop = sum(n)/sum(dma$n))
+  
+  proportion_subjects_in_age_groups_MB <- mb_data %>%
+    ungroup() %>%
+    filter(!is.na(d_z)) %>%
+    mutate(total_n = sum(n,na.rm=TRUE)) %>%
+    group_by(age_group,total_n) %>%
+    dplyr::summarise(n = sum(n,na.rm=TRUE)) %>%
+    mutate(nprop = n/total_n)
+  
+  #sample MB dataset to include all subjects between 3 and 6 months and a proportional number
+  #of participants (to the MA) from infants between 6 and 9 months and 9 to 12 months.
+  
+  sample_studyids_3_6 <- mb_data %>%
+    filter(!is.na(d_z)) %>%
+    filter(age_group=="3-6 mo") %>%
+    ungroup() %>%
+    distinct(unique_study_id)
+  
+  set.seed(40)
+  
+  sample_studyids_6_9 <- mb_data %>%
+    ungroup() %>%
+    filter(!is.na(d_z)) %>%
+    filter(age_group=="6-9 mo") %>%
+    slice_sample(
+      n=round(filter(proportion_subjects_in_age_groups_MA,age_group=="6-9 mo")$nprop/filter(proportion_subjects_in_age_groups_MA,age_group=="3-6 mo")$nprop*nrow(sample_studyids_3_6))) %>%
+    distinct(unique_study_id)
+  
+  #current studyids to use for subsample
+  sample_studyids <- bind_rows(sample_studyids_3_6,sample_studyids_6_9)
+
+  
+  # check whether the MA has a 9-12 month age group
+  # if yes sample 9-12 month olds proportionally
+  if ("9-12 mo" %in% proportion_subjects_in_age_groups_MA$age_group) {
+    sample_studyids_9_12 <- mb_data %>%
+      ungroup() %>%
+      filter(!is.na(d_z)) %>%
+      filter(age_group=="9-12 mo") %>%
+      slice_sample(
+        n=round(filter(proportion_subjects_in_age_groups_MA,age_group=="9-12 mo")$nprop/filter(proportion_subjects_in_age_groups_MA,age_group=="3-6 mo")$nprop*nrow(sample_studyids_3_6))) %>%
+      distinct(unique_study_id)
+    #subids to use for subsample
+    sample_studyids <- bind_rows(sample_studyids,sample_studyids_9_12)
+  }
+  
+  # check whether the MA has a 12-15 month age group
+  # if yes sample 12-15 month olds proportionally
+  if ("12-15 mo" %in% proportion_subjects_in_age_groups_MA$age_group) {
+    sample_studyids_12_15 <- mb_data %>%
+      ungroup() %>%
+      filter(!is.na(d_z)) %>%
+      filter(age_group=="12-15 mo") %>%
+      slice_sample(
+        n=round(filter(proportion_subjects_in_age_groups_MA,age_group=="12-15 mo")$nprop/filter(proportion_subjects_in_age_groups_MA,age_group=="3-6 mo")$nprop*nrow(sample_studyids_3_6))) %>%
+      distinct(unique_study_id)
+    #subids to use for subsample
+    sample_studyids <- bind_rows(sample_studyids,sample_studyids_12_15)
+  }
+  
+  #select final age-matched sample
+  sample_ages_full <- mb_data %>%
+    filter(unique_study_id %in% sample_studyids$unique_study_id)
+  
+  summary(sample_ages_full$mean_age)
+  summary(dma$mean_age)
+  
+  #show overlapping age plot - much better match than the "cutoff method" previously used
+  #the MB looks a bit more "peak-y" mainly because it does not have any participants in the 0-3 mo age range (which affects the peak of the density)
+  age_matching_plot <- ggplot() +
+    geom_density(data = dma, aes(x = mean_age,weight=n/sum(n), fill = "#FC4E07"), show.legend = T, 
+                 alpha = 0.8, color = "black") +
+    geom_density(data = sample_ages_full, aes(x = mean_age,weight=n/sum(n), fill = "steelblue"), 
+                 alpha = 0.8, color = "black") +
+    xlim(c(-50, 500)) +
+    xlab('Mean Age in Days') +
+    ylab('Density') +
+    scale_fill_manual(name = "", labels = c("Meta-analysis", "ManyBabies"), 
+                      values = c("#FC4E07", "steelblue")) +
+    ggtitle('Age-Matched Samples across MA and MB') +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5, size=15),
+          legend.position = "right",
+          axis.text.x = element_text(size = 13),
+          axis.title.x = element_text(size = 13),
+          axis.text.y = element_text(size = 12),
+          axis.title.y = element_text(size = 13))
+  
+  #save plot for supplementary materials:
+  ggsave(plot = age_matching_plot, file = here('misc_figures',paste0("age_matching_plot_","prepped_with_",ma_version,'.png')), height = 5, width = 8)
+  
+  mb_data <- sample_ages_full
+  
+  # retitle the dataset
+  MB_OUT_PATH <- paste(data.dir, "/mb_data_tidy_", n_trial_pairs_criterion/8, "_age_matched.csv", sep = "")
+}
 
 write_csv(mb_data, MB_OUT_PATH)
 

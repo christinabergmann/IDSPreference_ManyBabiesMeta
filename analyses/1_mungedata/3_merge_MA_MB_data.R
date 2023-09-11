@@ -31,6 +31,7 @@ if ( ic.dataset == TRUE & age.matched == FALSE ) {
 }
 
 if ( ic.dataset == FALSE & age.matched == TRUE ) {
+  MA_DATA_PATH <- paste(data.dir, "ma_data_tidy_mb_ages.csv", sep = "/")
   MB_DATA_PATH = paste(data.dir, "mb_data_tidy_0.125_age_matched.csv", sep = "/")
   OUTFILE = paste(data.dir, "mb_ma_combined_0.125_age_matched.csv", sep = "/")
 }
