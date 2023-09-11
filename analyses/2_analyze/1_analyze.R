@@ -562,74 +562,26 @@ mod1Int <- robu(yi ~ isMeta_c+mean_agec_mos*isMeta_c+test_lang_c*isMeta_c+method
                                small = TRUE)
 mod1Int
 
-##refit model centered on replication or meta-analysis
-robu(yi ~ isMeta_rep+mean_agec_mos*isMeta_rep+test_lang_c*isMeta_rep+method_c*isMeta_rep, 
-     data = d, 
-     studynum = as.factor(study_id),
-     var.eff.size = vi,
-     modelweights = "HIER",
-     small = TRUE)
-robu(yi ~ isMeta_meta+mean_agec_mos*isMeta_meta+test_lang_c*isMeta_meta+method_c*isMeta_meta, 
-     data = d, 
-     studynum = as.factor(study_id),
-     var.eff.size = vi,
-     modelweights = "HIER",
-     small = TRUE)
-
 ## moderator interaction model
-est = mod1Int$b.r
-t2 = mod1Int$mod_info$tau.sq
-mu.lo = mod1Int$reg_table$CI.L
-mu.hi = mod1Int$reg_table$CI.U
-mu.se = mod1Int$reg_table$SE
-pval = mod1Int$reg_table$prob
-V = mod1Int$VR.r  # variance-covariance matrix
-est.rep = est[ mod1Int$labels == "X.Intercept."]
+mod1Int_results <- save_interaction_model_results(mod1Int, "mod1Int",d,digits)
 
-# rounded and formatted estimates for text
-# expects pval.cutoff to be a global var
-ests = round( est, 2 )
-pvals2 = format.pval(pval, eps = pval.cutoff)
+##refit model centered on replication or meta-analysis
+#use this just to inspect the pattern of results for MA vs. MLR
+mod1Int_rep <- robu(yi ~ isMeta_rep+mean_agec_mos*isMeta_rep+test_lang_c*isMeta_rep+method_c*isMeta_rep, 
+     data = d, 
+     studynum = as.factor(study_id),
+     var.eff.size = vi,
+     modelweights = "HIER",
+     small = TRUE)
+mod1Int_meta <-robu(yi ~ isMeta_meta+mean_agec_mos*isMeta_meta+test_lang_c*isMeta_meta+method_c*isMeta_meta, 
+     data = d, 
+     studynum = as.factor(study_id),
+     var.eff.size = vi,
+     modelweights = "HIER",
+     small = TRUE)
 
-# save results to csv file
-update_result_csv( name = paste("mod1Int", "tau"),
-                     value = round( sqrt(t2), 2 ) )
-update_result_csv( name = paste("mod1Int", "k"),
-                     value = nrow(mod1Int$data.full) )
-update_result_csv( name = paste("mod1Int", "n subj"),
-                     value = round( sum(d$n) ) )
-update_result_csv( name = paste( "mod1Int", "est", mod1Int$labels ),
-                     value = ests )
-update_result_csv( name = paste( "mod1Int", "lo", mod1Int$labels ),
-                     value = round(mu.lo, digits) )
-update_result_csv( name = paste( "mod1Int", "hi", mod1Int$labels ),
-                     value = round(mu.hi, digits) )
-update_result_csv( name = paste("mod1Int", "pval", mod1Int$labels ),
-                     value = pvals2 )
-
-mod1IntRes <-  data.frame(
-  est.rep = est.rep,
-  est.rep.lo = mu.lo[ mod1Int$labels == "X.Intercept." ],
-  est.rep.hi = mu.hi[ mod1Int$labels == "X.Intercept." ])
-
-CIs <-  format_CI( mu.lo,
-                   mu.hi )
-temp <-  data.frame( Moderator = mod1Int$labels, 
-                     EstCI = paste( ests, CIs, sep = " " ),
-                     Pval = pvals2 )
-# save results
-setwd(results.dir)
-if(!dir.exists("tables_to_prettify")){
-  dir.create("tables_to_prettify")
-  }
-setwd("tables_to_prettify")
-
-write.csv( temp,
-           paste("model_", "mod1Int", "_table.csv", sep = "" ),
-           row.names = FALSE)
-  
-# also print it as an xtable
-print( xtable(temp), include.rownames = FALSE)
+mod1Int_rep_results <- save_interaction_model_results(mod1Int_rep, "mod1Int_rep",d,digits)
+mod1Int_meta_results <- save_interaction_model_results(mod1Int_meta, "mod1Int_meta",d,digits)
 
 ## Create Plot of Results
 
@@ -683,6 +635,21 @@ p3 <- ggplot(d,aes(test_lang,yi,color=studyTypePretty))+
 p_final <- p1/(p2+p3) + plot_annotation(tag_levels = 'A')+theme(plot.tag = element_text(size = 20))
 
 my_ggsave(name="interaction_overview.pdf",width=12,height=9)
+
+## fit age-restricted model
+mb_age_groups <- c("3-6 mo","6-9 mo","9-12 mo","12-15 mo")
+d_age_restricted <- filter(d,age_group %in% mb_age_groups)
+
+mod1Int_age_restricted <- robu(yi ~ isMeta_c+mean_agec_mos*isMeta_c+test_lang_c*isMeta_c+method_c*isMeta_c, 
+                data = d_age_restricted, 
+                studynum = as.factor(study_id),
+                var.eff.size = vi,
+                modelweights = "HIER",
+                small = TRUE)
+mod1Int_age_restricted
+
+## moderator interaction model
+mod1Int_results <- save_interaction_model_results(mod1Int_age_restricted, "mod1Int_age_restricted",d_age_restricted,digits)
 
 # 2. DENSITY PLOT OF META-ANALYSIS VS. REPLICATION CALIBRATED ESTIMATES ------------------------------------------------------------------
 

@@ -445,3 +445,108 @@ Corr MA reportedSignif est,0.17,9
 Corr MA reportedSignif lo,0.02,9
 Corr MA reportedSignif hi,0.32,9
 Corr MA reportedSignif pval,0.034657,9
+mod1Int_age_restricted tau,0.27,1
+mod1Int_age_restricted k,188,1
+mod1Int_age_restricted n subj,3841,1
+mod1Int_age_restricted est X.Intercept.,0.34,1
+mod1Int_age_restricted est isMeta_c,0.03,1
+mod1Int_age_restricted est mean_agec_mos,0.02,1
+mod1Int_age_restricted est test_lang_c,0,1
+mod1Int_age_restricted est method_c,0.05,1
+mod1Int_age_restricted est isMeta_c.mean_agec_mos,-0.04,1
+mod1Int_age_restricted est isMeta_c.test_lang_c,-0.19,1
+mod1Int_age_restricted est isMeta_c.method_c,-0.36,1
+mod1Int_age_restricted lo X.Intercept.,0.24,1
+mod1Int_age_restricted lo isMeta_c,-0.16,1
+mod1Int_age_restricted lo mean_agec_mos,0,1
+mod1Int_age_restricted lo test_lang_c,-0.2,1
+mod1Int_age_restricted lo method_c,-0.1,1
+mod1Int_age_restricted lo isMeta_c.mean_agec_mos,-0.09,1
+mod1Int_age_restricted lo isMeta_c.test_lang_c,-0.58,1
+mod1Int_age_restricted lo isMeta_c.method_c,-0.67,1
+mod1Int_age_restricted hi X.Intercept.,0.44,1
+mod1Int_age_restricted hi isMeta_c,0.23,1
+mod1Int_age_restricted hi mean_agec_mos,0.05,1
+mod1Int_age_restricted hi test_lang_c,0.19,1
+mod1Int_age_restricted hi method_c,0.21,1
+mod1Int_age_restricted hi isMeta_c.mean_agec_mos,0,1
+mod1Int_age_restricted hi isMeta_c.test_lang_c,0.2,1
+mod1Int_age_restricted hi isMeta_c.method_c,-0.06,1
+mod1Int_age_restricted pval X.Intercept.,0.00011328,1
+mod1Int_age_restricted pval isMeta_c,0.69811661,1
+mod1Int_age_restricted pval mean_agec_mos,0.05492283,1
+mod1Int_age_restricted pval test_lang_c,0.98698438,1
+mod1Int_age_restricted pval method_c,0.48627811,1
+mod1Int_age_restricted pval isMeta_c.mean_agec_mos,0.06090287,1
+mod1Int_age_restricted pval isMeta_c.test_lang_c,0.26507274,1
+mod1Int_age_restricted pval isMeta_c.method_c,0.02139515,1
+mod1Int_rep tau,0.27,1
+mod1Int_rep k,214,1
+mod1Int_rep n subj,4261,1
+mod1Int_rep est X.Intercept.,0.32,1
+mod1Int_rep est isMeta_rep,0.03,1
+mod1Int_rep est mean_agec_mos,0.04,1
+mod1Int_rep est test_lang_c,0.09,1
+mod1Int_rep est method_c,0.24,1
+mod1Int_rep est isMeta_rep.mean_agec_mos,-0.04,1
+mod1Int_rep est isMeta_rep.test_lang_c,-0.18,1
+mod1Int_rep est isMeta_rep.method_c,-0.38,1
+mod1Int_rep lo X.Intercept.,0.26,1
+mod1Int_rep lo isMeta_rep,-0.14,1
+mod1Int_rep lo mean_agec_mos,0.02,1
+mod1Int_rep lo test_lang_c,-0.01,1
+mod1Int_rep lo method_c,0.13,1
+mod1Int_rep lo isMeta_rep.mean_agec_mos,-0.07,1
+mod1Int_rep lo isMeta_rep.test_lang_c,-0.52,1
+mod1Int_rep lo isMeta_rep.method_c,-0.63,1
+mod1Int_rep hi X.Intercept.,0.39,1
+mod1Int_rep hi isMeta_rep,0.2,1
+mod1Int_rep hi mean_agec_mos,0.07,1
+mod1Int_rep hi test_lang_c,0.2,1
+mod1Int_rep hi method_c,0.34,1
+mod1Int_rep hi isMeta_rep.mean_agec_mos,-0.02,1
+mod1Int_rep hi isMeta_rep.test_lang_c,0.15,1
+mod1Int_rep hi isMeta_rep.method_c,-0.12,1
+mod1Int_rep pval X.Intercept.,< 0.0001,1
+mod1Int_rep pval isMeta_rep,0.65570063,1
+mod1Int_rep pval mean_agec_mos,0.00036602,1
+mod1Int_rep pval test_lang_c,0.08341173,1
+mod1Int_rep pval method_c,< 0.0001,1
+mod1Int_rep pval isMeta_rep.mean_agec_mos,0.00248745,1
+mod1Int_rep pval isMeta_rep.test_lang_c,0.21408648,1
+mod1Int_rep pval isMeta_rep.method_c,0.00492674,1
+mod1Int_meta tau,0.27,1
+mod1Int_meta k,214,1
+mod1Int_meta n subj,4261,1
+mod1Int_meta est X.Intercept.,0.35,1
+mod1Int_meta est isMeta_meta,0.03,1
+mod1Int_meta est mean_agec_mos,0,1
+mod1Int_meta est test_lang_c,-0.09,1
+mod1Int_meta est method_c,-0.14,1
+mod1Int_meta est isMeta_meta.mean_agec_mos,-0.04,1
+mod1Int_meta est isMeta_meta.test_lang_c,-0.18,1
+mod1Int_meta est isMeta_meta.method_c,-0.38,1
+mod1Int_meta lo X.Intercept.,0.16,1
+mod1Int_meta lo isMeta_meta,-0.14,1
+mod1Int_meta lo mean_agec_mos,-0.02,1
+mod1Int_meta lo test_lang_c,-0.5,1
+mod1Int_meta lo method_c,-0.39,1
+mod1Int_meta lo isMeta_meta.mean_agec_mos,-0.07,1
+mod1Int_meta lo isMeta_meta.test_lang_c,-0.52,1
+mod1Int_meta lo isMeta_meta.method_c,-0.63,1
+mod1Int_meta hi X.Intercept.,0.55,1
+mod1Int_meta hi isMeta_meta,0.2,1
+mod1Int_meta hi mean_agec_mos,0.02,1
+mod1Int_meta hi test_lang_c,0.32,1
+mod1Int_meta hi method_c,0.11,1
+mod1Int_meta hi isMeta_meta.mean_agec_mos,-0.02,1
+mod1Int_meta hi isMeta_meta.test_lang_c,0.15,1
+mod1Int_meta hi isMeta_meta.method_c,-0.12,1
+mod1Int_meta pval X.Intercept.,0.0111133,1
+mod1Int_meta pval isMeta_meta,0.6557006,1
+mod1Int_meta pval mean_agec_mos,0.8167092,1
+mod1Int_meta pval test_lang_c,0.5064701,1
+mod1Int_meta pval method_c,0.2412973,1
+mod1Int_meta pval isMeta_meta.mean_agec_mos,0.0024874,1
+mod1Int_meta pval isMeta_meta.test_lang_c,0.2140865,1
+mod1Int_meta pval isMeta_meta.method_c,0.0049267,1

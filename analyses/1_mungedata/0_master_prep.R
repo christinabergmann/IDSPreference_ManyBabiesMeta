@@ -32,7 +32,6 @@ for (ma_version in c("Dunst_original","Dunst_corrected","augmented_ma_extended")
 # only .125 and .75 are used in analyses
 criteria.vec = c(.125, .25, .5, .75)*8
 
-
 # even though this part of script preps the MB data,
 #  depends on MA version because of age-matching
 for (ma_version in c("Dunst_original","Dunst_corrected","augmented_ma_extended")) {

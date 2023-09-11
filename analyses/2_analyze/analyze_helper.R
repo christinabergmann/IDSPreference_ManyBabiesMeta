@@ -1209,3 +1209,66 @@ svalue_2 = function( yi,
   
 }
 
+
+# Saving Interaction Model Results -----------------------------------------
+
+#helper function bundling the summary of the regression results for the interaction model
+#of the MA vs. MLR
+save_interaction_model_results <- function(model, model_name,dataset, digits) {
+  est <- model$b.r
+  t2 <-  model$mod_info$tau.sq
+  mu.lo <-  model$reg_table$CI.L
+  mu.hi <- model$reg_table$CI.U
+  mu.se <- model$reg_table$SE
+  pval <- model$reg_table$prob
+  V <- model$VR.r  # variance-covariance matrix
+  
+  # rounded and formatted estimates for text
+  # expects pval.cutoff to be a global var
+  ests = round( est, 2 )
+  pvals2 = format.pval(pval, eps = pval.cutoff)
+  
+  # save results to csv file
+  update_result_csv( name = paste(model_name, "tau"),
+                     value = round( sqrt(t2), 2 ) )
+  update_result_csv( name = paste(model_name, "k"),
+                     value = nrow(model$data.full) )
+  update_result_csv( name = paste(model_name, "n subj"),
+                     value = round( sum(dataset$n) ) )
+  update_result_csv( name = paste( model_name, "est", model$labels ),
+                     value = ests )
+  update_result_csv( name = paste( model_name, "lo", model$labels ),
+                     value = round(mu.lo, digits) )
+  update_result_csv( name = paste(model_name, "hi", model$labels ),
+                     value = round(mu.hi, digits) )
+  update_result_csv( name = paste(model_name, "pval", model$labels ),
+                     value = pvals2 )
+  
+  #save overall estimate
+  overall_estimate <- data.frame(
+    est.rep = est[ model$labels == "X.Intercept."],
+    est.rep.lo = mu.lo[ model$labels == "X.Intercept." ],
+    est.rep.hi = mu.hi[ model$labels == "X.Intercept." ])
+  
+  #save results as pretty table
+  CIs <-  format_CI( mu.lo,
+                     mu.hi )
+  temp <-  data.frame( Moderator = model$labels, 
+                       EstCI = paste( ests, CIs, sep = " " ),
+                       Pval = pvals2 )
+  # save results
+  setwd(results.dir)
+  if(!dir.exists("tables_to_prettify")){
+    dir.create("tables_to_prettify")
+  }
+  setwd("tables_to_prettify")
+  
+  write.csv( temp,
+             paste("model_", model_name, "_table.csv", sep = "" ),
+             row.names = FALSE)
+  
+  # also print it as an xtable
+  print( xtable(temp), include.rownames = FALSE)
+  
+  return(temp)
+}
