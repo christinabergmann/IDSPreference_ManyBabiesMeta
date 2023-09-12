@@ -1,7 +1,7 @@
 name,value,section
 m ests MA,51,1
-m ests MB,104,1
-m ests total,155,1
+m ests MB,102,1
+m ests total,153,1
 k studies MA,16,1
 k studies MB,62,1
 median n MA,20,1
@@ -18,86 +18,226 @@ MA subset naive lo X.Intercept.,0.38,2
 MA subset naive hi X.Intercept.,0.95,2
 MA subset naive pval X.Intercept.,0.00033226,2
 Reps subset naive tau,0.11,2
-Reps subset naive k,104,2
-Reps subset naive n subj,2139,2
-Reps subset naive est X.Intercept.,0.35,2
-Reps subset naive lo X.Intercept.,0.28,2
-Reps subset naive hi X.Intercept.,0.43,2
+Reps subset naive k,102,2
+Reps subset naive n subj,2004,2
+Reps subset naive est X.Intercept.,0.34,2
+Reps subset naive lo X.Intercept.,0.27,2
+Reps subset naive hi X.Intercept.,0.42,2
 Reps subset naive pval X.Intercept.,< 0.0001,2
-NAIVE tau,0.31,2
-NAIVE k,155,2
-NAIVE n subj,3201,2
-NAIVE est X.Intercept.,0.35,2
-NAIVE est isMetaTRUE,0.28,2
-NAIVE lo X.Intercept.,0.28,2
-NAIVE lo isMetaTRUE,0.02,2
-NAIVE hi X.Intercept.,0.43,2
-NAIVE hi isMetaTRUE,0.55,2
+NAIVE tau,0.32,2
+NAIVE k,153,2
+NAIVE n subj,3066,2
+NAIVE est X.Intercept.,0.34,2
+NAIVE est isMetaTRUE,0.29,2
+NAIVE lo X.Intercept.,0.27,2
+NAIVE lo isMetaTRUE,0.03,2
+NAIVE hi X.Intercept.,0.42,2
+NAIVE hi isMetaTRUE,0.56,2
 NAIVE pval X.Intercept.,< 0.0001,2
-NAIVE pval isMetaTRUE,0.037111,2
+NAIVE pval isMetaTRUE,0.032091,2
 NAIVE avg for meta,0.64,2
 NAIVE avg lo for meta,0.37,2
 NAIVE avg hi for meta,0.91,2
 NAIVE avg pval for meta,3e-04,2
 MOD1 tau,0.29,1
-MOD1 k,155,1
-MOD1 n subj,3201,1
-MOD1 est X.Intercept.,0.13,1
+MOD1 k,153,1
+MOD1 n subj,3066,1
+MOD1 est X.Intercept.,0.14,1
 MOD1 est isMetaTRUE,0.45,1
 MOD1 est mean_agec_mos,0.05,1
-MOD1 est test_langb.nonnative,-0.09,1
-MOD1 est test_langc.artificial,-0.45,1
+MOD1 est test_langb.nonnative,-0.1,1
+MOD1 est test_langc.artificial,-0.46,1
 MOD1 est methodb.hpp,0.11,1
-MOD1 est methodc.other,0.59,1
+MOD1 est methodc.other,0.6,1
 MOD1 est speech_typeb.naturalistic,0.11,1
 MOD1 est speech_typec.filtered.synthesized,-0.19,1
-MOD1 est own_motherb.yes,-0.75,1
+MOD1 est own_motherb.yes,-0.76,1
 MOD1 est presentationb.video.recording,0.03,1
 MOD1 est dependent_measureb.affect,0.17,1
 MOD1 est main_question_ids_preferenceb.no,-0.22,1
 MOD1 lo X.Intercept.,-0.07,1
 MOD1 lo isMetaTRUE,0.02,1
 MOD1 lo mean_agec_mos,0.02,1
-MOD1 lo test_langb.nonnative,-0.2,1
+MOD1 lo test_langb.nonnative,-0.21,1
 MOD1 lo test_langc.artificial,-2.4,1
-MOD1 lo methodb.hpp,-0.21,1
+MOD1 lo methodb.hpp,-0.22,1
 MOD1 lo methodc.other,-1.19,1
 MOD1 lo speech_typeb.naturalistic,-0.8,1
 MOD1 lo speech_typec.filtered.synthesized,-0.64,1
 MOD1 lo own_motherb.yes,-1.97,1
-MOD1 lo presentationb.video.recording,-0.98,1
+MOD1 lo presentationb.video.recording,-0.97,1
 MOD1 lo dependent_measureb.affect,-0.6,1
 MOD1 lo main_question_ids_preferenceb.no,-1.05,1
 MOD1 hi X.Intercept.,0.34,1
 MOD1 hi isMetaTRUE,0.88,1
 MOD1 hi mean_agec_mos,0.07,1
-MOD1 hi test_langb.nonnative,0.02,1
-MOD1 hi test_langc.artificial,1.49,1
-MOD1 hi methodb.hpp,0.42,1
+MOD1 hi test_langb.nonnative,0.01,1
+MOD1 hi test_langc.artificial,1.48,1
+MOD1 hi methodb.hpp,0.43,1
 MOD1 hi methodc.other,2.38,1
-MOD1 hi speech_typeb.naturalistic,1.02,1
-MOD1 hi speech_typec.filtered.synthesized,0.27,1
-MOD1 hi own_motherb.yes,0.48,1
+MOD1 hi speech_typeb.naturalistic,1.03,1
+MOD1 hi speech_typec.filtered.synthesized,0.26,1
+MOD1 hi own_motherb.yes,0.46,1
 MOD1 hi presentationb.video.recording,1.03,1
 MOD1 hi dependent_measureb.affect,0.95,1
-MOD1 hi main_question_ids_preferenceb.no,0.6,1
-MOD1 pval X.Intercept.,0.18701825,1
-MOD1 pval isMetaTRUE,0.04123643,1
-MOD1 pval mean_agec_mos,0.00051226,1
-MOD1 pval test_langb.nonnative,0.12076311,1
-MOD1 pval test_langc.artificial,0.40139770,1
-MOD1 pval methodb.hpp,0.48449450,1
-MOD1 pval methodc.other,0.30149666,1
-MOD1 pval speech_typeb.naturalistic,0.7583615,1
-MOD1 pval speech_typec.filtered.synthesized,0.3772746,1
-MOD1 pval own_motherb.yes,0.1303712,1
-MOD1 pval presentationb.video.recording,0.9432423,1
-MOD1 pval dependent_measureb.affect,0.2827920,1
-MOD1 pval main_question_ids_preferenceb.no,0.5195254,1
+MOD1 hi main_question_ids_preferenceb.no,0.61,1
+MOD1 pval X.Intercept.,0.18811815,1
+MOD1 pval isMetaTRUE,0.04134880,1
+MOD1 pval mean_agec_mos,0.00052057,1
+MOD1 pval test_langb.nonnative,0.06854283,1
+MOD1 pval test_langc.artificial,0.39944047,1
+MOD1 pval methodb.hpp,0.50575942,1
+MOD1 pval methodc.other,0.30028134,1
+MOD1 pval speech_typeb.naturalistic,0.7492212,1
+MOD1 pval speech_typec.filtered.synthesized,0.3739142,1
+MOD1 pval own_motherb.yes,0.1267261,1
+MOD1 pval presentationb.video.recording,0.9371505,1
+MOD1 pval dependent_measureb.affect,0.2817760,1
+MOD1 pval main_question_ids_preferenceb.no,0.5205347,1
 MOD1 avg for meta,0.58,1
 MOD1 avg lo for meta,0.29,1
 MOD1 avg hi for meta,0.88,1
 MOD1 avg pval for meta,1e-03,1
+mod1Int tau,0.28,1
+mod1Int k,153,1
+mod1Int n subj,3066,1
+mod1Int est X.Intercept.,0.32,1
+mod1Int est isMeta_c,0.31,1
+mod1Int est mean_agec_mos,0.07,1
+mod1Int est test_lang_c,0.12,1
+mod1Int est method_c,-0.09,1
+mod1Int est isMeta_c.mean_agec_mos,0.04,1
+mod1Int est isMeta_c.test_lang_c,0.05,1
+mod1Int est isMeta_c.method_c,-0.65,1
+mod1Int lo X.Intercept.,-0.05,1
+mod1Int lo isMeta_c,-0.45,1
+mod1Int lo mean_agec_mos,0.01,1
+mod1Int lo test_lang_c,-0.2,1
+mod1Int lo method_c,-0.87,1
+mod1Int lo isMeta_c.mean_agec_mos,-0.07,1
+mod1Int lo isMeta_c.test_lang_c,-0.59,1
+mod1Int lo isMeta_c.method_c,-2.2,1
+mod1Int hi X.Intercept.,0.7,1
+mod1Int hi isMeta_c,1.06,1
+mod1Int hi mean_agec_mos,0.12,1
+mod1Int hi test_lang_c,0.44,1
+mod1Int hi method_c,0.69,1
+mod1Int hi isMeta_c.mean_agec_mos,0.16,1
+mod1Int hi isMeta_c.test_lang_c,0.69,1
+mod1Int hi isMeta_c.method_c,0.9,1
+mod1Int pval X.Intercept.,0.081125,1
+mod1Int pval isMeta_c,0.355544,1
+mod1Int pval mean_agec_mos,0.025138,1
+mod1Int pval test_lang_c,0.273987,1
+mod1Int pval method_c,0.783117,1
+mod1Int pval isMeta_c.mean_agec_mos,0.398431,1
+mod1Int pval isMeta_c.test_lang_c,0.785840,1
+mod1Int pval isMeta_c.method_c,0.336002,1
+mod1Int_rep tau,0.28,1
+mod1Int_rep k,153,1
+mod1Int_rep n subj,3066,1
+mod1Int_rep est X.Intercept.,0.17,1
+mod1Int_rep est isMeta_rep,0.31,1
+mod1Int_rep est mean_agec_mos,0.04,1
+mod1Int_rep est test_lang_c,0.09,1
+mod1Int_rep est method_c,0.24,1
+mod1Int_rep est isMeta_rep.mean_agec_mos,0.04,1
+mod1Int_rep est isMeta_rep.test_lang_c,0.05,1
+mod1Int_rep est isMeta_rep.method_c,-0.65,1
+mod1Int_rep lo X.Intercept.,0.04,1
+mod1Int_rep lo isMeta_rep,-0.45,1
+mod1Int_rep lo mean_agec_mos,0.02,1
+mod1Int_rep lo test_lang_c,-0.01,1
+mod1Int_rep lo method_c,0.13,1
+mod1Int_rep lo isMeta_rep.mean_agec_mos,-0.07,1
+mod1Int_rep lo isMeta_rep.test_lang_c,-0.59,1
+mod1Int_rep lo isMeta_rep.method_c,-2.2,1
+mod1Int_rep hi X.Intercept.,0.3,1
+mod1Int_rep hi isMeta_rep,1.06,1
+mod1Int_rep hi mean_agec_mos,0.07,1
+mod1Int_rep hi test_lang_c,0.2,1
+mod1Int_rep hi method_c,0.34,1
+mod1Int_rep hi isMeta_rep.mean_agec_mos,0.16,1
+mod1Int_rep hi isMeta_rep.test_lang_c,0.69,1
+mod1Int_rep hi isMeta_rep.method_c,0.9,1
+mod1Int_rep pval X.Intercept.,0.01045239,1
+mod1Int_rep pval isMeta_rep,0.35554417,1
+mod1Int_rep pval mean_agec_mos,0.00036663,1
+mod1Int_rep pval test_lang_c,0.08479784,1
+mod1Int_rep pval method_c,< 0.0001,1
+mod1Int_rep pval isMeta_rep.mean_agec_mos,0.39843134,1
+mod1Int_rep pval isMeta_rep.test_lang_c,0.78583978,1
+mod1Int_rep pval isMeta_rep.method_c,0.33600161,1
+mod1Int_meta tau,0.28,1
+mod1Int_meta k,153,1
+mod1Int_meta n subj,3066,1
+mod1Int_meta est X.Intercept.,0.48,1
+mod1Int_meta est isMeta_meta,0.31,1
+mod1Int_meta est mean_agec_mos,0.09,1
+mod1Int_meta est test_lang_c,0.14,1
+mod1Int_meta est method_c,-0.41,1
+mod1Int_meta est isMeta_meta.mean_agec_mos,0.04,1
+mod1Int_meta est isMeta_meta.test_lang_c,0.05,1
+mod1Int_meta est isMeta_meta.method_c,-0.65,1
+mod1Int_meta lo X.Intercept.,-0.62,1
+mod1Int_meta lo isMeta_meta,-0.45,1
+mod1Int_meta lo mean_agec_mos,-0.03,1
+mod1Int_meta lo test_lang_c,-0.81,1
+mod1Int_meta lo method_c,-2.3,1
+mod1Int_meta lo isMeta_meta.mean_agec_mos,-0.07,1
+mod1Int_meta lo isMeta_meta.test_lang_c,-0.59,1
+mod1Int_meta lo isMeta_meta.method_c,-2.2,1
+mod1Int_meta hi X.Intercept.,1.58,1
+mod1Int_meta hi isMeta_meta,1.06,1
+mod1Int_meta hi mean_agec_mos,0.21,1
+mod1Int_meta hi test_lang_c,1.1,1
+mod1Int_meta hi method_c,1.47,1
+mod1Int_meta hi isMeta_meta.mean_agec_mos,0.16,1
+mod1Int_meta hi isMeta_meta.test_lang_c,0.69,1
+mod1Int_meta hi isMeta_meta.method_c,0.9,1
+mod1Int_meta pval X.Intercept.,0.23212,1
+mod1Int_meta pval isMeta_meta,0.35554,1
+mod1Int_meta pval mean_agec_mos,0.12036,1
+mod1Int_meta pval test_lang_c,0.48332,1
+mod1Int_meta pval method_c,0.54489,1
+mod1Int_meta pval isMeta_meta.mean_agec_mos,0.39843,1
+mod1Int_meta pval isMeta_meta.test_lang_c,0.78584,1
+mod1Int_meta pval isMeta_meta.method_c,0.33600,1
+mod1Int_age_restricted tau,0.25,1
+mod1Int_age_restricted k,141,1
+mod1Int_age_restricted n subj,2850,1
+mod1Int_age_restricted est X.Intercept.,0.31,1
+mod1Int_age_restricted est isMeta_c,0.29,1
+mod1Int_age_restricted est mean_agec_mos,0.08,1
+mod1Int_age_restricted est test_lang_c,0.11,1
+mod1Int_age_restricted est method_c,-0.09,1
+mod1Int_age_restricted est isMeta_c.mean_agec_mos,0.06,1
+mod1Int_age_restricted est isMeta_c.test_lang_c,0.03,1
+mod1Int_age_restricted est isMeta_c.method_c,-0.64,1
+mod1Int_age_restricted lo X.Intercept.,-0.08,1
+mod1Int_age_restricted lo isMeta_c,-0.5,1
+mod1Int_age_restricted lo mean_agec_mos,-0.04,1
+mod1Int_age_restricted lo test_lang_c,-0.23,1
+mod1Int_age_restricted lo method_c,-0.86,1
+mod1Int_age_restricted lo isMeta_c.mean_agec_mos,-0.17,1
+mod1Int_age_restricted lo isMeta_c.test_lang_c,-0.64,1
+mod1Int_age_restricted lo isMeta_c.method_c,-2.19,1
+mod1Int_age_restricted hi X.Intercept.,0.71,1
+mod1Int_age_restricted hi isMeta_c,1.08,1
+mod1Int_age_restricted hi mean_agec_mos,0.19,1
+mod1Int_age_restricted hi test_lang_c,0.44,1
+mod1Int_age_restricted hi method_c,0.69,1
+mod1Int_age_restricted hi isMeta_c.mean_agec_mos,0.3,1
+mod1Int_age_restricted hi isMeta_c.test_lang_c,0.69,1
+mod1Int_age_restricted hi isMeta_c.method_c,0.91,1
+mod1Int_age_restricted pval X.Intercept.,0.10097,1
+mod1Int_age_restricted pval isMeta_c,0.40673,1
+mod1Int_age_restricted pval mean_agec_mos,0.14380,1
+mod1Int_age_restricted pval test_lang_c,0.34721,1
+mod1Int_age_restricted pval method_c,0.79057,1
+mod1Int_age_restricted pval isMeta_c.mean_agec_mos,0.49355,1
+mod1Int_age_restricted pval isMeta_c.test_lang_c,0.90250,1
+mod1Int_age_restricted pval isMeta_c.method_c,0.34252,1
 MA subset mods tau,0.55,1
 MA subset mods k,51,1
 MA subset mods n subj,1062,1
@@ -126,30 +266,31 @@ MA subset mods pval test_langc.artificial,0.3362166,1
 MA subset mods pval methodb.hpp,0.5830986,1
 MA subset mods pval methodc.other,0.2996742,1
 Reps subset mods tau,0,1
-Reps subset mods k,104,1
-Reps subset mods n subj,2139,1
+Reps subset mods k,102,1
+Reps subset mods n subj,2004,1
 Reps subset mods est X.Intercept.,0.1,1
-Reps subset mods est mean_agec_mos,0.05,1
-Reps subset mods est test_langb.nonnative,-0.08,1
+Reps subset mods est mean_agec_mos,0.04,1
+Reps subset mods est test_langb.nonnative,-0.1,1
 Reps subset mods est methodb.hpp,0.22,1
 Reps subset mods lo X.Intercept.,-0.05,1
 Reps subset mods lo mean_agec_mos,0.02,1
-Reps subset mods lo test_langb.nonnative,-0.19,1
+Reps subset mods lo test_langb.nonnative,-0.21,1
 Reps subset mods lo methodb.hpp,0.12,1
 Reps subset mods hi X.Intercept.,0.25,1
 Reps subset mods hi mean_agec_mos,0.07,1
-Reps subset mods hi test_langb.nonnative,0.04,1
-Reps subset mods hi methodb.hpp,0.32,1
-Reps subset mods pval X.Intercept.,0.18966468,1
-Reps subset mods pval mean_agec_mos,0.00029046,1
-Reps subset mods pval test_langb.nonnative,0.19337149,1
-Reps subset mods pval methodb.hpp,0.00014863,1
+Reps subset mods hi test_langb.nonnative,0,1
+Reps subset mods hi methodb.hpp,0.33,1
+Reps subset mods pval X.Intercept.,0.17680458,1
+Reps subset mods pval mean_agec_mos,0.00032137,1
+Reps subset mods pval test_langb.nonnative,0.05959164,1
+Reps subset mods pval methodb.hpp,0.00011699,1
 MA k nonaffirmative,23,4
 MA k affirmative,28,4
 weightr mu ,0.62,4
 weightr mu lo,0.34,4
 weightr mu hi,0.89,4
 weightr mu pval,< 0.0001,4
+weightr selection ratio,1.24067131337381,4
 Worst mu ,0.16,4
 Worst mu lo,-0.01,4
 Worst mu hi,0.33,4
@@ -179,28 +320,28 @@ matched k total,11,6
 matched k from MA,3,6
 matched k from R,8,6
 matched age diff mos,-0.371833708157241,6
-pre-matching age diff mos,4.654646179253,6
+pre-matching age diff mos,4.64034242497535,6
 matched subclass 1 isMeta FALSE k,6,6
 matched subclass 1 isMeta TRUE k,1,6
 matched subclass 2 isMeta FALSE k,2,6
 matched subclass 2 isMeta TRUE k,2,6
-pre-matching mean_age mos,7.86210895942384,6
+pre-matching mean_age mos,7.83255313967206,6
 matched mean_age mos subclass 1,4.14547451276148,6
 matched mean_age mos subclass 2,5.56475499970901,6
-IPW robu est X.Intercept.,0.415799196432835,6
-IPW robu est isMetaTRUE,0.353900288813189,6
-IPW robu lo X.Intercept.,0.28,6
-IPW robu lo isMetaTRUE,-0.08,6
+IPW robu est X.Intercept.,0.408241862398704,6
+IPW robu est isMetaTRUE,0.361457622847325,6
+IPW robu lo X.Intercept.,0.27,6
+IPW robu lo isMetaTRUE,-0.07,6
 IPW robu hi X.Intercept.,0.55,6
-IPW robu hi isMetaTRUE,0.79,6
-IPW robu pval X.Intercept.,0.0000144905149541685,6
-IPW robu pval isMetaTRUE,0.104716068324987,6
-Reps subset naiveIC tau,0.05,8
-Reps subset naiveIC k,56,8
-Reps subset naiveIC n subj,1060,8
-Reps subset naiveIC est X.Intercept.,0.44,8
-Reps subset naiveIC lo X.Intercept.,0.33,8
-Reps subset naiveIC hi X.Intercept.,0.55,8
+IPW robu hi isMetaTRUE,0.8,6
+IPW robu pval X.Intercept.,0.000023440228219318,6
+IPW robu pval isMetaTRUE,0.098978123067754,6
+Reps subset naiveIC tau,0.06,8
+Reps subset naiveIC k,54,8
+Reps subset naiveIC n subj,952,8
+Reps subset naiveIC est X.Intercept.,0.42,8
+Reps subset naiveIC lo X.Intercept.,0.31,8
+Reps subset naiveIC hi X.Intercept.,0.53,8
 Reps subset naiveIC pval X.Intercept.,< 0.0001,8
 Meta subset naiveIC tau,0.51,8
 Meta subset naiveIC k,51,8
@@ -209,130 +350,130 @@ Meta subset naiveIC est X.Intercept.,0.67,8
 Meta subset naiveIC lo X.Intercept.,0.38,8
 Meta subset naiveIC hi X.Intercept.,0.95,8
 Meta subset naiveIC pval X.Intercept.,0.00033226,8
-naiveIC tau,0.37,8
-naiveIC k,107,8
-naiveIC n subj,2122,8
+naiveIC tau,0.38,8
+naiveIC k,105,8
+naiveIC n subj,2014,8
 naiveIC est X.Intercept.,0.44,8
-naiveIC est isMetaTRUE,0.2,8
-naiveIC lo X.Intercept.,0.33,8
-naiveIC lo isMetaTRUE,-0.08,8
-naiveIC hi X.Intercept.,0.56,8
-naiveIC hi isMetaTRUE,0.48,8
-naiveIC pval X.Intercept.,< 0.0001,8
-naiveIC pval isMetaTRUE,0.15149,8
+naiveIC est isMetaTRUE,0.21,8
+naiveIC lo X.Intercept.,0.32,8
+naiveIC lo isMetaTRUE,-0.07,8
+naiveIC hi X.Intercept.,0.55,8
+naiveIC hi isMetaTRUE,0.49,8
+naiveIC pval X.Intercept.,<0.0001,8
+naiveIC pval isMetaTRUE,0.1344,8
 naiveIC avg for meta,0.65,8
 naiveIC avg lo for meta,0.37,8
 naiveIC avg hi for meta,0.92,8
 naiveIC avg pval for meta,3e-04,8
-modIC tau,0.37,8
-modIC k,107,8
-modIC n subj,2122,8
+modIC tau,0.38,8
+modIC k,105,8
+modIC n subj,2014,8
 modIC est X.Intercept.,0.34,8
 modIC est isMetaTRUE,0.3,8
 modIC est mean_agec_mos,0.06,8
-modIC est test_langb.nonnative,-0.2,8
-modIC est test_langc.artificial,-0.48,8
+modIC est test_langb.nonnative,-0.22,8
+modIC est test_langc.artificial,-0.49,8
 modIC est methodb.hpp,-0.03,8
 modIC est methodc.other,0.6,8
-modIC lo X.Intercept.,-0.03,8
+modIC lo X.Intercept.,-0.04,8
 modIC lo isMetaTRUE,-0.25,8
 modIC lo mean_agec_mos,0.02,8
-modIC lo test_langb.nonnative,-0.4,8
-modIC lo test_langc.artificial,-2.31,8
-modIC lo methodb.hpp,-0.52,8
-modIC lo methodc.other,-1.07,8
-modIC hi X.Intercept.,0.71,8
+modIC lo test_langb.nonnative,-0.43,8
+modIC lo test_langc.artificial,-2.32,8
+modIC lo methodb.hpp,-0.54,8
+modIC lo methodc.other,-1.06,8
+modIC hi X.Intercept.,0.72,8
 modIC hi isMetaTRUE,0.84,8
 modIC hi mean_agec_mos,0.09,8
-modIC hi test_langb.nonnative,0,8
-modIC hi test_langc.artificial,1.35,8
-modIC hi methodb.hpp,0.45,8
+modIC hi test_langb.nonnative,-0.01,8
+modIC hi test_langc.artificial,1.34,8
+modIC hi methodb.hpp,0.47,8
 modIC hi methodc.other,2.27,8
-modIC pval X.Intercept.,0.0710567,8
-modIC pval isMetaTRUE,0.2571203,8
-modIC pval mean_agec_mos,0.0067673,8
-modIC pval test_langb.nonnative,0.0466364,8
-modIC pval test_langc.artificial,0.3719682,8
-modIC pval methodb.hpp,0.8898732,8
-modIC pval methodc.other,0.2886606,8
-modIC avg for meta,0.63,8
+modIC pval X.Intercept.,0.0762025,8
+modIC pval isMetaTRUE,0.2607100,8
+modIC pval mean_agec_mos,0.0073627,8
+modIC pval test_langb.nonnative,0.0374929,8
+modIC pval test_langc.artificial,0.3687995,8
+modIC pval methodb.hpp,0.8882622,8
+modIC pval methodc.other,0.2864279,8
+modIC avg for meta,0.64,8
 modIC avg lo for meta,0.37,8
 modIC avg hi for meta,0.9,8
-modIC avg pval for meta,4e-04,8
-mean mean_agec_mos drage,0.0497212806594617,9
-mean mean_age mos drage,4.8,9
+modIC avg pval for meta,3e-04,8
+mean mean_agec_mos drage,-0.587286377357876,9
+mean mean_age mos drage,5.2,9
 mean mean_age mos dma,4.7,9
-Reps subset naiveageMatch tau,0.21,9
-Reps subset naiveageMatch k,15,9
-Reps subset naiveageMatch n subj,285,9
-Reps subset naiveageMatch est X.Intercept.,0.18,9
-Reps subset naiveageMatch lo X.Intercept.,-0.05,9
-Reps subset naiveageMatch hi X.Intercept.,0.4,9
-Reps subset naiveageMatch pval X.Intercept.,0.11617,9
-Meta subset naiveageMatch tau,0.51,9
-Meta subset naiveageMatch k,51,9
-Meta subset naiveageMatch n subj,1062,9
-Meta subset naiveageMatch est X.Intercept.,0.67,9
-Meta subset naiveageMatch lo X.Intercept.,0.38,9
-Meta subset naiveageMatch hi X.Intercept.,0.95,9
-Meta subset naiveageMatch pval X.Intercept.,0.00033226,9
+Reps subset naiveageMatch tau,0.14,9
+Reps subset naiveageMatch k,18,9
+Reps subset naiveageMatch n subj,332,9
+Reps subset naiveageMatch est X.Intercept.,0.19,9
+Reps subset naiveageMatch lo X.Intercept.,-0.01,9
+Reps subset naiveageMatch hi X.Intercept.,0.38,9
+Reps subset naiveageMatch pval X.Intercept.,0.060674,9
+Meta subset naiveageMatch tau,0.53,9
+Meta subset naiveageMatch k,39,9
+Meta subset naiveageMatch n subj,846,9
+Meta subset naiveageMatch est X.Intercept.,0.73,9
+Meta subset naiveageMatch lo X.Intercept.,0.33,9
+Meta subset naiveageMatch hi X.Intercept.,1.12,9
+Meta subset naiveageMatch pval X.Intercept.,0.0030454,9
 naiveageMatch tau,0.46,9
-naiveageMatch k,66,9
-naiveageMatch n subj,1347,9
-naiveageMatch est X.Intercept.,0.18,9
-naiveageMatch est isMetaTRUE,0.48,9
-naiveageMatch lo X.Intercept.,-0.04,9
+naiveageMatch k,57,9
+naiveageMatch n subj,1178,9
+naiveageMatch est X.Intercept.,0.19,9
+naiveageMatch est isMetaTRUE,0.52,9
+naiveageMatch lo X.Intercept.,0.01,9
 naiveageMatch lo isMetaTRUE,0.14,9
-naiveageMatch hi X.Intercept.,0.4,9
-naiveageMatch hi isMetaTRUE,0.82,9
-naiveageMatch pval X.Intercept.,0.1019287,9
-naiveageMatch pval isMetaTRUE,0.0083814,9
-naiveageMatch avg for meta,0.66,9
-naiveageMatch avg lo for meta,0.38,9
-naiveageMatch avg hi for meta,0.94,9
-naiveageMatch avg pval for meta,3e-04,9
+naiveageMatch hi X.Intercept.,0.37,9
+naiveageMatch hi isMetaTRUE,0.91,9
+naiveageMatch pval X.Intercept.,0.0394729,9
+naiveageMatch pval isMetaTRUE,0.0096542,9
+naiveageMatch avg for meta,0.71,9
+naiveageMatch avg lo for meta,0.33,9
+naiveageMatch avg hi for meta,1.1,9
+naiveageMatch avg pval for meta,3e-03,9
 modageMatch tau,0.5,9
-modageMatch k,66,9
-modageMatch n subj,1347,9
-modageMatch est X.Intercept.,0.33,9
-modageMatch est isMetaTRUE,0.38,9
-modageMatch est mean_agec_mos,0.08,9
-modageMatch est test_langb.nonnative,-0.27,9
-modageMatch est test_langc.artificial,-0.48,9
-modageMatch est methodb.hpp,-0.27,9
-modageMatch est methodc.other,0.56,9
-modageMatch lo X.Intercept.,-0.04,9
-modageMatch lo isMetaTRUE,0.01,9
-modageMatch lo mean_agec_mos,-0.02,9
-modageMatch lo test_langb.nonnative,-0.71,9
-modageMatch lo test_langc.artificial,-2.07,9
-modageMatch lo methodb.hpp,-1.58,9
-modageMatch lo methodc.other,-0.91,9
-modageMatch hi X.Intercept.,0.71,9
-modageMatch hi isMetaTRUE,0.74,9
-modageMatch hi mean_agec_mos,0.19,9
-modageMatch hi test_langb.nonnative,0.18,9
-modageMatch hi test_langc.artificial,1.11,9
-modageMatch hi methodb.hpp,1.04,9
-modageMatch hi methodc.other,2.03,9
-modageMatch pval X.Intercept.,0.075098,9
-modageMatch pval isMetaTRUE,0.043138,9
-modageMatch pval mean_agec_mos,0.097249,9
-modageMatch pval test_langb.nonnative,0.186110,9
-modageMatch pval test_langc.artificial,0.344028,9
-modageMatch pval methodb.hpp,0.620084,9
-modageMatch pval methodc.other,0.286290,9
-modageMatch avg for meta,0.71,9
-modageMatch avg lo for meta,0.4,9
-modageMatch avg hi for meta,1.02,9
-modageMatch avg pval for meta,2e-03,9
+modageMatch k,57,9
+modageMatch n subj,1178,9
+modageMatch est X.Intercept.,0.4,9
+modageMatch est isMetaTRUE,0.35,9
+modageMatch est mean_agec_mos,0.11,9
+modageMatch est test_langb.nonnative,-0.22,9
+modageMatch est test_langc.artificial,-0.43,9
+modageMatch est methodb.hpp,-0.21,9
+modageMatch est methodc.other,0.6,9
+modageMatch lo X.Intercept.,0.01,9
+modageMatch lo isMetaTRUE,-0.05,9
+modageMatch lo mean_agec_mos,-0.04,9
+modageMatch lo test_langb.nonnative,-0.57,9
+modageMatch lo test_langc.artificial,-1.91,9
+modageMatch lo methodb.hpp,-1.34,9
+modageMatch lo methodc.other,-0.8,9
+modageMatch hi X.Intercept.,0.78,9
+modageMatch hi isMetaTRUE,0.75,9
+modageMatch hi mean_agec_mos,0.26,9
+modageMatch hi test_langb.nonnative,0.14,9
+modageMatch hi test_langc.artificial,1.06,9
+modageMatch hi methodb.hpp,0.92,9
+modageMatch hi methodc.other,2,9
+modageMatch pval X.Intercept.,0.043271,9
+modageMatch pval isMetaTRUE,0.077641,9
+modageMatch pval mean_agec_mos,0.124751,9
+modageMatch pval test_langb.nonnative,0.188750,9
+modageMatch pval test_langc.artificial,0.363983,9
+modageMatch pval methodb.hpp,0.661939,9
+modageMatch pval methodc.other,0.244965,9
+modageMatch avg for meta,0.75,9
+modageMatch avg lo for meta,0.34,9
+modageMatch avg hi for meta,1.16,9
+modageMatch avg pval for meta,6e-03,9
 k between-S studies,10,9
 Reps subset naiveWithinS tau,0.11,9
-Reps subset naiveWithinS k,104,9
-Reps subset naiveWithinS n subj,2139,9
-Reps subset naiveWithinS est X.Intercept.,0.35,9
-Reps subset naiveWithinS lo X.Intercept.,0.28,9
-Reps subset naiveWithinS hi X.Intercept.,0.43,9
+Reps subset naiveWithinS k,102,9
+Reps subset naiveWithinS n subj,2004,9
+Reps subset naiveWithinS est X.Intercept.,0.34,9
+Reps subset naiveWithinS lo X.Intercept.,0.27,9
+Reps subset naiveWithinS hi X.Intercept.,0.42,9
 Reps subset naiveWithinS pval X.Intercept.,< 0.0001,9
 Meta subset naiveWithinS tau,0.56,9
 Meta subset naiveWithinS k,41,9
@@ -342,53 +483,53 @@ Meta subset naiveWithinS lo X.Intercept.,0.37,9
 Meta subset naiveWithinS hi X.Intercept.,1.07,9
 Meta subset naiveWithinS pval X.Intercept.,0.001186,9
 naiveWithinS tau,0.33,9
-naiveWithinS k,145,9
-naiveWithinS n subj,2844,9
-naiveWithinS est X.Intercept.,0.35,9
-naiveWithinS est isMetaTRUE,0.32,9
-naiveWithinS lo X.Intercept.,0.28,9
-naiveWithinS lo isMetaTRUE,0.01,9
-naiveWithinS hi X.Intercept.,0.43,9
-naiveWithinS hi isMetaTRUE,0.64,9
+naiveWithinS k,143,9
+naiveWithinS n subj,2709,9
+naiveWithinS est X.Intercept.,0.34,9
+naiveWithinS est isMetaTRUE,0.33,9
+naiveWithinS lo X.Intercept.,0.27,9
+naiveWithinS lo isMetaTRUE,0.02,9
+naiveWithinS hi X.Intercept.,0.42,9
+naiveWithinS hi isMetaTRUE,0.65,9
 naiveWithinS pval X.Intercept.,< 0.0001,9
-naiveWithinS pval isMetaTRUE,0.045016,9
+naiveWithinS pval isMetaTRUE,0.04002,9
 naiveWithinS avg for meta,0.68,9
 naiveWithinS avg lo for meta,0.35,9
-naiveWithinS avg hi for meta,1,9
+naiveWithinS avg hi for meta,1.01,9
 naiveWithinS avg pval for meta,1e-03,9
 modWithinS tau,0.3,9
-modWithinS k,145,9
-modWithinS n subj,2844,9
+modWithinS k,143,9
+modWithinS n subj,2709,9
 modWithinS est X.Intercept.,0.11,9
 modWithinS est isMetaTRUE,0.51,9
 modWithinS est mean_agec_mos,0.05,9
-modWithinS est test_langb.nonnative,-0.09,9
+modWithinS est test_langb.nonnative,-0.1,9
 modWithinS est test_langc.artificial,-0.46,9
 modWithinS est methodb.hpp,0.14,9
-modWithinS est methodc.other,0.56,9
-modWithinS lo X.Intercept.,-0.1,9
+modWithinS est methodc.other,0.57,9
+modWithinS lo X.Intercept.,-0.11,9
 modWithinS lo isMetaTRUE,-0.02,9
 modWithinS lo mean_agec_mos,0.02,9
 modWithinS lo test_langb.nonnative,-0.2,9
-modWithinS lo test_langc.artificial,-2.37,9
-modWithinS lo methodb.hpp,-0.2,9
-modWithinS lo methodc.other,-1.21,9
+modWithinS lo test_langc.artificial,-2.38,9
+modWithinS lo methodb.hpp,-0.21,9
+modWithinS lo methodc.other,-1.2,9
 modWithinS hi X.Intercept.,0.33,9
 modWithinS hi isMetaTRUE,1.03,9
 modWithinS hi mean_agec_mos,0.08,9
-modWithinS hi test_langb.nonnative,0.02,9
-modWithinS hi test_langc.artificial,1.46,9
-modWithinS hi methodb.hpp,0.49,9
+modWithinS hi test_langb.nonnative,0,9
+modWithinS hi test_langc.artificial,1.45,9
+modWithinS hi methodb.hpp,0.5,9
 modWithinS hi methodc.other,2.33,9
-modWithinS pval X.Intercept.,0.29325320,9
-modWithinS pval isMetaTRUE,0.05712042,9
-modWithinS pval mean_agec_mos,0.00041111,9
-modWithinS pval test_langb.nonnative,0.10426829,9
-modWithinS pval test_langc.artificial,0.39663222,9
-modWithinS pval methodb.hpp,0.40549128,9
-modWithinS pval methodc.other,0.32581187,9
+modWithinS pval X.Intercept.,0.29593942,9
+modWithinS pval isMetaTRUE,0.05733546,9
+modWithinS pval mean_agec_mos,0.00041387,9
+modWithinS pval test_langb.nonnative,0.05827907,9
+modWithinS pval test_langc.artificial,0.39450099,9
+modWithinS pval methodb.hpp,0.42411206,9
+modWithinS pval methodc.other,0.32435490,9
 modWithinS avg for meta,0.62,9
-modWithinS avg lo for meta,0.23,9
+modWithinS avg lo for meta,0.24,9
 modWithinS avg hi for meta,1.01,9
 modWithinS avg pval for meta,6e-03,9
 Perc reportedSignif when pvalSignif was 0,33,9
@@ -397,8 +538,8 @@ Worst reportedSignif mu ,0.15,9
 Worst reportedSignif mu lo,-0.19,9
 Worst reportedSignif mu hi,0.49,9
 Worst reportedSignif mu pval,0.322,9
-sval est to reps,4.86,9
-sval CI to reps,1.1024102832437,9
+sval est to reps,5.32,9
+sval CI to reps,1.16174203355803,9
 Corr MA reportedSignif est,0.38,9
 Corr MA reportedSignif lo,0.02,9
 Corr MA reportedSignif hi,0.75,9
