@@ -649,7 +649,7 @@ mod1Int_age_restricted <- robu(yi ~ isMeta_c+mean_agec_mos*isMeta_c+test_lang_c*
 mod1Int_age_restricted
 
 ## moderator interaction model
-mod1Int_results <- save_interaction_model_results(mod1Int_age_restricted, "mod1Int_age_restricted",d_age_restricted,digits)
+mod1Int_age_restricted_results <- save_interaction_model_results(mod1Int_age_restricted, "mod1Int_age_restricted",d_age_restricted,digits)
 
 # 2. DENSITY PLOT OF META-ANALYSIS VS. REPLICATION CALIBRATED ESTIMATES ------------------------------------------------------------------
 
