@@ -653,6 +653,57 @@ mod1Int_age_restricted
 ## moderator interaction model
 mod1Int_age_restricted_results <- save_interaction_model_results(mod1Int_age_restricted, "mod1Int_age_restricted",d_age_restricted,digits)
 
+#plot results with restricted age range
+p1 <- ggplot(d_age_restricted,aes(mean_age/30.44,yi,color=studyTypePretty))+
+  geom_pointrange(aes(size=1/vi,ymin=lo,ymax=hi),position=position_jitter(width=0.3),fatten=1,alpha=0.6)+
+  geom_smooth(method="lm",color="black",size=1.5)+
+  #geom_smooth(color="#d01c8b",se=FALSE,linetype="dashed")+
+  scale_color_brewer(type="qual",palette="Set1",direction=-1)+
+  facet_wrap(~studyTypePretty)+
+  scale_x_continuous(breaks=seq(0,30,3))+
+  theme_bw()+
+  theme(legend.position="none",
+        strip.text = element_text(size=16),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=16))+
+  ylab("Effect Size")+
+  xlab("Mean Age (in months)")
+
+p2 <- ggplot(d_age_restricted,aes(method,yi,color=studyTypePretty))+
+  geom_hline(yintercept=0,linetype="dashed",color="black")+
+  geom_point(aes(size=1/vi),position=position_jitter(width=0.05),fatten=1,alpha=0.3)+
+  geom_half_violin(position = position_nudge(x = -.15, y = 0), width=0.5,adjust=1.5,trim = FALSE,side="l")+
+  geom_half_boxplot(position = position_nudge(x = .15, y = 0), center=TRUE,width=0.5,side="r",errorbar.draw = FALSE, outlier.shape=NA)+
+  scale_color_brewer(type="qual",palette="Set1",direction=-1)+
+  scale_x_discrete(breaks=c("a.cf","b.hpp","c.other"),labels=c("Central\nFixation","HPP","Other"))+
+  facet_wrap(~studyTypePretty)+
+  theme_bw()+
+  theme(legend.position="none",
+        strip.text = element_text(size=16),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=16))+
+  ylab("Effect Size")+
+  xlab("Method")
+
+p3 <- ggplot(d_age_restricted,aes(test_lang,yi,color=studyTypePretty))+
+  geom_hline(yintercept=0,linetype="dashed",color="black")+
+  geom_point(aes(size=1/vi),position=position_jitter(width=0.05),fatten=1,alpha=0.3)+
+  geom_half_violin(position = position_nudge(x = -.15, y = 0), width=0.6,adjust=1.5,trim = FALSE,side="l")+
+  geom_half_boxplot(position = position_nudge(x = .15, y = 0), center=TRUE,width=0.6,side="r",errorbar.draw = FALSE, outlier.shape=NA)+
+  scale_color_brewer(type="qual",palette="Set1",direction=-1)+
+  scale_x_discrete(breaks=c("b.nonnative","a.native","c.artificial"),labels=c("Non-native","Native","Other"))+
+  facet_wrap(~studyTypePretty)+
+  theme_bw()+
+  theme(legend.position="none",
+        strip.text = element_text(size=16),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=16))+
+  ylab("Effect Size")+
+  xlab("Test Language")
+p_final <- p1/(p2+p3) + plot_annotation(tag_levels = 'A')+theme(plot.tag = element_text(size = 20))
+
+my_ggsave(name="interaction_overview_restricted_age.pdf",width=12,height=9)
+
 # 2. DENSITY PLOT OF META-ANALYSIS VS. REPLICATION CALIBRATED ESTIMATES ------------------------------------------------------------------
 
 
@@ -691,6 +742,60 @@ d$calibCond[ d$isMeta == TRUE ] = conditional_calib_ests(cond.MA.only)$calib.shi
 # ***important: MB heterogeneity estimate is 0 after conditioning on mods
 #  but MA heterogeneity estimate actually slightly increases
 
+#MZ: exploring alternate centering options
+# dma <- dma %>%
+#   mutate(
+#     method_c_b1 = case_when(
+#       method == "c.other" ~ 2/3,
+#       method == "b.hpp" ~ -1/3,
+#       method == "a.cf" ~ -1/3
+#     ),
+#     method_c_b2 = case_when(
+#       method == "c.other" ~ 0,
+#       method == "b.hpp" ~ 0.5,
+#       method == "a.cf" ~ -0.5
+#     ),
+#     test_lang_c_b1 = case_when(
+#       test_lang == "c.artificial" ~ 2/3,
+#       test_lang == "b.nonnative" ~ -1/3,
+#       test_lang == "a.native" ~ -1/3
+#     ),
+#     test_lang_c_b2 = case_when(
+#       test_lang == "c.artificial" ~ 0,
+#       test_lang == "b.nonnative" ~ 0.5,
+#       test_lang == "a.native" ~ -0.5
+#     )
+#   )
+# 
+# dr <- dr %>%
+#   mutate(
+#     method_c = case_when(
+#       method == "b.hpp" ~ 0.5,
+#       method == "a.cf" ~ -0.5
+#     ),
+#     test_lang_c = case_when(
+#       test_lang == "b.nonnative" ~ 0.5,
+#       test_lang == "a.native" ~ -0.5
+#     )
+#     
+#   )
+# 
+# ( cond.MA.only = fit_subset_meta( .dat = dma,
+#                                   .mods = c(modsS[ !(modsS %in% c("isMeta","method","test_lang"))],"method_c_b1","method_c_b2","test_lang_c_b1","test_lang_c_b2"),
+#                                   .label = "MA subset mods centered method" ) )
+# 
+# 
+# ( cond.reps.only = fit_subset_meta( .dat = dr,
+#                                     .mods = c(modsS[ !(modsS %in% c("isMeta","method","test_lang"))],"method_c","test_lang_c"),
+#                                     .label = "Reps subset mods centered method" ) )
+#
+# general model code for exploring effects of different centering decisions
+# robu( yi ~ method+test_lang+mean_agec_mos, 
+#       data = filter(d,isRep==0), 
+#       studynum = as.factor(study_id),
+#       var.eff.size = vi,
+#       modelweights = "HIER",
+#       small = TRUE)
 
 if ( redo.plots == TRUE ) {
   
@@ -1845,6 +1950,50 @@ if ( redo.plots == TRUE ) {
   
   
 }
+
+## Overview tables
+
+ma_effect_summary <- dma %>%
+  ungroup() %>%
+  mutate(`Test Language` = factor(test_lang, labels = c("Native", "Non-Native", "Artificial"))) %>%
+  mutate(`Native Language` = str_to_title(native_lang)) %>%
+  mutate(Method = factor(method, labels = c("Central fixation", "HPP", "Other"))) %>%
+  mutate(`Mean Age (mos.)`=round(mean_age/30.44,1)) %>%
+  rename(Study=short_cite) %>%
+  mutate(N = round(n,0)) %>%
+  mutate(`CI` = format_CI(lo,hi)) %>%
+  rename(Estimate = yi) %>%
+  select(Study,N,`Mean Age (mos.)`,`Test Language`,Method,Estimate,CI) %>%
+  arrange(Study)
+
+setwd(results.dir)
+setwd("tables_to_prettify")
+write.csv( ma_effect_summary, "ma_es_overview.csv",row.names = FALSE)
+
+#point estimates and 95% confidence intervals in the MA 
+# TeX for paper
+print( xtable(ma_effect_summary,digits=c(0,0,0,1,0,0,2,0)), include.rownames = FALSE)
+
+mlr_effect_summary <- dr %>%
+  ungroup() %>%
+  mutate(`Test Language` = factor(test_lang, labels = c("Native", "Non-Native"))) %>%
+  mutate(`Native Language` = str_to_title(native_lang)) %>%
+  mutate(Method = factor(method, labels = c("Central fixation", "HPP"))) %>%
+  mutate(`Mean Age (mos.)`=round(mean_age/30.44,1)) %>%
+  rename(`Lab ID`=study_id) %>%
+  mutate(N = round(n,0)) %>%
+  mutate(`CI` = format_CI(lo,hi)) %>%
+  rename(Estimate = yi) %>%
+  select(`Lab ID`,N,`Mean Age (mos.)`,`Test Language`,Method,Estimate,CI)%>%
+  arrange(`Lab ID`)
+
+setwd(results.dir)
+setwd("tables_to_prettify")
+write.csv( ma_effect_summary, "mlr_es_overview.csv",row.names = FALSE)
+
+#point estimates and 95% confidence intervals in the MA 
+# TeX for paper
+print( xtable(mlr_effect_summary,digits=c(0,0,0,1,0,0,2,0)), include.rownames = FALSE)
 
 
 
