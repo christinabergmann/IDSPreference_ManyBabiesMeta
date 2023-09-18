@@ -790,8 +790,29 @@ d$calibCond[ d$isMeta == TRUE ] = conditional_calib_ests(cond.MA.only)$calib.shi
 #                                     .label = "Reps subset mods centered method" ) )
 #
 # general model code for exploring effects of different centering decisions
-# robu( yi ~ method+test_lang+mean_agec_mos, 
-#       data = filter(d,isRep==0), 
+# robu( yi ~ method+test_lang+mean_agec_mos,
+#       data = filter(d,isRep==0),
+#       studynum = as.factor(study_id),
+#       var.eff.size = vi,
+#       modelweights = "HIER",
+#       small = TRUE)
+# 
+# d <- d %>%
+#   mutate(
+#     method_hpp = case_when(
+#       method == "a.cf" ~ "b.cf",
+#       method == "b.hpp" ~ "a.hpp",
+#       TRUE ~ method
+#     ),
+#     test_lang_nonnative = case_when(
+#       test_lang=="a.native" ~ "b.native",
+#       test_lang=="b.nonnative" ~ "a.nonnative",
+#       TRUE ~ test_lang
+#     )
+#   )
+# 
+# robu( yi ~ isMeta+method_hpp+test_lang+mean_agec_mos,
+#       data = d,
 #       studynum = as.factor(study_id),
 #       var.eff.size = vi,
 #       modelweights = "HIER",
