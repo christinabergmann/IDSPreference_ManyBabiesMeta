@@ -1,6 +1,6 @@
 model,stat,est,lo,hi,unique
 naive,AvgM,0.34,0.22,0.46,naive_AvgM
-naive,AvgR,0.34,0.27,0.46,naive_AvgR
+naive,AvgR,0.34,0.27,0.42,naive_AvgR
 naive,AvgDiff,-0.01,-0.14,0.13,naive_AvgDiff
 naive,Perc0M,86,83,90,naive_Perc0M
 naive,Perc0R,100,94,100,naive_Perc0R
