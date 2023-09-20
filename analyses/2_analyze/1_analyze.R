@@ -1090,7 +1090,7 @@ res$hi[ is.na(res$lo) ] = NA
 # # model-based ones are consistently a lot wider, actually
 # res[ res$model == "naive" & res$stat == "AvgM", c("lo", "hi") ]; c( naiveRes$est.ma.lo, naiveRes$est.ma.hi )
 # 
-# res[ res$model == "naive" & res$stat == "AvgR", c("lo", "hi") ]; c( naiveRes$est.rep.lo, naiveRes$est.ma.hi )
+# res[ res$model == "naive" & res$stat == "AvgR", c("lo", "hi") ]; c( naiveRes$est.rep.lo, naiveRes$est.rep.hi )
 # 
 # res[ res$model == "naive" & res$stat == "AvgDiff", c("lo", "hi") ]; c( naiveRes$avgDiffLo, naiveRes$avgDiffHi )
 # 
@@ -1114,13 +1114,13 @@ res$hi[ is.na(res$lo) ] = NA
 # for consistency with earlier table showing meta-regression estimates
 res[ res$model == "naive" & res$stat == "AvgM", c("lo", "hi") ] = c( naiveRes$est.ma.lo, naiveRes$est.ma.hi )
 
-res[ res$model == "naive" & res$stat == "AvgR", c("lo", "hi") ] = c( naiveRes$est.rep.lo, naiveRes$est.ma.hi )
+res[ res$model == "naive" & res$stat == "AvgR", c("lo", "hi") ] = c( naiveRes$est.rep.lo, naiveRes$est.rep.hi )
 
 res[ res$model == "naive" & res$stat == "AvgDiff", c("lo", "hi") ] = c( naiveRes$avgDiffLo, naiveRes$avgDiffHi )
 
 res[ res$model == "mod" & res$stat == "AvgM", c("lo", "hi") ] = c( mod1Res$est.ma.lo, mod1Res$est.ma.hi )
 
-res[ res$model == "mod" & res$stat == "AvgR", c("lo", "hi") ] = c( mod1Res$est.rep.lo, mod1Res$est.ma.hi )
+res[ res$model == "mod" & res$stat == "AvgR", c("lo", "hi") ] = c( mod1Res$est.rep.lo, mod1Res$est.rep.hi )
 
 res[ res$model == "mod" & res$stat == "AvgDiff", c("lo", "hi") ] = c( mod1Res$avgDiffLo, mod1Res$avgDiffHi )
 
