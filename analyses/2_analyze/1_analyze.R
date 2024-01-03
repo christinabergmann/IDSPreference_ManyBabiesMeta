@@ -85,7 +85,6 @@ if (ma.version == "augmented_ma_extended") {
 }
 
 
-
 if(!dir.exists(results.dir)){
   dir.create(results.dir)
 }
@@ -1880,7 +1879,6 @@ if ( redo.plots == TRUE ) {
                   rel.wt = 5 )
   }
   
-  
   # for aes on plot
   dp$is.pooled = grepl("Pooled", dp$label)
   if ( color.subclasses == TRUE ) dp$is.pooled[ dp$unique %in% dmt$unique ] = 2
@@ -1913,6 +1911,9 @@ if ( redo.plots == TRUE ) {
   max(d$hi)
   xBreaks = seq( -2.5, 5, 0.5)
   
+  vline_data <- dp %>%
+    filter(is.pooled == TRUE)
+  
   p = ggplot( data = dp, aes( x = yi, 
                               y = label, 
                               size = rel.wt,
@@ -1936,6 +1937,8 @@ if ( redo.plots == TRUE ) {
     ylab("") +
     
     geom_vline(xintercept = 0, lty = 2) +
+  
+    geom_vline(data = vline_data, mapping = aes(xintercept = yi), lty = 2, color = "#d95f02") +
     
     guides(size = "none") +
     
@@ -1950,7 +1953,6 @@ if ( redo.plots == TRUE ) {
     scale_x_continuous(limits = c(min(xBreaks), max(xBreaks)),
                        breaks = xBreaks) +
     
-    
     facet_grid(sourcePretty ~ .,
                scales = "free",
                space = "free_y") +  # allows y-axes to drop levels from other groups
@@ -1963,13 +1965,10 @@ if ( redo.plots == TRUE ) {
   
   p
   
-  
-  
   my_ggsave( name = "basic_forest.pdf",
-             width = 14,
+             width = 20,
              height = 28 )
-  
-  
+  #ggsave(plot = p, file = "basic_forest.png", width = 20, height = 28)
 }
 
 ## Overview tables
