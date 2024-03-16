@@ -1959,7 +1959,7 @@ if ( redo.plots == TRUE ) {
     
     theme_classic() + 
     theme(axis.text.x = element_text(size = 18),
-          axis.text.y = element_text(size = 14),
+          axis.text.y = element_text(size = 10),
           axis.title.x = element_text(size = 20),
           strip.text.y = element_text(size = 20))
   
@@ -1967,7 +1967,7 @@ if ( redo.plots == TRUE ) {
   
   my_ggsave( name = "basic_forest.pdf",
              width = 20,
-             height = 28 )
+             height = 30 )
   #ggsave(plot = p, file = "basic_forest.png", width = 20, height = 28)
 }
 
